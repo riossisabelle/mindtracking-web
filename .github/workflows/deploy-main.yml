@@ -76,13 +76,8 @@ jobs:
         run: |
           # Executa o container em modo detached (background)
           docker run -d \
-            # Reinicia automaticamente se o container parar
             --restart always \
-            # Nome do container para facilitar gerenciamento
             --name mindtracking-web \
-            # Conecta o container à rede Docker criada
             --network mindtrack-net \
-            # Mapeia a porta 80 do host para a porta 80 do container
             -p 80:80 \
-            # Imagem Docker a ser executada
             mindtrack/mindtracking-web:latest
