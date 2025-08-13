@@ -1,0 +1,74 @@
+# ========================================
+# DEPENDÊNCIAS E LOGS - Excluídos para otimizar build
+# ========================================
+
+# Pasta com dependências instaladas localmente
+# Serão reinstaladas dentro do container
+node_modules
+
+# Logs de debug e erro dos gerenciadores de pacotes
+# Não são necessários no container
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ========================================
+# BUILD ARTIFACTS - Gerados durante build local
+# ========================================
+
+# Pasta com build do Next.js (será gerada no container)
+.next
+# Pasta com build estático (será gerada no container)
+out
+
+# ========================================
+# ARQUIVOS DE AMBIENTE - Segurança e configuração
+# ========================================
+
+# Arquivo de variáveis de ambiente (contém secrets)
+.env
+# Todos os arquivos .env (desenvolvimento, teste, etc.)
+.env.*
+# Mantém apenas o arquivo de exemplo para documentação
+!.env.example
+
+# ========================================
+# ARQUIVOS DO SISTEMA E IDE - Específicos do ambiente local
+# ========================================
+
+# Arquivos do macOS (metadados do Finder)
+.DS_Store
+# Arquivos temporários do editor vim
+*.swp
+# Arquivos temporários do SWC (compilador)
+*.swc
+# Configurações do VS Code
+.vscode
+# Configurações do IntelliJ/WebStorm
+.idea
+
+# ========================================
+# TESTES E COBERTURA - Não necessários em produção
+# ========================================
+
+# Relatórios de cobertura de testes
+coverage
+# Arquivos de cobertura no formato LCOV
+*.lcov
+
+# ========================================
+# ARQUIVOS DOCKER - Evita recursão e redundância
+# ========================================
+
+# Todos os Dockerfiles (incluindo variações)
+Dockerfile*
+# O próprio arquivo .dockerignore
+.dockerignore
+
+# ========================================
+# ARQUIVOS LOCAIS - Configurações específicas do ambiente
+# ========================================
+
+# Arquivos de configuração local
+*.local
