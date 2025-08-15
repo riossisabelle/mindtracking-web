@@ -1,80 +1,47 @@
-# Nome do workflow que aparece na interface do GitHub Actions
 name: Build and Deploy MindTrack Web
 
-# Define quando o workflow será executado
 on:
-  # Executa automaticamente quando há push na branch main
   push:
     branches:
       - main
-  # Permite execução manual via interface do GitHub
   workflow_dispatch:
 
-# Define os jobs que serão executados
 jobs:
-  # Job responsável por construir e fazer push da imagem Docker
   build:
-    # Executa no runner Ubuntu mais recente do GitHub
     runs-on: ubuntu-latest
-    # Define os passos que serão executados
     steps:
-      # Passo 1: Faz checkout do código fonte do repositório
       - name: Checkout source
-        # Usa a action oficial do GitHub para checkout
         uses: actions/checkout@v3
 
-      # Passo 2: Faz login no Docker Hub para poder fazer push das imagens
       - name: Login to Docker Hub
-        # Usa secrets do GitHub para autenticação segura
-        # DOCKER_USERNAME e DOCKER_PASSWORD devem ser configurados nos secrets do repositório
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # Passo 3: Constrói a imagem Docker usando o Dockerfile local
       - name: Build Docker image
-        # Tag da imagem: mindtrack/mindtracking-web:latest
-        # O ponto final indica que o contexto é o diretório atual
         run: docker build -t mindtrack/mindtracking-web:latest .
 
-      # Passo 4: Faz push da imagem construída para o Docker Hub
       - name: Push Docker image
-        # Disponibiliza a imagem para ser baixada no servidor de deploy
         run: docker push mindtrack/mindtracking-web:latest
 
-  # Job responsável por fazer o deploy no servidor
   deploy:
-    # Aguarda a conclusão do job 'build' antes de executar
     needs: build
-    # Executa no runner self-hosted (servidor próprio)
     runs-on: self-hosted
-    # Define os passos de deploy
     steps:
-      # Passo 1: Cria a rede Docker se ela não existir
       - name: Create Docker network (if not exists)
         run: |
-          # Verifica se a rede 'mindtrack-net' existe
           if ! docker network inspect mindtrack-net &> /dev/null; then
-            # Se não existir, cria a rede para comunicação entre containers
             docker network create mindtrack-net;
           fi
 
-      # Passo 2: Para e remove o container anterior se estiver rodando
       - name: Stop and remove old container (if running)
         run: |
-          # Para o container 'mindtracking-web' se estiver rodando
-          # || true garante que não falhe se o container não existir
           docker stop mindtracking-web || true
-          # Remove o container parado
           docker rm mindtracking-web || true
 
-      # Passo 3: Baixa a versão mais recente da imagem do Docker Hub
       - name: Pull latest frontend image
-        # Atualiza a imagem local com a versão mais recente
         run: docker pull mindtrack/mindtracking-web:latest
 
-      # Passo 4: Executa o novo container com as configurações de produção
       - name: Run frontend container
         run: |
-          # Executa o container em modo detached (background)
           docker run -d \
             --restart always \
             --name mindtracking-web \
