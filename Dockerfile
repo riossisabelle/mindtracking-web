@@ -16,10 +16,7 @@ RUN npm ci
 # Copia o restante do código
 COPY . .
 
-# Se houver next.config.ts, precisamos do TypeScript aqui
-RUN npm install typescript @types/node --save-dev
-
-# Build
+# Build (TypeScript só é usado no build)
 RUN npx tsc --noEmit && mkdir -p public && npm run build
 
 
@@ -41,19 +38,15 @@ COPY package*.json ./
 # Instala apenas dependências de produção
 RUN npm ci --omit=dev
 
-# Caso tenha next.config.ts, precisamos garantir que TypeScript está disponível
-RUN npm install typescript @types/node
-
 # Ajusta permissões
 RUN chown -R node:node /app
 
 # Copia artefatos de build do estágio anterior
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.ts ./  
-COPY --from=builder /app/tsconfig.json ./   
+COPY --from=builder /app/next.config.js ./   
 
-# Instala libcap para permitir porta 80 sem root
+# Instala libcap para permitir uso da porta 80 sem root
 RUN apk add --no-cache libcap \
     && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
 
