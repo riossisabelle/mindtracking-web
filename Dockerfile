@@ -16,7 +16,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npx tsc --noEmit && npm run build
+RUN npx tsc --noEmit && mkdir -p public && npm run build
 
 
 # ESTÁGIO 2: RUNNER - Imagem final de produção
