@@ -1,8 +1,8 @@
-# syntax=docker/dockerfile:1
 
-# ========================================
+
+
 # ESTÁGIO 1: BUILDER - Construção da aplicação
-# ========================================
+
 
 FROM node:20-alpine AS builder
 
@@ -16,12 +16,11 @@ RUN npm ci
 
 COPY . .
 
-RUN mkdir -p public \
-    && npm run build
+RUN npx tsc --noEmit && npm run build
 
-# ========================================
+
 # ESTÁGIO 2: RUNNER - Imagem final de produção
-# ========================================
+
 
 FROM node:20-alpine AS runner
 
@@ -30,6 +29,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=80
 ENV HOSTNAME=0.0.0.0
+ENV NXT_SHARP=true
 
 COPY package*.json ./
 
