@@ -55,6 +55,9 @@ COPY package*.json ./
 # Reduz significativamente o tamanho da imagem final
 RUN npm ci --omit=dev
 
+# Instala o TypeScript para permitir leitura do next.config.ts em produção
+RUN npm install --save-dev typescript
+
 # Copia apenas os artefatos necessários do estágio builder
 # .next: pasta com o build otimizado da aplicação Next.js
 COPY --from=builder /app/.next ./.next
