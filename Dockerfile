@@ -38,9 +38,8 @@ RUN npm ci --omit=dev
 
 # Copia artefatos do build
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.ts ./   
-COPY --from=builder /app/tsconfig.json ./    
+COPY --from=builder /app/next.config.ts ./
+COPY --from=builder /app/tsconfig.json ./
 
 # Ajusta permissões
 RUN chown -R node:node /app
