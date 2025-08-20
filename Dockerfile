@@ -16,8 +16,8 @@ RUN npm ci
 # Copia o restante do código
 COPY . .
 
-# Build (TypeScript só é usado no build)
-RUN npx tsc --noEmit && mkdir -p public && npm run build
+# Compila TypeScript (inclui next.config.ts)
+RUN npx tsc && mkdir -p public && npm run build
 
 
 # =========================
@@ -44,7 +44,7 @@ RUN chown -R node:node /app
 # Copia artefatos de build do estágio anterior
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./   
+COPY --from=builder /app/next.config.js ./   # <-- agora vai existir
 
 # Instala libcap para permitir uso da porta 80 sem root
 RUN apk add --no-cache libcap \
@@ -53,7 +53,7 @@ RUN apk add --no-cache libcap \
 # Troca para usuário não-root
 USER node
 
-# Expõe porta
+# Expor porta
 EXPOSE 80
 
 # Comando para rodar
