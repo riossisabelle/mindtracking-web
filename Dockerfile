@@ -5,6 +5,7 @@
 ############################
 FROM node:20-alpine AS deps
 WORKDIR /app
+
 COPY package.json package-lock.json* ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
@@ -15,8 +16,11 @@ RUN --mount=type=cache,target=/root/.npm \
 FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Garante que o TS seja usado no build
 RUN npm run build
 
 ############################
@@ -29,10 +33,13 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
+# Copia apenas os arquivos necessários para rodar standalone
+COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
 USER nextjs
 EXPOSE 3000
+
+# O entrypoint correto é o server.js dentro do standalone
 CMD ["node", "server.js"]
