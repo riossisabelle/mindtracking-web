@@ -7,9 +7,9 @@ export default function Header() {
   const { darkMode, setDarkMode } = useTheme(); // usa o contexto global
 
   return (
-    <header className="w-full h-[100px] flex items-center transition-colors duration-500">
+    <header className="w-full h-[100px] flex items-center transition-colors duration-500 bg-transparent">
       {/* Container centralizado com margem lateral de 150px */}
-      <div className="flex w-full max-w-7xl mx-auto items-center justify-center sm:justify-between px-[150px]">
+      <div className="flex w-full max-w-7xl mx-auto items-center justify-center sm:justify-between px-6 sm:px-[150px]">
         
         {/* Logo + Texto */}
         <div className="flex items-center gap-3">
@@ -27,7 +27,7 @@ export default function Header() {
           </span>
         </div>
 
-        {/* Botão aparece já no sm (tablet) */}
+        {/* Botão só aparece em tablet/desktop */}
         <div className="hidden sm:flex">
           <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         </div>
