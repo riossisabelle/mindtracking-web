@@ -51,7 +51,7 @@ export default function Footer() {
   <h2 className="font-semibold text-lg whitespace-nowrap">
     Nossas Redes & Comunidades
   </h2>
-  <div className="flex space-x-4">
+  <div className="flex space-x-18">
     <a
       href="#"
       className="w-9 h-9 flex items-center justify-center rounded-full 
