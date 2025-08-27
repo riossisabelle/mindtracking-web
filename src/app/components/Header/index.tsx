@@ -7,13 +7,9 @@ export default function Header() {
   const { darkMode, setDarkMode } = useTheme(); // usa o contexto global
 
   return (
-    <header
-      className={`w-full h-[100px] flex items-center transition-colors duration-500
-      ${darkMode ? "bg-[#0C1324]" : "bg-gray-100"}
-      px-6 sm:px-10 lg:px-[150px]`}
-    >
-      {/* Container geral: muda comportamento no mobile */}
-      <div className="flex w-full items-center justify-center sm:justify-between">
+    <header className="w-full h-[100px] flex items-center transition-colors duration-500">
+      {/* Container centralizado com margem lateral de 150px */}
+      <div className="flex w-full max-w-7xl mx-auto items-center justify-center sm:justify-between px-[150px]">
         
         {/* Logo + Texto */}
         <div className="flex items-center gap-3">
