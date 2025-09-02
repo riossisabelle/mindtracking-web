@@ -26,7 +26,7 @@ export function SidebarItem({ href, icon, label, isOpen, theme, className, onCli
         {icon}
       </span>
       {isOpen && (
-        <span className={`font-semibold text-[17px] lg:text-[22px] ${className ?? ""} ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+        <span className={`font-semibold text-[17px] md:text-[22px] ${className ?? ""} ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
           {label}
         </span>
       )}

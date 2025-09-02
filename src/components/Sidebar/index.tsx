@@ -61,16 +61,22 @@ export default function Sidebar({
               alt="Logo"
               width={40}
               height={40}
-              className="rounded-full"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full"
             />
-            <h1 className="text-[17px] font-bold">Mindtracking</h1>
+            <h1 className="text-[17px] md:text-[22px] font-bold">Mindtracking</h1>
           </div>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Alternar menu"
             className="cursor-pointer"
           >
-            <Image src="/images/menu.svg" alt="Menu" width={30} height={30} />
+            <Image 
+              src="/images/menu.svg" 
+              alt="Menu" 
+              width={30} 
+              height={30}
+              className="w-8 h-8 md:w-10 md:h-10" 
+            />
           </button>
         </div>
       )}
@@ -200,7 +206,7 @@ export default function Sidebar({
                   height={40}
                   className="rounded-full"
                 />
-                <h2 className="text-[20px] font-bold">Mindtracking</h2>
+                <h2 className="text-[20px] md:text-[24px] font-bold">Mindtracking</h2>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
@@ -212,11 +218,12 @@ export default function Sidebar({
                   alt="Menu"
                   width={32}
                   height={32}
+                  className="w-8 h-8 md:w-10 md:h-10"
                 />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-1 mt-4 text-[17px]">
+            <nav className="flex flex-col gap-1 mt-4 text-[17px] md:text-[22px]">
               {menuItems.map((item, idx) => (
                 <SidebarItem
                   key={idx}
@@ -241,7 +248,7 @@ export default function Sidebar({
               >
                 {theme === "dark" ? <Sun size={24} /> : <Moon size={24} />}
                 <span
-                  className={`font-semibold text-[17px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  className={`font-semibold text-[17px] md:text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 >
                   {theme === "dark" ? "Modo claro" : "Modo escuro"}
                 </span>
@@ -269,7 +276,7 @@ export default function Sidebar({
                     alt="User"
                     width={55}
                     height={55}
-                    className="rounded-full border cursor-pointer"
+                    className="rounded-full border cursor-pointer w-14 h-14 md:w-16 md:h-16"
                   />
                 </Link>
               </div>
