@@ -107,7 +107,7 @@ export default function Sidebar({
               src={
                 theme === "dark"
                   ? "/images/Logo-blue-600-w2.svg"
-                  : "/images/Logo.svg"
+                  : "/images/Logo-blue-600-w2.svg"
               }
               alt="Logo"
               width={49}
