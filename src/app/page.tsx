@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "./contexts/ThemeContext";
 import ForgotPasswordModal from "../components/Auth/Modal1";
 
 export default function Home() {

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import { ThemeProvider } from "../contexts/ThemeContext";
+import Sidebar from "./components/Sidebar";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
