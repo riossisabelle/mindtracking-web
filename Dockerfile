@@ -1,45 +1,67 @@
-# syntax = docker/dockerfile:1.6
-
-############################
-# 1) Instala dependências
-############################
-FROM node:20-alpine AS deps
-WORKDIR /app
-
-COPY package.json package-lock.json* ./
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
-
-############################
-# 2) Build
-############################
+# =========================
+# ESTÁGIO 1: BUILDER
+# =========================
 FROM node:20-alpine AS builder
-WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY --from=deps /app/node_modules ./node_modules
+WORKDIR /app
+
+ENV CI=true
+
+# Copia package.json e package-lock.json
+COPY package*.json ./
+
+# Instala dependências completas
+RUN npm ci
+
+# Copia o restante do código
 COPY . .
 
-# Garante que o TS seja usado no build
-RUN npm run build
+# Se houver next.config.ts, precisamos do TypeScript aqui
+RUN npm install typescript @types/node --save-dev
 
-############################
-# 3) Runner (produção)
-############################
+# Build
+RUN npx tsc --noEmit && mkdir -p public && npm run build
+
+
+# =========================
+# ESTÁGIO 2: RUNNER (produção)
+# =========================
 FROM node:20-alpine AS runner
+
 WORKDIR /app
+
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=80
+ENV HOSTNAME=0.0.0.0
+ENV NXT_SHARP=true
 
-RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+# Copia package.json e package-lock.json
+COPY package*.json ./
 
-# Copia apenas os arquivos necessários para rodar standalone
+# Instala apenas dependências de produção
+RUN npm ci --omit=dev
 
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Caso tenha next.config.ts, precisamos garantir que TypeScript está disponível
+RUN npm install typescript @types/node
 
-USER nextjs
-EXPOSE 3000
+# Ajusta permissões
+RUN chown -R node:node /app
 
-# O entrypoint correto é o server.js dentro do standalone
-CMD ["node", "server.js"]
+# Copia artefatos de build do estágio anterior
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.ts ./  
+COPY --from=builder /app/tsconfig.json ./   
+
+# Instala libcap para permitir porta 80 sem root
+RUN apk add --no-cache libcap \
+    && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
+
+# Troca para usuário não-root
+USER node
+
+# Expõe porta
+EXPOSE 80
+
+# Comando para rodar
+CMD ["npm", "run", "start"]
