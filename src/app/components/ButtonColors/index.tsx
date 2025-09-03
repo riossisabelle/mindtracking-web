@@ -2,13 +2,13 @@
 
 interface Props {
   darkMode: boolean;
-  setDarkMode: (value: boolean) => void;
+  toggleTheme: () => void;
 }
 
-export default function DarkModeToggle({ darkMode, setDarkMode }: Props) {
+export default function DarkModeToggle({ darkMode, toggleTheme }: Props) {
   return (
     <button
-      onClick={() => setDarkMode(!darkMode)}
+      onClick={toggleTheme}
       className="w-17 h-8 flex items-center rounded-full p-1 border-[2.5px] border-blue-600 
                  transition-colors duration-300 mt-4 sm:mt-0 self-center sm:self-auto cursor-pointer"
     >

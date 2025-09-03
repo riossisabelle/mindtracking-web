@@ -1,6 +1,7 @@
 "use client";
 
-import { useTheme } from "../ThemeProvider";
+import { useTheme } from "./../../contexts/ThemeContext";
+import { useState } from "react";
 
 export default function Footer() {
   const { darkMode } = useTheme();
