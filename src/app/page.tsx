@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTheme } from "./contexts/ThemeContext";
-import ForgotPasswordModal from "../components/Auth/Modal1";
+import ForgotPasswordModal from "./components/Auth/Modal1";
 
 export default function Home() {
   const { theme } = useTheme();
