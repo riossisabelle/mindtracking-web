@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "./components/ThemeProvider";
 import ClientLayout from "./ClientLayout";
 
 const inter = Inter({
@@ -10,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "MindTracking",
-  description: "Aplicação de rastreamento mental",
+  description: "Aplicação de rastreamento mental", // Mais descritivo
 };
 
 export default function RootLayout({
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ClientLayout>{children}</ClientLayout>
+        <ThemeProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </ThemeProvider>
       </body>
     </html>
   );
