@@ -13,7 +13,11 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-slate-800 text-white rounded-[12px] p-4 sm:p-6 md:p-8 relative max-h-[90vh] sm:w-[90%] md:w-[85%] lg:w-[1066px] lg:h-[690px]">
+      <div className="bg-slate-800 text-white rounded-[12px] p-4 sm:p-6 md:p-8 relative 
+        max-h-[90vh] 
+        w-[90%] max-w-[1066px] 
+        h-auto min-h-[400px] sm:min-h-[500px] md:min-h-[600px]
+        flex flex-col items-center justify-center">
         {/* Botão Fechar */}
         <button
           onClick={onClose}
@@ -25,7 +29,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
             width={20}
             height={20}
             className="w-12.5 h-12.5 cursor-pointer"
-            />
+          />
         </button>
 
         {children}

@@ -23,14 +23,17 @@ export default function ForgotPasswordModal({
   const handleRecover = async () => {
     setLoading(true);
     setError(null);
-
-
+    try {
+      
+    } catch (error) {
+      setError("Erro ao recuperar senha");
+    }
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex items-center justify-center h-full">
-        <div className="flex flex-col items-center lg:w-[530px] lg:h-[380px] mx-auto">
+        <div className="flex flex-col items-center lg:w-[530px] lg:h-[400px] mx-auto">
           <div className="lg:mb-8">
             <Image
               src="/images/icons/Logo_branca.svg"
@@ -56,7 +59,7 @@ export default function ForgotPasswordModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               icon="../images/icons/UsuarioEmail.svg"
-              iconClassName=""
+              iconClassName="w-6.5 h-auto"
             />
           </div>
 
