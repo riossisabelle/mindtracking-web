@@ -1,7 +1,7 @@
 "use client";
 
-import DarkModeToggle from "../ButtonColors/index";
-import { useTheme } from "./../../contexts/ThemeContext";
+import DarkModeToggle from "../../common/ButtonColors";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 export default function Header() {
   const { darkMode, toggleTheme } = useTheme(); // agora usa toggleTheme corretamente
