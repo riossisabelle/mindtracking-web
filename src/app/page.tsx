@@ -1,24 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useTheme } from "./contexts/ThemeContext";
-import Sidebar from "./components/Sidebar";
-import ForgotPasswordModal from "./components/Auth/RedefiniçãoSenha/VerificacaoEmail";
+import { useTheme } from "../contexts/ThemeContext";
+import Sidebar from "../components/layout/Sidebar";
+import ForgotPasswordModal from "../components/features/Auth/RedefiniçãoSenha/VerificacaoEmail";
 
 export default function Home() {
-  const { theme } = useTheme();
+  const { theme } = useTheme(); // Obtém o tema atual do contexto
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const handleModalSuccess = () => {
     console.log("Modal de sucesso foi chamado!");
     setIsModalOpen(false);
     // Aqui você pode abrir o modal 2 se quiser
   };
-  
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+    <div
+      className={`min-h-screen flex items-center justify-center ${
+        theme === "dark" ? "bg-gray-900" : "bg-gray-100"
+      }`}
+    >
       <div className="text-center space-y-4">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+        <Sidebar />
+        <h1
+          className={`text-2xl font-bold ${
+            theme === "dark" ? "text-white" : "text-gray-800"
+          }`}
+        >
           Teste do Modal
         </h1>
         <button
@@ -28,7 +37,7 @@ export default function Home() {
           Abrir Modal de Verificação de Email
         </button>
       </div>
-      
+
       <ForgotPasswordModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import Modal from "../../../Ui/Modals/ModalRedefinicaoSenha";
-import Button from "../../../Ui/Buttons/ButtonVerificarEmail";
-import IconInput from "../../../Ui/Inputs/InputEmail";
+import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
+import Button from "../../../../common/Buttons/ButtonVerificarEmail";
+import IconInput from "../../../../common/Inputs/InputEmail";
 
 interface Props {
   isOpen: boolean;
