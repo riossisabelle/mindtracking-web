@@ -12,9 +12,8 @@ import {
   Sun,
   HelpCircle,
   LogOut,
-  X,
 } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 const menuItems = [
   {
@@ -57,31 +56,31 @@ export default function Sidebar({
         >
           <div className="flex items-center gap-3">
             <Image
-              src="/images/Logo-blue-600-w2.svg"
+              src="/images/icons/Logo-blue-600-w2.svg"
               alt="Logo"
               width={40}
               height={40}
               className="w-10 h-10 md:w-12 md:h-12 rounded-full"
             />
-            <h1 className="text-[17px] md:text-[22px] font-bold">Mindtracking</h1>
+            <h1 className="text-[17px] md:text-[22px] font-bold">
+              Mindtracking
+            </h1>
           </div>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Alternar menu"
             className="cursor-pointer"
           >
-            <Image 
-              src="/images/menu.svg" 
-              alt="Menu" 
-              width={30} 
+            <Image
+              src="/images/icons/menu.svg"
+              alt="Menu"
+              width={30}
               height={30}
-              className="w-8 h-8 md:w-10 md:h-10" 
+              className="w-8 h-8 md:w-10 md:h-10"
             />
           </button>
         </div>
       )}
-
-
 
       {/* Sidebar desktop */}
       <aside
@@ -106,8 +105,8 @@ export default function Sidebar({
             <Image
               src={
                 theme === "dark"
-                  ? "/images/Logo-blue-600-w2.svg"
-                  : "/images/Logo-blue-600-w2.svg"
+                  ? "/images/icons/Logo-blue-600-w2.svg"
+                  : "/images/icons/Logo-blue-600-w2.svg"
               }
               alt="Logo"
               width={49}
@@ -116,8 +115,9 @@ export default function Sidebar({
             />
             {isOpen && (
               <span
-                className={`font-semibold text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"
-                  }`}
+                className={`font-semibold text-[22px] whitespace-nowrap ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
               >
                 MindTracking
               </span>
@@ -151,8 +151,9 @@ export default function Sidebar({
             {theme === "dark" ? <Sun size={24} /> : <Moon size={24} />}
             {isOpen && (
               <span
-                className={`font-semibold text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"
-                  }`}
+                className={`font-semibold text-[22px] whitespace-nowrap ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
               >
                 {theme === "dark" ? "Modo claro" : "Modo escuro"}
               </span>
@@ -190,7 +191,7 @@ export default function Sidebar({
       {/* Sidebar mobile (overlay) */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 pt-14 bg-black/60 z-40 lg:hidden" 
+          className="fixed inset-0 pt-14 bg-black/60 z-40 lg:hidden"
           onClick={() => setMobileOpen(false)}
         >
           <aside
@@ -200,13 +201,15 @@ export default function Sidebar({
             <div className="flex items-center justify-between mb-6 px-5">
               <div className="flex items-center gap-2">
                 <Image
-                  src="/images/Logo-blue-600-w2.svg"
+                  src="/images/icons/Logo-blue-600-w2.svg"
                   alt="Logo"
                   width={40}
                   height={40}
                   className="rounded-full"
                 />
-                <h2 className="text-[20px] md:text-[24px] font-bold">Mindtracking</h2>
+                <h2 className="text-[20px] md:text-[24px] font-bold">
+                  Mindtracking
+                </h2>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
@@ -214,7 +217,7 @@ export default function Sidebar({
                 className="cursor-pointer mt-1"
               >
                 <Image
-                  src="/images/plus-circle.svg"
+                  src="/images/icons/plus-circle.svg"
                   alt="Menu"
                   width={32}
                   height={32}
@@ -241,10 +244,11 @@ export default function Sidebar({
             <div className="mt-auto mb-10 flex flex-col">
               <button
                 onClick={toggleTheme}
-                className={`flex items-center gap-3 p-3 mx-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer ${theme === "dark"
-                  ? "text-gray-100 hover:bg-gray-700"
-                  : "text-[#0F172A] hover:bg-gray-100"
-                  }`}
+                className={`flex items-center gap-3 p-3 mx-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
+                  theme === "dark"
+                    ? "text-gray-100 hover:bg-gray-700"
+                    : "text-[#0F172A] hover:bg-gray-100"
+                }`}
               >
                 {theme === "dark" ? <Sun size={24} /> : <Moon size={24} />}
                 <span

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "./../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 import { useState } from "react";
 
 export default function Footer() {
