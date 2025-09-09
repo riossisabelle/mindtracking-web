@@ -1,48 +1,56 @@
 "use client";
 
-import { useState } from "react";
-import { useTheme } from "../contexts/ThemeContext";
-import Sidebar from "../components/layout/Sidebar";
-import ForgotPasswordModal from "../components/features/Auth/RedefiniçãoSenha/VerificacaoEmail";
+// import { useState } from "react";
+// import { useTheme } from "../contexts/ThemeContext";
+import Header from "@/components/layout/Header";
+// import Footer from "@/components/layout/Footer";
+import Image from "next/image";
+import Button from "@/components/common/Buttons";
+import { Inter } from "next/font/google";
+import Text from "@/components/common/Text";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { theme } = useTheme(); // Obtém o tema atual do contexto
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleModalSuccess = () => {
-    console.log("Modal de sucesso foi chamado!");
-    setIsModalOpen(false);
-    // Aqui você pode abrir o modal 2 se quiser
-  };
 
   return (
-    <div
-      className={`min-h-screen flex items-center justify-center ${
-        theme === "dark" ? "bg-gray-900" : "bg-gray-100"
-      }`}
-    >
-      <div className="text-center space-y-4">
-        <Sidebar />
-        <h1
-          className={`text-2xl font-bold ${
-            theme === "dark" ? "text-white" : "text-gray-800"
-          }`}
-        >
-          Teste do Modal
-        </h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-        >
-          Abrir Modal de Verificação de Email
-        </button>
-      </div>
+    <div>
+        <Header />
 
-      <ForgotPasswordModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={handleModalSuccess}
-      />
+        <main className="flex height-[544px] max-w-[1150px] mt-10 self-stretch m-auto items-center justify-between">
+          <div className="flex flex-col w-[47em] items-start gap-[2.56em] pl-20">
+            <Text 
+              size="5xl"
+              weight="bold"
+              color="text-slate-900"
+              align="left"
+              lineHeight="normal"
+              text="Cuide da sua mente com MindTracking"  
+            />
+            <Text
+              size="lg"
+              weight="semibold"
+              align="left"
+              lineHeight="snug"
+              text="Bem-vindo ao MindTracking! Aqui, você pode monitorar seu bem-estar emocional e mental de forma simples e eficaz"
+            /
+            >
+            <div className="flex gap-3.5">
+              <Button 
+                text="Fazer login"
+                secondary={false}
+              />
+              <Button 
+                text="Cadastra-se"
+                secondary={true}
+              />
+            </div>
+          </div>
+          
+          <Image src="/images/Athena-com-prancheta.png" alt="Athena segurando uma prancheta" width={220} height={427} />
+        </main>
+
+        {/* <Footer /> */}
     </div>
   );
 }
