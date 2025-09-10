@@ -50,8 +50,9 @@ export default function VerifyCodeModal({ isOpen, onClose, onSuccess, email }: P
       }
 
       onSuccess(); // abre modal 3
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro ao verificar código.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -92,7 +93,7 @@ export default function VerifyCodeModal({ isOpen, onClose, onSuccess, email }: P
                 maxLength={1}
                 value={digit}
                 onChange={(e) => handleChange(i, e.target.value)}
-                ref={(el) => (inputsRef.current[i] = el)}
+                ref={(el) => { inputsRef.current[i] = el; }}
                 className={`w-12 h-12 text-center text-lg font-bold rounded-lg border
                   ${theme === "dark" ? "bg-gray-800 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}
                   focus:outline-none focus:border-blue-500`}

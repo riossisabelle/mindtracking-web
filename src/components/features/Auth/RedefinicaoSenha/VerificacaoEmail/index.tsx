@@ -43,7 +43,7 @@ function validateEmail(valueRaw: string): string | null {
   if (domain.length > 255) return "Domínio do e-mail é muito longo";
   if (!/^[A-Za-z0-9.-]+$/.test(domain)) return "Caracteres inválidos no domínio";
   if (!domain.includes(".")) return "Domínio deve conter ponto";
-  if (domain.includes("..")) return "Domínio não pode conter '..'";
+  if (domain.includes("..")) return "Domínio não pode conter '..' ou mais de um ponto";
 
   const labels = domain.split(".");
   if (labels.some((l) => l.length === 0)) return "Domínio inválido";
@@ -64,6 +64,7 @@ function validateEmail(valueRaw: string): string | null {
     "outlook.com",
     "yahoo.com.br",
     "terra.com.br",
+    "uol.com.br",
   ]);
   if (!allowedDomains.has(domain.toLowerCase())) {
     return "Este não é um domínio permitido";

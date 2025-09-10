@@ -20,10 +20,11 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         className={`${
           theme === "dark" ? "bg-slate-800 text-white" : "bg-white text-black"
         } rounded-[12px] p-4 sm:p-6 md:p-8 relative
-         max-h-[90vh] w-[90%] max-w-[1066px] h-auto
-         min-h-[clamp(550px,80vh,700px)]
-         sm:min-h-[clamp(550px,80vh,700px)]
-         md:min-h-[clamp(690px,85vh,750px)]
+         max-h-[85vh] w-[90%] max-w-[1066px] h-auto
+         min-h-[min(550px,80vh)]
+         sm:min-h-[min(550px,80vh)]
+         md:min-h-[min(690px,85vh)]
+         overflow-y-auto overscroll-contain
          flex flex-col items-center justify-center`}
       >
         {/* Botão Fechar */}

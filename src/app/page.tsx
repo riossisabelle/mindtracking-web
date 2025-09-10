@@ -4,15 +4,24 @@ import { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import Sidebar from "../components/layout/Sidebar";
 import ForgotPasswordModal from "../components/features/Auth/RedefinicaoSenha/VerificacaoEmail";
+import VerifyCodeModal from "../components/features/Auth/RedefinicaoSenha/VerificacaoCodigo";
 
 export default function Home() {
   const { theme } = useTheme(); // Obtém o tema atual do contexto
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [userEmail] = useState("");
 
-  const handleModalSuccess = () => {
-    console.log("Modal de sucesso foi chamado!");
-    setIsModalOpen(false);
-    // Aqui você pode abrir o modal 2 se quiser
+  const handleEmailModalSuccess = () => {
+    console.log("Modal de email foi chamado!");
+    setIsEmailModalOpen(false);
+    // Aqui você pode abrir o modal de código se quiser
+  };
+
+  const handleCodeModalSuccess = () => {
+    console.log("Modal de código foi chamado!");
+    setIsCodeModalOpen(false);
+    // Aqui você pode abrir o próximo modal se quiser
   };
 
   return (
@@ -30,18 +39,34 @@ export default function Home() {
         >
           Teste do Modal
         </h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-        >
-          Abrir Modal de Verificação de Email
-        </button>
+        <div className="space-y-3">
+          <button
+            onClick={() => setIsEmailModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Abrir Modal de Verificação de Email
+          </button>
+          
+          <button
+            onClick={() => setIsCodeModalOpen(true)}
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Abrir Modal de Verificação de Código
+          </button>
+        </div>
       </div>
 
       <ForgotPasswordModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={handleModalSuccess}
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        onSuccess={handleEmailModalSuccess}
+      />
+
+      <VerifyCodeModal
+        isOpen={isCodeModalOpen}
+        onClose={() => setIsCodeModalOpen(false)}
+        onSuccess={handleCodeModalSuccess}
+        email={userEmail || "teste@exemplo.com"}
       />
     </div>
   );
