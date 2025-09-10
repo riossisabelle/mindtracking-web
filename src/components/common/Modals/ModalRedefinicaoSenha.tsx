@@ -21,9 +21,9 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
           theme === "dark" ? "bg-slate-800 text-white" : "bg-white text-black"
         } rounded-[12px] p-4 sm:p-6 md:p-8 relative
          max-h-[90vh] w-[90%] max-w-[1066px] h-auto
-         min-h-[clamp(300px,60vh,400px)]
-         sm:min-h-[clamp(350px,65vh,500px)]
-         md:min-h-[clamp(400px,85vh,690px)]
+         min-h-[clamp(550px,80vh,700px)]
+         sm:min-h-[clamp(550px,80vh,700px)]
+         md:min-h-[clamp(690px,85vh,750px)]
          flex flex-col items-center justify-center`}
       >
         {/* Botão Fechar */}
