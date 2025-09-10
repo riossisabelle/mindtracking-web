@@ -156,6 +156,34 @@ Notas:
 - `src/app/page.tsx`: página inicial.
 - Pastas nomeadas como segmentos agrupadores `(public)` e `(private)` ajudam a organizar domínios de rotas.
 
+## Fluxo de Navegação
+
+### Páginas Públicas
+- **Landing Page**
+  - **Entrar** → Auth (Login/Cadastro) - via modal
+  - **Cadastrar-se** → Auth (Sign Up) - via modal
+- **Auth (Login / Cadastro / Recuperação de senha)**
+  - Após login bem-sucedido → Dashboard
+  - Recuperação de senha → confirmação via modal
+- **Not Found (404)**
+  - Página de fallback para rotas inexistentes
+  - **Voltar para Home** → Landing Page
+
+### Páginas Protegidas (usuário autenticado)
+- **Dashboard**
+  - Acesso ao Diário
+  - Acesso ao Questionário
+  - Acesso ao Perfil
+  - Acesso ao Athena (assistente virtual)
+- **Diário** → volta para Dashboard
+- **Questionário** → volta para Dashboard
+- **Perfil**
+  - Configurações de conta
+  - Logout → volta para Landing Page
+- **Athena (assistente virtual)** → navegação paralela, pode voltar ao Dashboard
+
+
+
 ## Context API
 - `src/contexts/ThemeContext.tsx`: provê estado de tema. Importe no layout raiz para efeito global.
 
