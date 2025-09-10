@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import Sidebar from "../components/layout/Sidebar";
-import ForgotPasswordModal from "../components/features/Auth/RedefiniçãoSenha/VerificacaoEmail";
+import ForgotPasswordModal from "../components/features/Auth/RedefinicaoSenha/VerificacaoEmail";
 
 export default function Home() {
   const { theme } = useTheme(); // Obtém o tema atual do contexto

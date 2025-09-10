@@ -4,6 +4,7 @@ import Image from "next/image";
 import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
 import IconInput from "../../../../common/Inputs/InputEmail";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface Props {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function ForgotPasswordModal({
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
 
   const handleRecover = async () => {
     setLoading(true);
@@ -36,7 +38,7 @@ export default function ForgotPasswordModal({
         <div className="flex flex-col items-center lg:w-[530px] lg:h-[400px] mx-auto">
           <div className="lg:mb-8">
             <Image
-              src="/images/icons/Logo_branca.svg"
+              src={theme === "dark" ? "/images/icons/Logo_branca.svg" : "/images/icons/Logo-slate-900.svg"}
               alt="Logo"
               width={54}
               height={51}
@@ -58,7 +60,7 @@ export default function ForgotPasswordModal({
               label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              icon="../images/icons/UsuarioEmail.svg"
+              icon={theme === "dark" ? "../images/icons/UsuarioEmail.svg" : "../images/icons/UsuarioEmail-black.svg"}
               iconClassName="w-6.5 h-auto"
             />
           </div>
@@ -66,8 +68,8 @@ export default function ForgotPasswordModal({
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <div>
-            <Button onClick={() => console.log("Recuperar")} loading={false}>
-              Verificar seu e-mail
+            <Button onClick={handleRecover} loading={loading} disabled={loading}>
+              {loading ? "Carregando..." : "Verificar seu e-mail"}
             </Button>
           </div>
         </div>
