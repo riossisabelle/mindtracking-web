@@ -15,7 +15,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="flex fixed inset-0 z-50 justify-center items-center bg-black/50">
       <div
         className={`${
           theme === "dark" ? "bg-slate-800 text-white" : "bg-white text-black"
@@ -37,7 +37,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
             alt="Fechar"
             width={20}
             height={20}
-            className="w-12.5 h-12.5 cursor-pointer"
+            className="w-8 h-8 md:w-12.5 md:h-12.5 cursor-pointer"
           />
         </button>
 
