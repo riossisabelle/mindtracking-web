@@ -16,7 +16,7 @@ export default function Text(props: propsText) {
     const { theme } = useTheme();
 
     return (
-        <p className={` height
+        <p className={`
             ${props.size === 'sm' ? 'text-sm' : ''} 
             ${props.size === 'md' ? 'text-md' : ''}
             ${props.size === 'lg' ? 'text-lg' : ''}
