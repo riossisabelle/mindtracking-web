@@ -1,23 +1,17 @@
-"use client";
-
-import Header from "@/components/layout/Header";
-// import Footer from "@/components/layout/Footer";
+import React from "react";
 import Image from "next/image";
 import Button from "@/components/common/Buttons";
-import Footer from "@/components/layout/Footer";
 import DarkModeToggle from "@/components/common/ButtonColors";
 import { useTheme } from "@/contexts/ThemeContext";
 import Seta from "@/components/common/Icons/Seta";
 import Card from "@/components/common/Cards/Cards_LadingPage";
 import ImageDashboard from "@/components/features/LadingPage/Images_Dashboard";
 
-export default function Home() {
+export function Home() {
   const { darkMode, toggleTheme } = useTheme();
 
   return (
-    <main className="w-full h-full">
-      <Header />
-
+    <main>
       <section className="flex flex-col lg:flex-row height-[544px] w-full md:max-w-[1150px] mt-0 self-stretch m-auto items-center justify-between text-slate-900 gap-[24px]">
         <div className="flex flex-col w-full lg:w-[47em] items-center lg:items-start gap-[24px] md:gap-[2.56em] px-8 lg:pl-[3.745em]">
           <h1
@@ -119,8 +113,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
-        <div className="flex flex-col gap-8 text-center lg:text-start items-center lg:items-start">
+      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0 text-center lg:text-start">
+        <div className="flex flex-col gap-8">
           <h1
             className={`w-full md:w-full md:max-w-full lg:max-w-[13em] font-bold text-2xl md:text-4xl lg:text-6xl leading-snug ${
               darkMode ? "text-slate-50" : "text-slate-900"
@@ -136,7 +130,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full flex items-center justify-between gap-16 py-5 mt-5">
+        <div className="w-full flex items-center justify-between gap-16 py-5 mt-10">
           <Image
             src="/images/Athena-apresentando-dashboard.png"
             className="hidden md:hidden lg:flex"
@@ -148,18 +142,6 @@ export default function Home() {
           <ImageDashboard />
         </div>
       </section>
-
-      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
-            <h1 className="text-5xl text-slate-900 font-bold text-center">Cultive uma Mente mais saúdavel e consciente</h1>
-            
-            <p className="text-2xl text-slate-900 font-semibold text-center">Ao usar a MindTracking, você desbloqueia um caminho para um maior bem-estar e autocompreensão</p>
-            
-            <div>
-
-            </div>
-      </section>
-
-      {/* <Footer /> */}
     </main>
   );
 }
