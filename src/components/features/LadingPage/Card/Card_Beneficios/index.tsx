@@ -11,24 +11,32 @@ export default function CardBeneficio(props: CardBeneficioProps) {
   const darkMode = useTheme();
 
   return (
-    <div>
+    <div className="flex flex-row items-center justify-center gap-6 bg-[#0F172A1A] rounded-2xl border-2 border-blue-600 shadow-2xl shadow-slate-800 p-7">
       <Image
         src={props.icon}
         alt={props.title}
-        width={32}
-        height={32}
-        className="mb-4"
+        width={52}
+        height={52}
+        className={`bg-[#2563EA0D] rounded-full p-2 ${
+          darkMode.darkMode ? "brightness-0 invert" : ""
+        }`}
       />
-      <h3
-        className={`text-lg font-semibold ${darkMode ? "text-slate-50" : "text-slate-900"}`}
-      >
-        {props.title}
-      </h3>
-      <p
-        className={`text-sm ${darkMode ? "text-slate-300" : "text-slate-700"}`}
-      >
-        {props.parag}
-      </p>
+      <div className="flex flex-col items-start gap-2">
+        <h3
+          className={`text-lg font-semibold ${
+            darkMode.darkMode ? "text-slate-50" : "text-slate-900"
+          }`}
+        >
+          {props.title}
+        </h3>
+        <p
+          className={`text-sm ${
+            darkMode.darkMode ? "text-slate-50" : "text-slate-900"
+          }`}
+        >
+          {props.parag}
+        </p>
+      </div>
     </div>
   );
 }

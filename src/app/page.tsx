@@ -10,6 +10,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import Seta from "@/components/common/Icons/Seta";
 import Card from "@/components/common/Cards/Cards_LadingPage";
 import ImageDashboard from "@/components/features/LadingPage/Images_Dashboard";
+import CardBeneficio from "@/components/features/LadingPage/Card/Card_Beneficios";
 
 export default function Home() {
   const { darkMode, toggleTheme } = useTheme();
@@ -150,13 +151,36 @@ export default function Home() {
       </section>
 
       <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
-            <h1 className="text-5xl text-slate-900 font-bold text-center">Cultive uma Mente mais saúdavel e consciente</h1>
+            <h1 className={`text-5xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-center`}>Cultive uma Mente mais saúdavel e consciente</h1>
             
-            <p className="text-2xl text-slate-900 font-semibold text-center">Ao usar a MindTracking, você desbloqueia um caminho para um maior bem-estar e autocompreensão</p>
+            <p className={`text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-semibold text-center`}>Ao usar a MindTracking, você desbloqueia um caminho para um maior bem-estar e autocompreensão</p>
             
-            <div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1150px] w-full px-4 md:px-8">
+                <CardBeneficio 
+                  icon="/images/icons/light-bulb.svg"
+                  title="Desenvolva Autoconhecimento"
+                  parag="Entenda seus gatilhos, emoções e o que realmente impacta seu bem-estar."
+                />
+                <CardBeneficio 
+                  icon="/images/icons/list.svg"
+                  title="Reduza estresse e ansiedade"
+                  parag="Com questionários regulares e suporte, encontre mais calma no seu dia a dia."
+                />
+                <CardBeneficio 
+                  icon="/images/icons/heart.svg"
+                  title="Cuide da sua saúde emocional"
+                  parag="Crie um espaço dedicado para seu desenvolvimento pessoal e equilíbrio mental."
+                />
+                <CardBeneficio 
+                  icon="/images/icons/protect.svg"
+                  title="Fortaleça sua resiliência"
+                  parag="Aprenda a lidar com os desafios da vida de forma mais equilibrada e construtiva."
+                />
             </div>
+      </section>
+      
+      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
+        
       </section>
 
       {/* <Footer /> */}
