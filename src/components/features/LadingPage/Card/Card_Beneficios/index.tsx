@@ -11,7 +11,7 @@ export default function CardBeneficio(props: CardBeneficioProps) {
   const darkMode = useTheme();
 
   return (
-    <div className="flex flex-row items-center justify-center gap-6 bg-[#0F172A1A] rounded-2xl border-2 border-blue-600 shadow-2xl shadow-slate-800 p-7">
+    <div className="flex flex-row items-center justify-center gap-6 bg-[#0F172A1A] rounded-2xl border-2 border-blue-600 shadow-lg shadow-slate-800 p-4 md:p-7">
       <Image
         src={props.icon}
         alt={props.title}
@@ -23,7 +23,7 @@ export default function CardBeneficio(props: CardBeneficioProps) {
       />
       <div className="flex flex-col items-start gap-2">
         <h3
-          className={`text-lg font-semibold ${
+          className={`text-base md:text-lg font-semibold ${
             darkMode.darkMode ? "text-slate-50" : "text-slate-900"
           }`}
         >

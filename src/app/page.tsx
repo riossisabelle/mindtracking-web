@@ -11,6 +11,7 @@ import Seta from "@/components/common/Icons/Seta";
 import Card from "@/components/common/Cards/Cards_LadingPage";
 import ImageDashboard from "@/components/features/LadingPage/Images_Dashboard";
 import CardBeneficio from "@/components/features/LadingPage/Card/Card_Beneficios";
+import FAQ from "@/components/common/FAQ";
 
 export default function Home() {
   const { darkMode, toggleTheme } = useTheme();
@@ -151,39 +152,79 @@ export default function Home() {
       </section>
 
       <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
-            <h1 className={`text-5xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-center`}>Cultive uma Mente mais saúdavel e consciente</h1>
-            
-            <p className={`text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-semibold text-center`}>Ao usar a MindTracking, você desbloqueia um caminho para um maior bem-estar e autocompreensão</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1150px] w-full px-4 md:px-8">
-                <CardBeneficio 
-                  icon="/images/icons/light-bulb.svg"
-                  title="Desenvolva Autoconhecimento"
-                  parag="Entenda seus gatilhos, emoções e o que realmente impacta seu bem-estar."
-                />
-                <CardBeneficio 
-                  icon="/images/icons/list.svg"
-                  title="Reduza estresse e ansiedade"
-                  parag="Com questionários regulares e suporte, encontre mais calma no seu dia a dia."
-                />
-                <CardBeneficio 
-                  icon="/images/icons/heart.svg"
-                  title="Cuide da sua saúde emocional"
-                  parag="Crie um espaço dedicado para seu desenvolvimento pessoal e equilíbrio mental."
-                />
-                <CardBeneficio 
-                  icon="/images/icons/protect.svg"
-                  title="Fortaleça sua resiliência"
-                  parag="Aprenda a lidar com os desafios da vida de forma mais equilibrada e construtiva."
-                />
-            </div>
-      </section>
-      
-      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
-        
+        <h1
+          className={`text-2xl md:text-5xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-center`}
+        >
+          Cultive uma Mente mais saúdavel e consciente
+        </h1>
+
+        <p
+          className={`text-base md:text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-semibold text-center`}
+        >
+          Ao usar a MindTracking, você desbloqueia um caminho para um maior
+          bem-estar e autocompreensão
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1150px] w-full px-4 md:px-8">
+          <CardBeneficio
+            icon="/images/icons/light-bulb.svg"
+            title="Desenvolva Autoconhecimento"
+            parag="Entenda seus gatilhos, emoções e o que realmente impacta seu bem-estar."
+          />
+
+          <CardBeneficio
+            icon="/images/icons/list.svg"
+            title="Reduza estresse e ansiedade"
+            parag="Com questionários regulares e suporte, encontre mais calma no seu dia a dia."
+          />
+
+          <CardBeneficio
+            icon="/images/icons/heart.svg"
+            title="Cuide da sua saúde emocional"
+            parag="Crie um espaço dedicado para seu desenvolvimento pessoal e equilíbrio mental."
+          />
+
+          <CardBeneficio
+            icon="/images/icons/protect.svg"
+            title="Fortaleça sua resiliência"
+            parag="Aprenda a lidar com os desafios da vida de forma mais equilibrada e construtiva."
+          />
+        </div>
       </section>
 
-      {/* <Footer /> */}
+      <section className="flex flex-col height-[544px] w-full md:max-w-full mt-36 mb-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
+        <div className="flex flex-row w-full md:max-w-[1150px] justify-between">
+          <div className="flex flex-col items-start justify-center gap-8">
+            <h1
+              className={`text-2xl md:text-5xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-start`}
+            >
+              Sua mente tem perguntas?
+            </h1>
+            <p
+              className={`text-base md:text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-medium text-start`}
+            >
+              É normal ter dúvidas no começo. Por isso, preparamos as respostas
+              para as perguntas mais comuns sobre a plataforma.
+            </p>
+          </div>
+
+          <div>
+            <Image
+              className="scale-x-[-1] mt-8"
+              src="/images/athena-apontando-abaixo.png"
+              alt="Athena apontando para baixo"
+              width={550}
+              height={500}
+            />
+          </div>
+        </div>
+
+        <div className="w-full">
+          <FAQ />
+        </div>
+      </section>
+
+      <Footer />
     </main>
   );
 }
