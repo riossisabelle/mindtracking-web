@@ -24,46 +24,12 @@ const questions = [
   },
 ];
 
-// ⬇️ Escopo de login e verificação
+
 const Questionnaire = ({ theme }: QuestionnaireProps) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selected, setSelected] = useState<string>('');
   const [isLoadingNext, setIsLoadingNext] = useState(false);
-
-  // Usuário simulado para login automático (ajuste depois)
-  const email = "emily@example.com";
-  const senha = "senha123";
-
-  // ⬇️ 1. Executa login ao montar componente
-  useEffect(() => {
-    const autenticarUsuario = async () => {
-      try {
-        const response = await axios.post('https://localhos.com/auth/login', {
-          email,
-          senha
-        });
-
-        const user = response.data;
-
-        // ⬇️ 2. Verifica se já respondeu o questionário hoje
-        if (user?.questionario?.respondidoHoje === true) {
-          // Redireciona para tela inicial (a rota será definida futuramente)
-          console.log("Usuário já respondeu o questionário hoje. Redirecionar para tela inicial.");
-          // Exemplo: window.location.href = "/home"; ou router.push('/home')
-        } else {
-          console.log("Usuário ainda não respondeu. Exibindo questionário obrigatório.");
-          // Permanece na tela do questionário
-        }
-
-      } catch (error) {
-        console.error("Erro ao fazer login:", error);
-      }
-    };
-
-    autenticarUsuario();
-  }, []);
-  // ⬆️ Fim da lógica de login e verificação
 
   const question = questions[currentQuestion];
 
@@ -121,7 +87,7 @@ const Questionnaire = ({ theme }: QuestionnaireProps) => {
 
         {/* Título */}
         <h1 className={`text-xl sm:text-2xl font-bold mt-10 lg:mt-20 ${textPrimary} transition-colors duration-200`}>
-          Bem-vindo, Emily! Vamos continuar.
+          Questionário
         </h1>
 
         {/* Pergunta */}

@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <div>
       <Sidebar />
-      <main className="ml-0 lg:ml-34.5 ">
+      <main className="ml-0 lg:ml-37.5 ">
           <Questionnaire theme={theme} />
       </main>
     </div>
