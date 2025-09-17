@@ -11,12 +11,12 @@ export default function CardBeneficio(props: CardBeneficioProps) {
   const darkMode = useTheme();
 
   return (
-    <div className="flex flex-row items-center justify-center gap-6 bg-[#0F172A1A] rounded-2xl border-2 border-blue-600 shadow-lg shadow-slate-800 p-4 md:p-7">
+    <div className={`flex flex-row items-center justify-center gap-6 ${ darkMode.darkMode ? "bg-[#FFFFFF1A]" : "bg-[#0F172A1A]" } rounded-2xl border-2 border-blue-600 p-4 md:p-7`}>
       <Image
         src={props.icon}
         alt={props.title}
-        width={52}
-        height={52}
+        width={50}
+        height={50}
         className={`bg-[#2563EA0D] rounded-full p-2 ${
           darkMode.darkMode ? "brightness-0 invert" : ""
         }`}

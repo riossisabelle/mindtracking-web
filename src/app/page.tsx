@@ -17,13 +17,13 @@ export default function Home() {
   const { darkMode, toggleTheme } = useTheme();
 
   return (
-    <main className="w-full h-full">
+    <main className="w-full h-full overflow-x-hidden">
       <Header />
 
       <section className="flex flex-col lg:flex-row height-[544px] w-full md:max-w-[1150px] mt-0 self-stretch m-auto items-center justify-between text-slate-900 gap-[24px]">
         <div className="flex flex-col w-full lg:w-[47em] items-center lg:items-start gap-[24px] md:gap-[2.56em] px-8 lg:pl-[3.745em]">
           <h1
-            className={`text-3xl lg:text-5xl md:text-4xl text-center lg:text-start font-bold leading-snug w-full ${darkMode ? "text-slate-50" : "text-slate-900"}`}
+            className={`text-2xl md:text-4xl lg:text-6xl text-center lg:text-start font-bold leading-snug w-full ${darkMode ? "text-slate-50" : "text-slate-900"}`}
           >
             Cuide da sua mente com MindTracking
           </h1>
@@ -86,7 +86,7 @@ export default function Home() {
       <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between text-slate-900 gap-12 px-8 lg:px-12">
         <div className="flex flex-col gap-8 items-center justify-center">
           <h1
-            className={`max-w-[788px] font-bold text-2xl md:text-4xl leading-snug text-center ${
+            className={`max-w-[788px] font-bold text-2xl md:text-4xl lg:text-6xl leading-snug text-center ${
               darkMode ? "text-slate-50" : "text-slate-900"
             }`}
           >
@@ -121,7 +121,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
+      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-36 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
         <div className="flex flex-col gap-8 text-center lg:text-start items-center lg:items-start">
           <h1
             className={`w-full md:w-full md:max-w-full lg:max-w-[13em] font-bold text-2xl md:text-4xl lg:text-6xl leading-snug ${
@@ -138,7 +138,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full flex items-center justify-between gap-16 py-5 mt-5">
+        <div className="w-full flex items-center justify-center md:justify-center lg:justify-between gap-16 py-5 mt-5">
           <Image
             src="/images/Athena-apresentando-dashboard.png"
             className="hidden md:hidden lg:flex"
@@ -147,19 +147,21 @@ export default function Home() {
             alt="Athena apresentando dashboard"
           />
 
-          <ImageDashboard />
+          <div className="flex justify-center md:justify-center lg:justify-start">
+            <ImageDashboard />
+          </div>
         </div>
       </section>
 
-      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
+      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-36 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
         <h1
-          className={`text-2xl md:text-5xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-center`}
+          className={`text-2xl md:text-4xl lg:text-6xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-center leading-snug`}
         >
           Cultive uma Mente mais saúdavel e consciente
         </h1>
 
         <p
-          className={`text-base md:text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-semibold text-center`}
+          className={`text-base md:text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-semibold text-center leading-snug`}
         >
           Ao usar a MindTracking, você desbloqueia um caminho para um maior
           bem-estar e autocompreensão
@@ -192,16 +194,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex flex-col height-[544px] w-full md:max-w-full mt-36 mb-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
+      <section className="flex flex-col height-[544px] w-full max-w-full mt-8 mb-16 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0 overflow-x-hidden">
         <div className="flex flex-row w-full md:max-w-[1150px] justify-between">
           <div className="flex flex-col items-start justify-center gap-8">
             <h1
-              className={`text-2xl md:text-5xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-start`}
+              className={`text-2xl md:text-4xl lg:text-6xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-start leading-snug`}
             >
               Sua mente tem perguntas?
             </h1>
             <p
-              className={`text-base md:text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-medium text-start`}
+              className={`text-base md:text-2xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-medium text-start leading-snug`}
             >
               É normal ter dúvidas no começo. Por isso, preparamos as respostas
               para as perguntas mais comuns sobre a plataforma.
@@ -219,7 +221,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full">
+        <div className="w-full max-w-full mt-5">
           <FAQ />
         </div>
       </section>

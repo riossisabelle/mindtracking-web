@@ -7,12 +7,8 @@ export default function Footer() {
   const { darkMode } = useTheme();
 
   return (
-    <>
-      <div className="pb-0 lg:pb-[250px]"></div>
-
-      <footer
-        className={`bottom-0 left-0 w-full border-t-2 border-blue-600 transition-colors duration-500 z-50
-        relative lg:fixed
+    <footer
+        className={`w-full border-t-2 border-blue-600 transition-colors duration-500
         ${darkMode ? "text-white" : "text-gray-900"}`}
       >
         <div className="max-w-screen-xl mx-auto flex flex-col px-6 sm:px-12 md:px-[150px] py-[50px]">
@@ -167,6 +163,5 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-    </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FAQItemProps {
   question: string;
@@ -10,26 +11,26 @@ interface FAQItemProps {
   onToggle: () => void;
 }
 
+
 const FAQItem = ({ question, answer, isOpen, onToggle }: FAQItemProps) => {
   const { darkMode } = useTheme();
 
   return (
-    <div
-      className={`w-full rounded-3xl border-4 transition-all duration-300 ${
-        darkMode
-          ? "bg-slate-800 border-blue-500 text-slate-50"
-          : "bg-slate-100 border-blue-500 text-slate-900"
-      }`}
+    <motion.div
+      className={`w-full py-5 rounded-3xl border-2 border-blue-600 cursor-pointer ${ darkMode ? "bg-[#FFFFFF1A]" : "bg-[#0F172A1A]" }`}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
     >
-      <button
+      <motion.button
         onClick={onToggle}
-        className="w-full px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between text-left hover:bg-opacity-80 transition-colors duration-200"
+        className="w-full px-4 py-3 sm:px-6 sm:py-4 flex cursor-pointer items-center justify-between text-left hover:bg-opacity-80 transition-colors duration-200"
+        whileTap={{ scale: 0.98 }}
       >
-        <span className="font-bold text-base lg:text-lg pr-4">{question}</span>
-        <div
-          className={`flex-shrink-0 transition-transform duration-300 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+        <span className="font-bold text-base lg:text-lg cursor-pointer pr-4">{question}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="flex-shrink-0"
         >
           <svg 
             width="24" 
@@ -47,17 +48,33 @@ const FAQItem = ({ question, answer, isOpen, onToggle }: FAQItemProps) => {
               strokeLinejoin="round"
             />
           </svg>
-        </div>
-      </button>
+        </motion.div>
+      </motion.button>
       
-      {isOpen && (
-        <div className="px-4 pb-3 sm:px-6 sm:pb-4">
-          <p className="text-sm lg:text-base leading-relaxed opacity-90">
-            {answer}
-          </p>
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-3 sm:px-6 sm:pb-4">
+              <motion.p
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 0.9 }}
+                exit={{ y: -10, opacity: 0 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
+                className="text-sm lg:text-base leading-relaxed"
+              >
+                {answer}
+              </motion.p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
@@ -96,17 +113,32 @@ const FAQ = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-3">
+    <motion.div 
+      className="w-full max-w-6xl mx-auto space-y-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       {faqData.map((item, index) => (
-        <FAQItem
+        <motion.div
           key={index}
-          question={item.question}
-          answer={item.answer}
-          isOpen={openItems.includes(index)}
-          onToggle={() => toggleItem(index)}
-        />
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ 
+            duration: 0.4, 
+            delay: index * 0.1,
+            ease: "easeOut"
+          }}
+        >
+          <FAQItem
+            question={item.question}
+            answer={item.answer}
+            isOpen={openItems.includes(index)}
+            onToggle={() => toggleItem(index)}
+          />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 
