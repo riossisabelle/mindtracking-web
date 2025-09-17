@@ -121,7 +121,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-36 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
+      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-24 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
         <div className="flex flex-col gap-8 text-center lg:text-start items-center lg:items-start">
           <h1
             className={`w-full md:w-full md:max-w-full lg:max-w-[13em] font-bold text-2xl md:text-4xl lg:text-6xl leading-snug ${
@@ -153,7 +153,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-36 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
+      <section className="flex flex-col height-[544px] w-full md:max-w-[1150px] mt-10 self-stretch m-auto items-center justify-between gap-12 px-8 lg:px-0">
         <h1
           className={`text-2xl md:text-4xl lg:text-6xl ${darkMode ? "text-slate-50" : "text-slate-900"} font-bold text-center leading-snug`}
         >
@@ -167,7 +167,7 @@ export default function Home() {
           bem-estar e autocompreensão
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1150px] w-full px-4 md:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 max-w-[1150px] w-full px-4 md:px-8">
           <CardBeneficio
             icon="/images/icons/light-bulb.svg"
             title="Desenvolva Autoconhecimento"

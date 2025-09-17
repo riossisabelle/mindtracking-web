@@ -26,7 +26,9 @@ const FAQItem = ({ question, answer, isOpen, onToggle }: FAQItemProps) => {
         className="w-full px-4 py-3 sm:px-6 sm:py-4 flex cursor-pointer items-center justify-between text-left hover:bg-opacity-80 transition-colors duration-200"
         whileTap={{ scale: 0.98 }}
       >
+        
         <span className="font-bold text-base lg:text-lg cursor-pointer pr-4">{question}</span>
+        
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -114,7 +116,7 @@ const FAQ = () => {
 
   return (
     <motion.div 
-      className="w-full max-w-6xl mx-auto space-y-3"
+      className="w-full max-w-6xl mx-auto space-y-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
