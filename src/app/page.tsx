@@ -1,17 +1,24 @@
 "use client";
 
-import { useTheme } from "../contexts/ThemeContext";
+import React from "react";
 import Sidebar from "../components/layout/Sidebar";
-import Questionnaire from "./(private)/Questionnaire";
+import Diario from "../components/layout/Diario";
+import { useTheme } from "../contexts/ThemeContext";
 
 export default function Home() {
-  const { theme } = useTheme(); // Obtém o tema atual
+  const { theme } = useTheme();
 
   return (
-    <div>
+    <div
+      className={`min-h-screen flex ${
+        theme === "dark" ? "bg-gray-900" : "bg-gray-100"
+      }`}
+    >
       <Sidebar />
-      <main className="ml-0 lg:ml-34.5 ">
-          <Questionnaire theme={theme} />
+
+      {/* ÚNICO MAIN */}
+      <main className="flex-1 mt-25 lg:ml-37.5 md:mt-25 ">
+        <Diario />
       </main>
     </div>
   );
