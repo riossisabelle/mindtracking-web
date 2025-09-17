@@ -5,12 +5,14 @@ import { useTheme } from "../contexts/ThemeContext";
 import Sidebar from "../components/layout/Sidebar";
 import ForgotPasswordModal from "../components/features/Auth/RedefinicaoSenha/VerificacaoEmail";
 import VerifyCodeModal from "../components/features/Auth/RedefinicaoSenha/VerificacaoCodigo";
+import ResetPasswordModal from "../components/features/Auth/RedefinicaoSenha/AtualizacaoSenha";
 
 export default function Home() {
   const { theme } = useTheme(); // Obtém o tema atual do contexto
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
-  const [userEmail] = useState("");
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [userEmail] = useState("teste@exemplo.com");
 
   const handleEmailModalSuccess = () => {
     console.log("Modal de email foi chamado!");
@@ -22,6 +24,12 @@ export default function Home() {
     console.log("Modal de código foi chamado!");
     setIsCodeModalOpen(false);
     // Aqui você pode abrir o próximo modal se quiser
+  };
+
+  const handleResetModalSuccess = () => {
+    console.log("Modal de redefinição de senha foi chamado!");
+    setIsResetModalOpen(false);
+    // Aqui você pode fazer o que quiser após a redefinição
   };
 
   return (
@@ -46,12 +54,19 @@ export default function Home() {
           >
             Abrir Modal de Verificação de Email
           </button>
-          
+
           <button
             onClick={() => setIsCodeModalOpen(true)}
             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
           >
             Abrir Modal de Verificação de Código
+          </button>
+
+          <button
+            onClick={() => setIsResetModalOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Abrir Modal de Redefinição de Senha
           </button>
         </div>
       </div>
@@ -66,7 +81,14 @@ export default function Home() {
         isOpen={isCodeModalOpen}
         onClose={() => setIsCodeModalOpen(false)}
         onSuccess={handleCodeModalSuccess}
-        email={userEmail || "teste@exemplo.com"}
+        email={userEmail}
+      />
+
+      <ResetPasswordModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onSuccess={handleResetModalSuccess}
+        email={userEmail}
       />
     </div>
   );

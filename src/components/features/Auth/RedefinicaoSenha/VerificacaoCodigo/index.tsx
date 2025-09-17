@@ -12,7 +12,12 @@ interface Props {
   email: string; // recebido do modal anterior
 }
 
-export default function VerifyCodeModal({ isOpen, onClose, onSuccess, email }: Props) {
+export default function VerifyCodeModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  email,
+}: Props) {
   const [code, setCode] = useState(["", "", "", ""]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,7 +56,8 @@ export default function VerifyCodeModal({ isOpen, onClose, onSuccess, email }: P
 
       onSuccess(); // abre modal 3
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Erro ao verificar código.";
+      const message =
+        err instanceof Error ? err.message : "Erro ao verificar código.";
       setError(message);
     } finally {
       setLoading(false);
@@ -65,7 +71,11 @@ export default function VerifyCodeModal({ isOpen, onClose, onSuccess, email }: P
           {/* Logo */}
           <div className="mb-6 md:mb-8">
             <Image
-              src={theme === "dark" ? "/images/icons/Logo_branca.svg" : "/images/icons/Logo-slate-900.svg"}
+              src={
+                theme === "dark"
+                  ? "/images/icons/Logo_branca.svg"
+                  : "/images/icons/Logo-slate-900.svg"
+              }
               alt="Logo"
               width={54}
               height={51}
@@ -74,13 +84,15 @@ export default function VerifyCodeModal({ isOpen, onClose, onSuccess, email }: P
           </div>
 
           {/* Título */}
-          <h2 className="text-[22px] md:text-[32px] font-bold">Verificando seu e-mail</h2>
+          <h2 className="text-[22px] md:text-[32px] font-bold">
+            Verificando seu e-mail
+          </h2>
           <div className="md:pt-6 md:pb-12.5 pt-3 pb-10 flex flex-col items-center">
             <p className="text-[13px] md:text-[16px] font-medium text-center md:w-110 lg:w-full">
               Enviamos um código de 4 dígitos para seu e-mail.
             </p>
             <p className="text-[13px] md:text-[16px] w-65 md:w-full font-medium text-center">
-            Insira o código abaixo para confirmar sua identidade e continuar.
+              Insira o código abaixo para confirmar sua identidade e continuar.
             </p>
           </div>
 
@@ -94,13 +106,15 @@ export default function VerifyCodeModal({ isOpen, onClose, onSuccess, email }: P
                 value={digit}
                 placeholder="0"
                 onChange={(e) => handleChange(i, e.target.value)}
-                ref={(el) => { inputsRef.current[i] = el; }}
-                className="text-[28px] md:text-[36px] font-bold text-center border-[2.2px] border-blue-600 rounded-[12px] w-16 h-16 md:w-20 md:h-20 placeholder-[#666666]"
+                ref={(el) => {
+                  inputsRef.current[i] = el;
+                }}
+                className="text-[28px] md:text-[36px] font-bold text-center border-[2.2px] border-blue-600 rounded-[12px] w-16 h-16 md:w-20 md:h-20 placeholder-[#666666] focus:border-blue-600 focus:outline-none"
               />
             ))}
           </div>
 
-          {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+          {error && <p className="mt-1 text-sm text-red-500 text-center">{error}</p>}
 
           {/* Botão */}
           <div className="pt-8">

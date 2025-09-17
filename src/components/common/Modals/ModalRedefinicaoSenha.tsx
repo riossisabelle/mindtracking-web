@@ -33,7 +33,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
           className="absolute top-3 right-3 text-gray-400"
         >
           <Image
-            src={theme === "dark" ? "/images/icons/BotaoFechar-white.svg" : "/images/icons/BotaoFechar-black.svg"}
+            src={theme === "dark" ? "/images/icons/BotaoFechar-branco.svg" : "/images/icons/BotaoFechar-preto.svg"}
             alt="Fechar"
             width={20}
             height={20}

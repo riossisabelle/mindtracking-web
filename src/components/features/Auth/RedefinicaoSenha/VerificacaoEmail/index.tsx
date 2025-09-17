@@ -148,7 +148,7 @@ export default function ForgotPasswordModal({
             />
           </div>
 
-          {(submitError && !emailError) && <p className="text-red-500 text-sm mt-2">{submitError}</p>}
+          {(submitError && !emailError) && <p className="text-red-500 text-sm mt-1">{submitError}</p>}
 
           <div className="pt-8">
             <Button onClick={handleRecover} loading={loading} disabled={loading || isInvalid}>
