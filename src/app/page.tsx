@@ -12,18 +12,19 @@ export default function Home() {
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
-  const [userEmail] = useState("teste@exemplo.com");
+  const [userEmail, setUserEmail] = useState("");
 
-  const handleEmailModalSuccess = () => {
-    console.log("Modal de email foi chamado!");
+  const handleEmailModalSuccess = (emailFromModal: string) => {
+    console.log("Modal de email foi chamado!", emailFromModal);
+    setUserEmail(emailFromModal);
     setIsEmailModalOpen(false);
-    // Aqui você pode abrir o modal de código se quiser
+    setIsCodeModalOpen(true);
   };
 
   const handleCodeModalSuccess = () => {
     console.log("Modal de código foi chamado!");
     setIsCodeModalOpen(false);
-    // Aqui você pode abrir o próximo modal se quiser
+    setIsResetModalOpen(true);
   };
 
   const handleResetModalSuccess = () => {

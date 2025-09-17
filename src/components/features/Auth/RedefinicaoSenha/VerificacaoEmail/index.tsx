@@ -5,11 +5,13 @@ import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
 import IconInput from "../../../../common/Inputs/InputEmail";
 import { useTheme } from "@/contexts/ThemeContext";
+import { recuperarSenha } from "@/lib/api/auth";
+import { isAxiosError } from "axios";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void; // abre modal 2
+  onSuccess: (email: string) => void; // abre modal 2
 }
 
 function isAsciiOnly(value: string): boolean {
@@ -97,11 +99,18 @@ export default function ForgotPasswordModal({
 
     try {
       setLoading(true);
-      // TODO: chamada de API de recuperação (quando disponível)
-      await new Promise((r) => setTimeout(r, 800));
-      onSuccess();
-    } catch (error) {
-      setSubmitError("Erro ao recuperar senha");
+
+      // 🔹 chamada real da API
+      await recuperarSenha({ email });
+
+      // se deu certo, abre o próximo modal, passando o email digitado
+      onSuccess(email);
+    } catch (error: unknown) {
+      setSubmitError(
+        isAxiosError(error)
+          ? error.response?.data?.message || "Erro ao recuperar senha"
+          : "Erro ao recuperar senha"
+      );
     } finally {
       setLoading(false);
     }
@@ -113,14 +122,20 @@ export default function ForgotPasswordModal({
         <div className="flex flex-col items-center lg:w-[530px] lg:h-[400px] mx-auto">
           <div className="md:mb-8 mb-6">
             <Image
-              src={theme === "dark" ? "/images/icons/Logo_branca.svg" : "/images/icons/Logo-slate-900.svg"}
+              src={
+                theme === "dark"
+                  ? "/images/icons/Logo_branca.svg"
+                  : "/images/icons/Logo-slate-900.svg"
+              }
               alt="Logo"
               width={54}
               height={51}
               className="w-16.5 h-auto"
             />
           </div>
-          <h2 className="text-[22px] md:text-[32px] font-bold">Esqueceu sua senha?</h2>
+          <h2 className="text-[22px] md:text-[32px] font-bold">
+            Esqueceu sua senha?
+          </h2>
           <div className="md:pt-6 md:pb-12.5 pt-3 pb-10">
             <p className="text-[13px] md:text-[16px] font-medium text-center">
               Sem problemas. Nós cuidamos disso para você.
@@ -139,7 +154,11 @@ export default function ForgotPasswordModal({
               onChange={(e) => setEmail(e.target.value)}
               onBlur={handleBlur}
               error={touched ? emailError : null}
-              icon={theme === "dark" ? "../images/icons/UsuarioEmail.svg" : "../images/icons/UsuarioEmail-black.svg"}
+              icon={
+                theme === "dark"
+                  ? "../images/icons/UsuarioEmail.svg"
+                  : "../images/icons/UsuarioEmail-black.svg"
+              }
               iconClassName="w-6.5 h-auto"
               inputMode="email"
               autoComplete="email"
@@ -148,10 +167,16 @@ export default function ForgotPasswordModal({
             />
           </div>
 
-          {(submitError && !emailError) && <p className="text-red-500 text-sm mt-1">{submitError}</p>}
+          {submitError && !emailError && (
+            <p className="text-red-500 text-sm mt-1">{submitError}</p>
+          )}
 
           <div className="pt-8">
-            <Button onClick={handleRecover} loading={loading} disabled={loading || isInvalid}>
+            <Button
+              onClick={handleRecover}
+              loading={loading}
+              disabled={loading || isInvalid}
+            >
               {loading ? "Carregando..." : "Verificar seu e-mail"}
             </Button>
           </div>

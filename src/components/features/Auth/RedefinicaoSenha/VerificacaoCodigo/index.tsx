@@ -4,12 +4,14 @@ import Image from "next/image";
 import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
 import { useTheme } from "@/contexts/ThemeContext";
+import { verificarCodigo } from "@/lib/api/auth"; // ✅ importa serviço
+import { isAxiosError } from "axios";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void; // abre modal 3 (reset senha)
-  email: string; // recebido do modal anterior
+  onSuccess: (codigo: string) => void; // agora passa o código para o modal 3
+  email: string;
 }
 
 export default function VerifyCodeModal({
@@ -42,23 +44,19 @@ export default function VerifyCodeModal({
     setError(null);
 
     try {
-      // chamada real para a API
-      const res = await fetch("/auth/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: code.join("") }),
-      });
+      const codigo = code.join("");
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Código inválido.");
-      }
+      // 🔹 Chamada real para a API
+      await verificarCodigo({ email, codigo });
 
-      onSuccess(); // abre modal 3
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Erro ao verificar código.";
-      setError(message);
+      // se deu certo, abre o modal de redefinição
+      onSuccess(codigo);
+    } catch (error: unknown) {
+      setError(
+        isAxiosError(error)
+          ? error.response?.data?.message || "Erro ao verificar código"
+          : "Erro ao verificar código"
+      );
     } finally {
       setLoading(false);
     }
@@ -68,7 +66,6 @@ export default function VerifyCodeModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex justify-center items-center h-full">
         <div className="flex flex-col items-center lg:w-[530px] lg:h-[400px] mx-auto">
-          {/* Logo */}
           <div className="mb-6 md:mb-8">
             <Image
               src={
@@ -83,7 +80,6 @@ export default function VerifyCodeModal({
             />
           </div>
 
-          {/* Título */}
           <h2 className="text-[22px] md:text-[32px] font-bold">
             Verificando seu e-mail
           </h2>
@@ -96,7 +92,6 @@ export default function VerifyCodeModal({
             </p>
           </div>
 
-          {/* Inputs */}
           <div className="flex space-x-4">
             {code.map((digit, i) => (
               <input
@@ -116,7 +111,6 @@ export default function VerifyCodeModal({
 
           {error && <p className="mt-1 text-sm text-red-500 text-center">{error}</p>}
 
-          {/* Botão */}
           <div className="pt-8">
             <Button
               onClick={handleVerify}
