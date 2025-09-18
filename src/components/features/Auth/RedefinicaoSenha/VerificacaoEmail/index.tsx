@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
@@ -75,7 +75,6 @@ function validateEmail(valueRaw: string): string | null {
   return null;
 }
 
-
 export default function ForgotPasswordModal({
   isOpen,
   onClose,
@@ -99,11 +98,7 @@ export default function ForgotPasswordModal({
 
     try {
       setLoading(true);
-
-      // 🔹 chamada real da API
       await recuperarSenha({ email });
-
-      // se deu certo, abre o próximo modal, passando o email digitado
       onSuccess(email);
     } catch (error: unknown) {
       setSubmitError(
@@ -115,6 +110,15 @@ export default function ForgotPasswordModal({
       setLoading(false);
     }
   };
+
+  // Limpa os dados ao fechar o modal
+  useEffect(() => {
+    if (!isOpen) {
+      setEmail("");
+      setTouched(false);
+      setSubmitError(null);
+    }
+  }, [isOpen]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

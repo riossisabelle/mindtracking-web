@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
@@ -61,6 +61,15 @@ export default function VerifyCodeModal({
       setLoading(false);
     }
   };
+
+  // Limpa os dados ao fechar o modal
+  useEffect(() => {
+    if (!isOpen) {
+      setCode(["", "", "", ""]);
+      setError(null);
+      setLoading(false);
+    }
+  }, [isOpen]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

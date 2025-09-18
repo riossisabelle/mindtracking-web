@@ -7,16 +7,27 @@ export type LoginResponse = {
 };
 
 export const login = async (email: string, senha: string) => {
-  const { data } = await api.post<LoginResponse>("/auth/login", { email, senha });
+  const { data } = await api.post<LoginResponse>("/auth/login", {
+    email,
+    senha,
+  });
   return data;
 };
 
-export const register = async (payload: { nome: string; email: string; senha: string; dataNascimento?: string }) => {
+export const register = async (payload: {
+  nome: string;
+  email: string;
+  senha: string;
+  dataNascimento?: string;
+}) => {
   const { data } = await api.post("/auth/register", payload);
   return data;
 };
 
-export const verifyEmail = async (payload: { email: string; codigo: string }) => {
+export const verifyEmail = async (payload: {
+  email: string;
+  codigo: string;
+}) => {
   const { data } = await api.post("/auth/verify-email", payload);
   return data;
 };
@@ -26,12 +37,19 @@ export const recuperarSenha = async (payload: { email: string }) => {
   return data;
 };
 
-export const verificarCodigo = async (payload: { email: string; codigo: string }) => {
+export const verificarCodigo = async (payload: {
+  email: string;
+  codigo: string;
+}) => {
   const { data } = await api.post("/auth/verificar-codigo", payload);
   return data;
 };
 
-export const redefinirSenha = async (payload: { email: string; codigo: string; novaSenha: string }) => {
+export const redefinirSenha = async (payload: {
+  email: string;
+  senha: string;
+  confirmarSenha: string;
+}) => {
   const { data } = await api.post("/auth/redefinir-senha", payload);
   return data;
 };

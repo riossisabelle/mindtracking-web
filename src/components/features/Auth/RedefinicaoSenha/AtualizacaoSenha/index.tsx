@@ -1,10 +1,11 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
 import PasswordInput from "../../../../common/Inputs/InputSenha";
 import { useTheme } from "@/contexts/ThemeContext";
+import { redefinirSenha } from "@/lib/api/auth";
 
 interface Props {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export default function ResetPasswordModal({
   isOpen,
   onClose,
   onSuccess,
-  email, // eslint-disable-line @typescript-eslint/no-unused-vars
+  email,
 }: Props) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -47,7 +48,7 @@ export default function ResetPasswordModal({
 
   const passwordError = useMemo(
     () => validatePassword(password, confirm),
-    [password, confirm],
+    [password, confirm]
   );
   const isInvalid = Boolean(passwordError);
 
@@ -60,27 +61,31 @@ export default function ResetPasswordModal({
 
     try {
       setLoading(true);
-      // TODO: chamada real da API /auth/reset usando o email
-      // const res = await fetch("/auth/reset", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ email, password }),
-      // });
-      await new Promise((r) => setTimeout(r, 1000));
+      await redefinirSenha({ email, senha: password, confirmarSenha: confirm });
       onSuccess();
-    } catch {
+    } catch (err: unknown) {
       setSubmitError("Erro ao redefinir senha");
     } finally {
       setLoading(false);
     }
   };
 
+  // Limpa os dados ao fechar o modal
+  useEffect(() => {
+    if (!isOpen) {
+      setPassword("");
+      setConfirm("");
+      setTouched(false);
+      setSubmitError(null);
+    }
+  }, [isOpen]);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex items-center justify-center h-full">
         <div className="flex flex-col items-center lg:w-[523px] lg:h-auto mx-auto">
           {/* Logo */}
-          <div className="md:mb-8 mb-6">
+          <div className="mb-4.5">
             <Image
               src={
                 theme === "dark"
@@ -98,7 +103,7 @@ export default function ResetPasswordModal({
           <h2 className="text-[22px] md:text-[32px] font-bold">
             Crie sua nova senha
           </h2>
-          <div className="md:pt-6 md:pb-8 pt-3 pb-8">
+          <div className="lg:pt-4 lg:pb-4 pt-4 pb-6">
             <p className="text-[13px] md:text-[16px] font-medium text-center w-70 md:w-115 lg:w-130">
               Perfeito! Agora, defina uma nova senha de acesso. Escolha uma
               combinação forte para manter sua conta e suas reflexões sempre
@@ -107,7 +112,7 @@ export default function ResetPasswordModal({
           </div>
 
           {/* Campo Senha */}
-          <div className="w-full max-w-md mb-3">
+          <div className="w-full max-w-md lg:mb-1.5 mb-3">
             <PasswordInput
               id="new-password"
               name="password"
@@ -117,12 +122,13 @@ export default function ResetPasswordModal({
               onBlur={handleBlur}
               error={touched ? passwordError : null}
               required
+              minLength={8}
               maxLength={8}
             />
           </div>
 
           {/* Campo Confirmar Senha */}
-          <div className="w-full max-w-md mb-3">
+          <div className="w-full max-w-md lg:mb-1.5 mb-3">
             <PasswordInput
               id="confirm-password"
               name="confirm"
@@ -132,19 +138,20 @@ export default function ResetPasswordModal({
               onBlur={handleBlur}
               error={touched ? passwordError : null}
               required
+              minLength={8}
               maxLength={8}
             />
           </div>
 
           {/* Mensagem de erro de submit */}
           {submitError && !passwordError && (
-            <p className="text-red-500 text-sm mt-1 text-center">
+            <p className="text-red-500 text-sm mt-1 text-start w-[448px]">
               {submitError}
             </p>
           )}
 
           {/* Botão */}
-          <div className="pt-3">
+          <div className="pt-1.5">
             <Button
               onClick={handleReset}
               loading={loading}

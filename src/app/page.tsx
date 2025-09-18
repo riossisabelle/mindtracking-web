@@ -1,37 +1,11 @@
 "use client";
-
-import { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import Sidebar from "../components/layout/Sidebar";
-import ForgotPasswordModal from "../components/features/Auth/RedefinicaoSenha/VerificacaoEmail";
-import VerifyCodeModal from "../components/features/Auth/RedefinicaoSenha/VerificacaoCodigo";
-import ResetPasswordModal from "../components/features/Auth/RedefinicaoSenha/AtualizacaoSenha";
+import ForgotPasswordButton from "@/components/common/Buttons/ButtonEsqueceuSenha";
 
 export default function Home() {
   const { theme } = useTheme(); // Obtém o tema atual do contexto
-  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
-  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
-  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
 
-  const handleEmailModalSuccess = (emailFromModal: string) => {
-    console.log("Modal de email foi chamado!", emailFromModal);
-    setUserEmail(emailFromModal);
-    setIsEmailModalOpen(false);
-    setIsCodeModalOpen(true);
-  };
-
-  const handleCodeModalSuccess = () => {
-    console.log("Modal de código foi chamado!");
-    setIsCodeModalOpen(false);
-    setIsResetModalOpen(true);
-  };
-
-  const handleResetModalSuccess = () => {
-    console.log("Modal de redefinição de senha foi chamado!");
-    setIsResetModalOpen(false);
-    // Aqui você pode fazer o que quiser após a redefinição
-  };
 
   return (
     <div
@@ -48,49 +22,8 @@ export default function Home() {
         >
           Teste do Modal
         </h1>
-        <div className="space-y-3">
-          <button
-            onClick={() => setIsEmailModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            Abrir Modal de Verificação de Email
-          </button>
-
-          <button
-            onClick={() => setIsCodeModalOpen(true)}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            Abrir Modal de Verificação de Código
-          </button>
-
-          <button
-            onClick={() => setIsResetModalOpen(true)}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            Abrir Modal de Redefinição de Senha
-          </button>
-        </div>
+        <ForgotPasswordButton />
       </div>
-
-      <ForgotPasswordModal
-        isOpen={isEmailModalOpen}
-        onClose={() => setIsEmailModalOpen(false)}
-        onSuccess={handleEmailModalSuccess}
-      />
-
-      <VerifyCodeModal
-        isOpen={isCodeModalOpen}
-        onClose={() => setIsCodeModalOpen(false)}
-        onSuccess={handleCodeModalSuccess}
-        email={userEmail}
-      />
-
-      <ResetPasswordModal
-        isOpen={isResetModalOpen}
-        onClose={() => setIsResetModalOpen(false)}
-        onSuccess={handleResetModalSuccess}
-        email={userEmail}
-      />
     </div>
   );
 }
