@@ -271,7 +271,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full max-w-full mt-5">
+        <div className="w-full max-w-full pb-10 mt-5">
           <FAQ />
         </div>
       </section>
