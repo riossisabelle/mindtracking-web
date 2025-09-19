@@ -58,7 +58,9 @@ export default function PasswordInput({
             placeholder={label}
             aria-invalid={isError || undefined}
             aria-describedby={helperId}
+
             maxLength={20}
+
             className={`w-full font-bold text-[15.37px] ml-1.5 bg-transparent placeholder-opacity-50 focus:outline-none ${
               theme === "dark"
                 ? "text-slate-50 placeholder-white"
@@ -85,7 +87,9 @@ export default function PasswordInput({
               alt={show ? "ocultar senha" : "mostrar senha"}
               width={26}
               height={26}
+
               className="md:size-7.5"
+
             />
           </button>
         </div>
@@ -106,4 +110,6 @@ export default function PasswordInput({
       )}
     </div>
   );
+
 }
+
