@@ -58,6 +58,7 @@ export default function PasswordInput({
             placeholder={label}
             aria-invalid={isError || undefined}
             aria-describedby={helperId}
+            maxLength={20}
             className={`w-full font-bold text-[15.37px] ml-1.5 bg-transparent placeholder-opacity-50 focus:outline-none ${
               theme === "dark"
                 ? "text-slate-50 placeholder-white"

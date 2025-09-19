@@ -5,23 +5,73 @@ import IconInput from "@/components/common/Inputs/InputEmail";
 import PasswordInput from "@/components/common/Inputs/InputSenha";
 import Button from "@/components/common/Buttons";
 import { motion } from "framer-motion";
-import { ArrowBigDown, Calendar, ChevronLeft, Phone } from "lucide-react";
+import { Calendar, ChevronLeft, Phone } from "lucide-react";
 import GenderSelect from "@/components/common/Inputs/InputGenero";
+import { validateEmail, validatePassword } from "@/lib/validation";
 
 export default function Register() {
   const { theme } = useTheme();
   const [displayedText, setDisplayedText] = useState("");
   const [isRegisterView, setIsRegisterView] = useState(true);
   const [currentText, setCurrentText] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // Estados do formulário 1
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  
+  // Estados do formulário 2
   const [birthdate, setBirthdate] = useState("");
+  const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
+
+  // Validação do formulário 1
+  const isFormOneValid = () => {
+    return (
+      email.trim() !== "" &&
+      password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
+      !emailError &&
+      !passwordError
+    );
+  };
+
+  // Validação do formulário 2
+  const isFormTwoValid = () => {
+    return (
+      name.trim() !== "" &&
+      birthdate.trim() !== "" &&
+      phone.trim() !== "" &&
+      gender.trim() !== ""
+    );
+  };
+
+  // Validação E-mail
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    setEmailError(validateEmail(value));
+  };
+
+  // Validação Senha
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError(validatePassword(value, confirmPassword));
+  };
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value);
+    setPasswordError(validatePassword(password, value));
+  };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
-
-    // 1. Remove tudo que não for número
     const onlyNums = rawValue.replace(/[^\d]/g, "");
-
-    // 2. Aplica a máscara DD/MM/AAAA
+    
     let formattedDate = onlyNums;
     if (onlyNums.length > 2) {
       formattedDate = `${onlyNums.slice(0, 2)}/${onlyNums.slice(2)}`;
@@ -29,53 +79,78 @@ export default function Register() {
     if (onlyNums.length > 4) {
       formattedDate = `${onlyNums.slice(0, 2)}/${onlyNums.slice(2, 4)}/${onlyNums.slice(4, 8)}`;
     }
-
-    // 3. Atualiza o estado com o valor formatado
+    
     setBirthdate(formattedDate);
   };
 
-  const [phone, setPhone] = useState("");
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
-
-    // 1. Remove tudo que não for número
     const onlyNums = rawValue.replace(/[^\d]/g, "");
-
-    // Limita a 11 dígitos (DDD + 9 dígitos)
     const limitedNums = onlyNums.slice(0, 11);
-
-    // 2. Aplica a máscara dinâmica
+    
     let formattedPhone = limitedNums;
     if (limitedNums.length > 2) {
       formattedPhone = `(${limitedNums.slice(0, 2)}) ${limitedNums.slice(2)}`;
     }
-
-    // Se for um celular com 9º dígito
     if (limitedNums.length > 6 && limitedNums.length === 11) {
       formattedPhone = `(${limitedNums.slice(0, 2)}) ${limitedNums.slice(2, 7)}-${limitedNums.slice(7)}`;
-    }
-    // Se for um telefone fixo ou celular antigo
-    else if (limitedNums.length > 6) {
+    } else if (limitedNums.length > 6) {
       formattedPhone = `(${limitedNums.slice(0, 2)}) ${limitedNums.slice(2, 6)}-${limitedNums.slice(6)}`;
     }
-
-    // 3. Atualiza o estado
+    
     setPhone(formattedPhone);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
+
+  const handleGenderChange = (value: string) => {
+    setGender(value);
+  };
+
+  const handleRegisterClick = async () => {
+    if (isRegisterView) {
+      // Validação do formulário 1
+      const emailValidation = validateEmail(email);
+      const passwordValidation = validatePassword(password, confirmPassword);
+      
+      if (emailValidation) {
+        setEmailError(emailValidation);
+        return;
+      }
+      if (passwordValidation) {
+        setPasswordError(passwordValidation);
+        return;
+      }
+      toggleView();
+    } else {
+      // Validação do formulário 2
+      if (!isFormTwoValid()) {
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        // Lógica de cadastro completo
+        console.log("Cadastro completo:", { email, password, name, birthdate, phone, gender });
+        // await api.register({ email, password, name, birthdate, phone, gender });
+      } catch (error) {
+        console.error("Erro no cadastro:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const toggleView = () => {
+    setIsRegisterView(!isRegisterView);
   };
 
   const fullTextForRegister =
     "Bem-vindo à MindTracking! Eu sou a Athena, sua assistente emocional. Estou aqui pra te ajudar a entender melhor seus sentimentos e serei sua parceira nessa jornada de autoconhecimento. Preciso te conhecer um pouco para te cadastrar nesta jornada.";
   const fullTextForRegisterTwo =
     "Pra começarmos do jeitinho certo, me conta seu nome e quando você nasceu. Assim, posso te conhecer melhor e deixar tudo mais personalizado por aqui.";
-  
-    const toggleView = () => {
-    setIsRegisterView(!isRegisterView);
-  };
-
-  const handleRegisterClick = () => {
-    toggleView();
-  };
 
   useEffect(() => {
     let i = 0;
@@ -89,7 +164,7 @@ export default function Register() {
     }, 30);
 
     return () => clearInterval(typingInterval);
-  }, [setIsRegisterView]);
+  }, [isRegisterView]);
 
   useEffect(() => {
     let i = 0;
@@ -101,12 +176,14 @@ export default function Register() {
         clearInterval(typingText);
       }
     }, 30);
-  }, [setIsRegisterView]);
+    
+    return () => clearInterval(typingText);
+  }, [isRegisterView]);
 
   return (
-    <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start  lg:justify-between px-5">
+    <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start lg:justify-between px-5">
       {isRegisterView ? (
-        <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start  lg:justify-between">
+        <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           <div className="hidden lg:flex flex-col items-center mt-8 relative">
             <div className="flex items-start">
               <motion.div
@@ -151,7 +228,7 @@ export default function Register() {
                   Sua jornada rumo ao equilíbrio emocional começa aqui
                 </h2>
               </div>
-              <div className="flex flex-col gap-4">
+              <form className="flex flex-col gap-4">
                 <IconInput
                   width="w-full"
                   type="email"
@@ -167,6 +244,9 @@ export default function Register() {
                   inputMode="email"
                   autoComplete="email"
                   maxLength={254}
+                  value={email}
+                  onChange={handleEmailChange}
+                  error={emailError}
                   required
                 />
 
@@ -176,31 +256,33 @@ export default function Register() {
                   id="forgot-password"
                   name="password"
                   label="Senha"
-                  inputMode="email"
-                  autoComplete="email"
-                  maxLength={254}
+                  value={password}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  error={passwordError}
                   required
                 />
 
                 <PasswordInput
                   width="w-full"
                   type="password"
-                  id="forgot-password"
-                  name="password"
+                  id="forgot-confirm-password"
+                  name="confirmPassword"
                   label="Confirme sua senha"
-                  inputMode="email"
-                  autoComplete="email"
-                  maxLength={254}
+                  value={confirmPassword}
+                  onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                  error={passwordError}
                   required
                 />
-              </div>
+              </form>
 
               <div className="w-full mt-5 flex flex-col items-center">
                 <Button
                   text="Prosseguir para próxima etapa"
-                  widthClass=" md:w-full"
-                  type="submit"
+                  widthClass="md:w-full"
+                  type="button"
                   onClick={handleRegisterClick}
+                  disabled={!isFormOneValid()}
+                  loading={loading}
                 />
               </div>
             </div>
@@ -263,7 +345,7 @@ export default function Register() {
             <div className="flex flex-col gap-4 mt-2">
               <IconInput
                 width="w-full"
-                type="name"
+                type="text"
                 id="forgot-name"
                 name="name"
                 label="Nome"
@@ -276,35 +358,34 @@ export default function Register() {
                 inputMode="text"
                 autoComplete="name"
                 maxLength={254}
+                value={name}
+                onChange={handleNameChange}
                 required
               />
 
               <IconInput
                 width="w-full"
-                type="text" // Mantém como texto
+                type="text"
                 id="birthdate"
                 name="birthdate"
                 label="Data de nascimento"
-                placeholder="DD/MM/AAAA" // Você pode adicionar um placeholder explícito se quiser
+                placeholder="DD/MM/AAAA"
                 icon={
-                  // theme === "dark"
-                  //   ? "../images/icons/Calendar.svg" // Sugestão: use um ícone de calendário
-                  //   : "../images/icons/Calendar-black.svg"
                   <Calendar
                     className={`${theme === "dark" ? "text-slate-50" : "text-gray-800"}`}
                   />
                 }
                 iconClassName="w-6.5 h-auto"
-                inputMode="numeric" // Melhora a experiência em celulares (mostra o teclado numérico)
-                maxLength={10} // Limita o tamanho para DD/MM/AAAA
+                inputMode="numeric"
+                maxLength={10}
                 required
-                value={birthdate} // O valor do input é controlado pelo estado
-                onChange={handleDateChange} // A mágica acontece aqui
+                value={birthdate}
+                onChange={handleDateChange}
               />
 
               <IconInput
                 width="w-full"
-                type="text" // CORRIGIDO
+                type="text"
                 id="phone"
                 name="phone"
                 label="Telefone"
@@ -315,11 +396,11 @@ export default function Register() {
                   />
                 }
                 iconClassName="w-6.5 h-auto"
-                inputMode="tel" // CORRIGIDO
-                maxLength={15} // Aumentado para comportar a máscara completa (XX) XXXXX-XXXX
+                inputMode="tel"
+                maxLength={15}
                 required
-                value={phone} // Controlado pelo estado
-                onChange={handlePhoneChange} // Função de formatação
+                value={phone}
+                onChange={handlePhoneChange}
               />
 
               <GenderSelect />
@@ -328,9 +409,11 @@ export default function Register() {
             <div className="w-full mt-5 flex flex-col items-center">
               <Button
                 text="Criar minha conta"
-                widthClass=" md:w-full"
-                type="submit"
+                widthClass="md:w-full"
+                type="button"
                 onClick={handleRegisterClick}
+                disabled={!isFormTwoValid()}
+                loading={loading}
               />
             </div>
           </div>
