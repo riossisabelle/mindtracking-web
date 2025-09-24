@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useTheme } from "@/contexts/ThemeContext";
-import Button from "../../Buttons/ButtonEsqueceuSenha";
 import BaseCard from "./BaseCard";
 
 export default function QuestionarioCard() {
@@ -25,7 +24,7 @@ export default function QuestionarioCard() {
 
         <div className="pt-4.5 pb-4.5">
             <button className={`
-          md:w-[330px] md:h-[52px] sm:w-[290px] sm:h-[50px] w-[290px] h-[50px] bg-blue-600 hover:bg-blue-500 text-white font-bold text-[16px] 
+          md:w-full md:h-[52px] sm:w-[290px] sm:h-[50px] w-[290px] h-[50px] bg-blue-600 hover:bg-blue-500 text-white font-bold text-[16px] 
           py-2 rounded-3xl border-4 border-transparent transition-all duration-200 cursor-pointer
           disabled:opacity-60 disabled:cursor-not-allowed
           active:scale-[0.98] active:brightness-95 active:border-blue-700
