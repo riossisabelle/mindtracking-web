@@ -14,9 +14,16 @@ import Card from "@/components/common/Cards/Cards_LadingPage";
 import ImageDashboard from "@/components/features/LadingPage/Images_Dashboard";
 import CardBeneficio from "@/components/features/LadingPage/Card/Card_Beneficios";
 import FAQ from "@/components/common/FAQ";
+import { useState } from "react";
+import Modal from "@/components/common/Modals/Auth/Login";
+import Login from "@/components/common/Modals/Auth/Login/children";
+import Register from "@/components/common/Modals/Auth/Register/children";
+import { text } from "stream/consumers";
 
 export default function Home() {
   const { darkMode, toggleTheme } = useTheme();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   return (
     <main className="w-full h-full overflow-x-hidden">
@@ -38,10 +45,39 @@ export default function Home() {
           </p>
 
           <div className="hidden lg:flex lg:gap-3.5">
-            <Button text="Fazer login" secondary={false} />
+            <Button
+              text="Fazer login"
+              secondary={false}
+              onClick={() => setIsLoginModalOpen(true)}
+            />
 
-            <Button text="Cadastra-se" secondary={true} />
+            <Button
+              text="Cadastra-se"
+              secondary={true}
+              onClick={() => setIsRegisterModalOpen(true)}
+            />
           </div>
+
+          <Modal
+            isOpen={isLoginModalOpen}
+            onClose={() => setIsLoginModalOpen(false)}
+          >
+            <Login />
+            <Image
+              className="hidden lg:flex absolute ml-[45em] mt-[0.575em]"
+              src="/images/athena-pulando.png"
+              alt="Athena pulando"
+              width={250}
+              height={200}
+            />
+          </Modal>
+
+          <Modal
+            isOpen={isRegisterModalOpen}
+            onClose={() => setIsRegisterModalOpen(false)}
+          >
+            <Register />
+          </Modal>
 
           <div className="flex flex-col items-center justify-center w-full gap-[24px] lg:hidden">
             <div className="flex md:hidden lg:hidden">
@@ -51,6 +87,20 @@ export default function Home() {
               text="Acessar meu espaço"
               secondary={false}
               widthClass="w-full"
+              onClick={() => setIsLoginModalOpen(true)}
+            />
+            <h1
+              className={`text-center text-lg font-bold ${darkMode ? "text-slate-50" : "text-slate-900"}`}
+            >
+              Ou
+            </h1>
+            <Button
+              text="Cadastra-se"
+              secondary={true}
+              widthClass="w-full"
+              paddingClass="px-10 py-2"
+              mtForSecondary="mt-0"
+              onClick={() => setIsRegisterModalOpen(true)}
             />
           </div>
         </div>
@@ -223,7 +273,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full max-w-full mt-5">
+        <div className="w-full max-w-full pb-10 mt-5">
           <FAQ />
         </div>
       </section>
