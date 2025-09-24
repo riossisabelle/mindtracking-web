@@ -1,13 +1,4 @@
 "use client";
-
-
-
-import Header from "@/components/layout/Header";
-// import Footer from "@/components/layout/Footer";
-import Image from "next/image";
-import Button from "@/components/common/Buttons";
-import Footer from "@/components/layout/Footer";
-import DarkModeToggle from "@/components/common/ButtonColors";
 import { useTheme } from "@/contexts/ThemeContext";
 import Seta from "@/components/common/Icons/Seta";
 import Card from "@/components/common/Cards/Cards_LadingPage";
@@ -280,6 +271,5 @@ export default function Home() {
 
       <Footer />
     </main>
-
   );
 }
