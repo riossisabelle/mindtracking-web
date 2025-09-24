@@ -10,7 +10,7 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, children }: ModalProps) {
-  const { theme } = useTheme(); // Obtém o tema atual do contexto
+  const { theme } = useTheme();
 
   if (!isOpen) return null;
 
@@ -20,20 +20,20 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         className={`${
           theme === "dark" ? "bg-slate-800 text-white" : "bg-white text-black"
         } rounded-[12px] p-4 sm:p-6 md:p-8 relative
-         max-h-[85vh] w-[90%] max-w-[1066px] h-auto
+         max-h-[90vh] w-[90%] max-w-[1066px] h-auto
          min-h-[min(550px,80vh)]
          sm:min-h-[min(550px,80vh)]
-         md:min-h-[min(690px,85vh)]
+         md:min-h-[min(690px,92vh)]
          overflow-y-auto overscroll-contain
-         flex flex-col items-center justify-center`}
+         flex flex-col items-center justify-start`} // Alterado para justify-start
       >
         {/* Botão Fechar */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400"
+          className="absolute top-3 right-3 text-gray-400 z-10"
         >
           <Image
-            src={theme === "dark" ? "/images/icons/BotaoFechar.svg" : "/images/icons/BotaoFechar-preto.svg"}
+            src={theme === "dark" ? "/images/icons/BotaoFechar-branco.svg" : "/images/icons/BotaoFechar-preto.svg"}
             alt="Fechar"
             width={20}
             height={20}
@@ -41,7 +41,9 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
           />
         </button>
 
-        {children}
+        <div className="w-full h-full overflow-y-auto">
+          {children}
+        </div>
       </div>
     </div>
   );

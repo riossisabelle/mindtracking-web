@@ -7,7 +7,14 @@ import Button from "@/components/common/Buttons";
 import { motion } from "framer-motion";
 import { Calendar, ChevronLeft, Phone } from "lucide-react";
 import GenderSelect from "@/components/common/Inputs/InputGenero";
-import { validateEmail, validatePassword } from "@/lib/validation";
+import {
+  validateEmail,
+  validatePassword,
+  validateName,
+  validateBirthdate,
+  validatePhone,
+  validateGender,
+} from "@/lib/validation";
 
 export default function Register() {
   const { theme } = useTheme();
@@ -15,19 +22,23 @@ export default function Register() {
   const [isRegisterView, setIsRegisterView] = useState(true);
   const [currentText, setCurrentText] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // Estados do formulário 1
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  
+
   // Estados do formulário 2
   const [birthdate, setBirthdate] = useState("");
+  const [birthdateError, setBirthdateError] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
   const [gender, setGender] = useState("");
+  const [genderError, setGenderError] = useState<string | null>(null);
 
   // Validação do formulário 1
   const isFormOneValid = () => {
@@ -46,7 +57,11 @@ export default function Register() {
       name.trim() !== "" &&
       birthdate.trim() !== "" &&
       phone.trim() !== "" &&
-      gender.trim() !== ""
+      gender.trim() !== "" &&
+      !nameError &&
+      !birthdateError &&
+      !phoneError &&
+      !genderError
     );
   };
 
@@ -71,7 +86,7 @@ export default function Register() {
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
     const onlyNums = rawValue.replace(/[^\d]/g, "");
-    
+
     let formattedDate = onlyNums;
     if (onlyNums.length > 2) {
       formattedDate = `${onlyNums.slice(0, 2)}/${onlyNums.slice(2)}`;
@@ -79,15 +94,16 @@ export default function Register() {
     if (onlyNums.length > 4) {
       formattedDate = `${onlyNums.slice(0, 2)}/${onlyNums.slice(2, 4)}/${onlyNums.slice(4, 8)}`;
     }
-    
+
     setBirthdate(formattedDate);
+    setBirthdateError(validateBirthdate(formattedDate));
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
     const onlyNums = rawValue.replace(/[^\d]/g, "");
     const limitedNums = onlyNums.slice(0, 11);
-    
+
     let formattedPhone = limitedNums;
     if (limitedNums.length > 2) {
       formattedPhone = `(${limitedNums.slice(0, 2)}) ${limitedNums.slice(2)}`;
@@ -97,16 +113,20 @@ export default function Register() {
     } else if (limitedNums.length > 6) {
       formattedPhone = `(${limitedNums.slice(0, 2)}) ${limitedNums.slice(2, 6)}-${limitedNums.slice(6)}`;
     }
-    
+
     setPhone(formattedPhone);
+    setPhoneError(validatePhone(formattedPhone));
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
+    const value = e.target.value;
+    setName(value);
+    setNameError(validateName(value));
   };
 
   const handleGenderChange = (value: string) => {
     setGender(value);
+    setGenderError(validateGender(value));
   };
 
   const handleRegisterClick = async () => {
@@ -114,7 +134,7 @@ export default function Register() {
       // Validação do formulário 1
       const emailValidation = validateEmail(email);
       const passwordValidation = validatePassword(password, confirmPassword);
-      
+
       if (emailValidation) {
         setEmailError(emailValidation);
         return;
@@ -125,15 +145,37 @@ export default function Register() {
       }
       toggleView();
     } else {
-      // Validação do formulário 2
-      if (!isFormTwoValid()) {
+      // Validação completa do formulário 2
+      const nameValidation = validateName(name);
+      const birthdateValidation = validateBirthdate(birthdate);
+      const phoneValidation = validatePhone(phone);
+      const genderValidation = validateGender(gender);
+
+      setNameError(nameValidation);
+      setBirthdateError(birthdateValidation);
+      setPhoneError(phoneValidation);
+      setGenderError(genderValidation);
+
+      if (
+        nameValidation ||
+        birthdateValidation ||
+        phoneValidation ||
+        genderValidation
+      ) {
         return;
       }
-      
+
       setLoading(true);
       try {
         // Lógica de cadastro completo
-        console.log("Cadastro completo:", { email, password, name, birthdate, phone, gender });
+        console.log("Cadastro completo:", {
+          email,
+          password,
+          name,
+          birthdate,
+          phone,
+          gender,
+        });
         // await api.register({ email, password, name, birthdate, phone, gender });
       } catch (error) {
         console.error("Erro no cadastro:", error);
@@ -176,7 +218,7 @@ export default function Register() {
         clearInterval(typingText);
       }
     }, 30);
-    
+
     return () => clearInterval(typingText);
   }, [isRegisterView]);
 
@@ -224,7 +266,7 @@ export default function Register() {
                 <h1 className="text-center text-2xl md:text-3xl font-bold leading-snug">
                   Vamos começar!
                 </h1>
-                <h2 className="text-center text-base w-64 md:w-full md:text-lg leading-snug">
+                <h2 className="text-center md:mb-4 mb-0 text-base w-64 md:w-full md:text-lg leading-snug">
                   Sua jornada rumo ao equilíbrio emocional começa aqui
                 </h2>
               </div>
@@ -275,7 +317,7 @@ export default function Register() {
                 />
               </form>
 
-              <div className="w-full mt-5 flex flex-col items-center">
+              <div className="w-full mt-2 flex flex-col items-center">
                 <Button
                   text="Prosseguir para próxima etapa"
                   widthClass="md:w-full"
@@ -290,15 +332,15 @@ export default function Register() {
         </div>
       ) : (
         <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
-          <div className="hidden lg:flex flex-col items-center mt-8 relative">
-            <div className="absolute md:top-[-3.5em] md:left-[-2.745em] lg:top-[-5.5em] lg:left-[-2.745em]">
+            <div className="hidden md:flex absolute md:top-[1em] md:left-[0.745em] ">
               <button className="cursor-pointer" onClick={toggleView}>
                 <ChevronLeft
                   size={48}
-                  className={`${theme === "dark" ? "text-white" : "text-slate-900"}`}
+                  className={`${theme === "dark" ? "text-white" : "text-slate-900"} `}
                 />
               </button>
             </div>
+          <div className="hidden lg:flex flex-col items-center mt-8 relative">
 
             <div className="flex items-start">
               <motion.div
@@ -330,19 +372,22 @@ export default function Register() {
                   : "../images/icons/Logo-slate-900.svg"
               }
               alt="logo"
-              width={64}
-              height={64}
+              width={54}
+              height={54}
             />
             <div className="flex flex-col items-center justify-between w-full gap-2">
-              <h1 className="text-center text-2xl md:text-3xl font-bold leading-snug">
+              <h1 className="text-center text-2xl md:text-2xl lg:text-3xl font-bold leading-snug">
                 Estamos quase lá...
               </h1>
-              <h2 className="text-center text-base w-64 md:w-full md:text-lg leading-snug">
+              <h2 className="text-center text-base w-64 md:w-full md:text-base lg:text-lg leading-snug">
                 Precisamos apenas de seu nome e sua data de nascimento para
                 completar seu cadastro
               </h2>
             </div>
-            <div className="flex flex-col gap-4 mt-2">
+
+            <div className="flex flex-col gap-3 mt-4">
+              {" "}
+              {/* Reduzi o gap para 3 */}
               <IconInput
                 width="w-full"
                 type="text"
@@ -357,12 +402,12 @@ export default function Register() {
                 iconClassName="w-6.5 h-auto"
                 inputMode="text"
                 autoComplete="name"
-                maxLength={254}
+                maxLength={150}
                 value={name}
                 onChange={handleNameChange}
+                error={nameError}
                 required
               />
-
               <IconInput
                 width="w-full"
                 type="text"
@@ -381,8 +426,8 @@ export default function Register() {
                 required
                 value={birthdate}
                 onChange={handleDateChange}
+                error={birthdateError}
               />
-
               <IconInput
                 width="w-full"
                 type="text"
@@ -401,15 +446,16 @@ export default function Register() {
                 required
                 value={phone}
                 onChange={handlePhoneChange}
+                error={phoneError}
               />
-
-              <GenderSelect />
+              <GenderSelect onChange={handleGenderChange} error={genderError} />
             </div>
 
-            <div className="w-full mt-5 flex flex-col items-center">
+
+            <div className="w-full mt-3 md:mt-0 flex flex-col items-center">
               <Button
                 text="Criar minha conta"
-                widthClass="md:w-full"
+                widthClass="w-[20em] md:w-full"
                 type="button"
                 onClick={handleRegisterClick}
                 disabled={!isFormTwoValid()}

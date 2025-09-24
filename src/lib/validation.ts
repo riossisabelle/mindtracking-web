@@ -1,4 +1,4 @@
-export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{8,12}$/;
+export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{8,}$/;
 export function isAsciiOnly(value: string): boolean {
   return /^[\x00-\x7F]*$/.test(value);
 }
@@ -69,5 +69,83 @@ export function validatePassword(password: string, confirm: string): string | nu
   if (!passwordRegex.test(password))
     return "A senha deve incluir letra maiúscula, minúscula, número e caractere especial";
   if (password !== confirm) return "As senhas não coincidem";
+  return null;
+}
+
+// validation.ts - Adicione estas funções
+
+export function validateBirthdate(birthdate: string): string | null {
+  const trimmed = birthdate.trim();
+  if (!trimmed) return "Data de nascimento é obrigatória";
+  
+  // Verificar formato DD/MM/AAAA
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) {
+    return "Formato inválido. Use DD/MM/AAAA";
+  }
+  
+  const [day, month, year] = trimmed.split('/').map(Number);
+  
+  // Validar data real
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return "Data de nascimento inválida";
+  }
+  
+  // Calcular idade
+  const today = new Date();
+  let age = today.getFullYear() - year;
+  
+  // Ajustar idade se ainda não fez aniversário este ano
+  if (today.getMonth() < month - 1 || 
+      (today.getMonth() === month - 1 && today.getDate() < day)) {
+    age--;
+  }
+  
+  // Validar faixa etária (12-70 anos)
+  if (age < 12) return "Você deve ter pelo menos 12 anos";
+  if (age > 70) return "Idade máxima permitida é 70 anos";
+  
+  return null;
+}
+
+export function validatePhone(phone: string): string | null {
+  const trimmed = phone.trim();
+  if (!trimmed) return "Telefone é obrigatório";
+  
+  // Remover formatação para validar
+  const cleanPhone = trimmed.replace(/\D/g, '');
+  
+  // Validar se é celular (9 dígitos) ou fixo (8 dígitos) com DDD
+  if (cleanPhone.length !== 10 && cleanPhone.length !== 11) {
+    return "Telefone deve ter 10 ou 11 dígitos (com DDD)";
+  }
+  
+  // Validar DDD (11 a 99)
+  const ddd = parseInt(cleanPhone.substring(0, 2));
+  if (ddd < 11 || ddd > 99) {
+    return "DDD inválido";
+  }
+  
+  return null;
+}
+
+export function validateGender(gender: string): string | null {
+  if (!gender) return "Gênero é obrigatório";
+  
+  const validGenders = ["masculino", "feminino", "outro", "prefiro não dizer"];
+  if (!validGenders.includes(gender.toLowerCase())) {
+    return "Selecione um gênero válido";
+  }
+  
+  return null;
+}
+
+export function validateName(name: string): string | null {
+  const trimmed = name.trim();
+  if (!trimmed) return "Nome é obrigatório";
+  if (!isAsciiOnly(name)) return "O nome não pode conter emoji";
+  if (trimmed.length < 2) return "Nome muito curto (mínimo 2 caracteres)";
+  if (trimmed.length > 150) return "Nome muito longo (máximo 150 caracteres)";
+  if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(trimmed)) return "Nome contém caracteres inválidos";
   return null;
 }

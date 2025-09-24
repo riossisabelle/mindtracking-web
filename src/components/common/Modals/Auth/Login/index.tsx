@@ -23,7 +23,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
          max-h-[85vh] w-[90%] max-w-[1066px] h-auto
          min-h-[min(550px,80vh)]
          sm:min-h-[min(550px,80vh)]
-         md:min-h-[min(690px,85vh)]
+         md:min-h-[min(690px,92vh)]
          overflow-y-auto overscroll-contain
          flex flex-col items-center justify-center`}
       >
@@ -33,7 +33,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
           className="absolute top-3 right-3 text-gray-400"
         >
           <Image
-            src={theme === "dark" ? "/images/icons/BotaoFechar.svg" : "/images/icons/BotaoFechar-preto.svg"}
+            src={theme === "dark" ? "/images/icons/BotaoFechar-branco.svg" : "/images/icons/BotaoFechar-preto.svg"}
             alt="Fechar"
             width={20}
             height={20}
