@@ -23,7 +23,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
          max-h-[85vh] w-[90%] max-w-[1066px] h-auto
          min-h-[min(550px,80vh)]
          sm:min-h-[min(550px,80vh)]
-         md:min-h-[min(690px,90vh)]
+         md:min-h-[min(690px,92vh)]
          overflow-y-auto overscroll-contain
          flex flex-col items-center justify-center`}
       >
