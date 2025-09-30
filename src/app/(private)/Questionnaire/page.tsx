@@ -1,6 +1,6 @@
 "use client";
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import Image from 'next/image';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const questions = [
@@ -66,8 +66,26 @@ const Questionnaire = () => {
   const bgPrimary = theme === "dark" ? "bg-gray-900" : "bg-gray-100";
 
   return (
-    <div className={`flex-1 flex justify-center items-center min-h-screen max-h-screen overflow-hidden ${bgPrimary} transition-colors duration-200`}>
-      <div className="w-full max-w-[90rem] px-4 md:px-12 pt-20 lg:pb-6 lg:px-[80px] md:pb-80 mx-auto space-y-8">
+    <div className={`flex-1 flex flex-col min-h-screen max-h-screen overflow-hidden ${bgPrimary} transition-colors duration-200`}>
+      {/* Header do Questionário
+      <div className={`flex w-full pt-10 items-center justify-center md:justify-start px-4 md:px-28 ${bgPrimary}`}>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/images/icons/Logo-blue-600-w2.svg"
+            alt="Logo"
+            width={40}
+            height={40}
+            className="w-8 h-8 md:w-10 md:h-10"
+          />
+          <h2 className={`text-xl md:text-xl font-bold ${textPrimary}`}>
+            MindTracking
+          </h2>
+        </div>
+      </div> */}
+
+      {/* Conteúdo do Questionário */}
+      <div className="flex-1 flex justify-center items-center overflow-hidden">
+        <div className="w-full max-w-[90rem] px-4 md:px-12 lg:px-[80px] mx-auto space-y-8">
 
         {/* Barra de Progresso */}
         <section className="mb-6 md:mb-4">
@@ -148,6 +166,7 @@ const Questionnaire = () => {
           </button>
         </div>
 
+        </div>
       </div>
     </div>
   );
