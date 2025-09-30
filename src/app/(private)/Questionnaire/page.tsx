@@ -1,10 +1,7 @@
 "use client";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
-interface QuestionnaireProps {
-  theme: "light" | "dark";
-}
+import { useTheme } from '@/contexts/ThemeContext';
 
 const questions = [
   {
@@ -25,7 +22,8 @@ const questions = [
 ];
 
 
-const Questionnaire = ({ theme }: QuestionnaireProps) => {
+const Questionnaire = () => {
+  const { theme } = useTheme();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selected, setSelected] = useState<string>('');

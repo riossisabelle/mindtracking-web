@@ -68,7 +68,7 @@ export default function Login() {
       // Redireciona conforme questionario_inicial
       if (res.user && typeof res.user === "object" && "questionario_inicial" in res.user) {
         if ((res.user as any).questionario_inicial === false) {
-          router.push("/Questionnaire");
+          router.push("/questionnaire");
         } else {
           router.push("/dashboard");
         }
