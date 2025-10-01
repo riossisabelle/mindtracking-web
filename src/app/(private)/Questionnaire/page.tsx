@@ -1,54 +1,69 @@
 "use client";
-import axios from 'axios';
+
 import { useEffect, useState } from 'react';
+import { getPerguntas, responderQuestionario } from '@/lib/api/questionario';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface QuestionnaireProps {
   theme: "light" | "dark";
 }
 
-const questions = [
-  {
-    id: 1,
-    text: 'Com que frequência você se envolve em atividades que aumentam sua auto-imagem positiva?',
-    options: [
-      'Melhorar a qualidade do sono',
-      'Aumentar a atividade física',
-      'Gerenciar o estresse',
-      'Comer mais saudável',
-    ],
-  },
-  {
-    id: 2,
-    text: 'Com que frequência você sente que está emocionalmente equilibrado?',
-    options: ['Sempre', 'Frequentemente', 'Raramente', 'Nunca'],
-  },
-];
+
+
 
 
 const Questionnaire = ({ theme }: QuestionnaireProps) => {
+  const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selected, setSelected] = useState<string>('');
   const [isLoadingNext, setIsLoadingNext] = useState(false);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Determina tipo de questionário
+  const tipo = searchParams.get('tipo') || '';
+  const isDiario = tipo === 'diario';
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      setLoadingQuestions(true);
+      try {
+        const data = await getPerguntas(isDiario);
+        setQuestions(data.perguntas || data); // adapta para o formato retornado
+      } finally {
+        setLoadingQuestions(false);
+      }
+    };
+    fetchQuestions();
+  }, [isDiario]);
 
   const question = questions[currentQuestion];
 
-  const handleNext = () => {
+
+  const handleNext = async () => {
     if (!selected || isLoadingNext) return;
-
     setIsLoadingNext(true);
-
     const updatedAnswers = [...answers];
     updatedAnswers[currentQuestion] = selected;
     setAnswers(updatedAnswers);
-
     setIsLoadingNext(false);
     setSelected('');
-
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
     } else {
-      alert('Questionário finalizado!');
+      // Envia respostas ao final
+      try {
+        await responderQuestionario({
+          tipo: isDiario ? 'diario' : 'obrigatorio',
+          respostas: updatedAnswers,
+        });
+        alert('Questionário enviado com sucesso!');
+        router.push('/private/dashboard');
+      } catch (e) {
+        alert('Erro ao enviar questionário.');
+      }
     }
   };
 
@@ -61,16 +76,21 @@ const Questionnaire = ({ theme }: QuestionnaireProps) => {
     setSelected(option);
   };
 
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
+  const progress = questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0;
 
   const textPrimary = theme === "dark" ? "text-white" : "text-gray-900";
   const textSecondary = theme === "dark" ? "text-gray-300" : "text-gray-700";
   const bgPrimary = theme === "dark" ? "bg-gray-900" : "bg-gray-100";
 
+  if (loadingQuestions) {
+    return <div className="flex items-center justify-center min-h-screen">Carregando perguntas...</div>;
+  }
+  if (!question) {
+    return <div className="flex items-center justify-center min-h-screen">Nenhuma pergunta encontrada.</div>;
+  }
   return (
     <div className={`flex-1 flex justify-center items-center min-h-screen max-h-screen overflow-hidden ${bgPrimary} transition-colors duration-200`}>
       <div className="w-full max-w-[90rem] px-4 md:px-12 pt-20 lg:pb-6 lg:px-[80px] md:pb-80 mx-auto space-y-8">
-
         {/* Barra de Progresso */}
         <section className="mb-6 md:mb-4">
           <div className={`font-medium flex justify-between text-sm ${textSecondary} mb-2`}>
@@ -84,31 +104,25 @@ const Questionnaire = ({ theme }: QuestionnaireProps) => {
             />
           </div>
         </section>
-
         {/* Título */}
         <h1 className={`text-xl sm:text-2xl font-bold mt-10 lg:mt-20 ${textPrimary} transition-colors duration-200`}>
           Questionário
         </h1>
-
         {/* Pergunta */}
         <p className={`text-base sm:text-lg font-bold mt-4 mb-6 lg:mb-10 ${textPrimary} transition-colors duration-200`}>
-          {question.text}
+          {question.text || question.pergunta}
         </p>
-
         {/* Opções de resposta */}
         <div className="flex flex-col gap-5 sm:gap-6 md:gap-8 w-full font-regular">
-          {question.options.map((option, idx) => {
+          {(question.options || question.opcoes || []).map((option: string, idx: number) => {
             const isSelected = selected === option;
-
             const borderColor =
               theme === "light"
                 ? "border-blue-600"
                 : isSelected
                 ? "border-blue-600"
                 : "border-gray-600";
-
             const optionTextColor = theme === "dark" ? "text-gray-100" : "text-gray-900";
-
             return (
               <div
                 key={idx}
@@ -126,7 +140,6 @@ const Questionnaire = ({ theme }: QuestionnaireProps) => {
             );
           })}
         </div>
-
         {/* Botões */}
         <div className="flex sm:gap-3 md:gap-8 justify-between items-center w-full pt-4">
           {currentQuestion > 0 && (
@@ -137,7 +150,6 @@ const Questionnaire = ({ theme }: QuestionnaireProps) => {
               Voltar
             </button>
           )}
-
           <button
             onClick={handleNext}
             disabled={!selected || isLoadingNext}
@@ -149,7 +161,6 @@ const Questionnaire = ({ theme }: QuestionnaireProps) => {
             Próxima pergunta
           </button>
         </div>
-
       </div>
     </div>
   );

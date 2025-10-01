@@ -1,7 +1,7 @@
 // src/lib/api/axios.ts
 import axios from "axios";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "https://mindtracking-api.onrender.com/";
+const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/";
 
 const api = axios.create({
   baseURL,

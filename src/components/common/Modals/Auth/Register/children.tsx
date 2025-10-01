@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { register as registerApi } from "@/lib/api/auth";
 import { useTheme } from "@/contexts/ThemeContext";
 import Image from "next/image";
 import IconInput from "@/components/common/Inputs/InputEmail";
@@ -129,12 +132,17 @@ export default function Register() {
     setGenderError(validateGender(value));
   };
 
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [showVerify, setShowVerify] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const VerifyEmailModal = dynamic(() => import("@/components/features/Auth/Register/ModalCode"), { ssr: false });
+
   const handleRegisterClick = async () => {
+    setApiError(null);
     if (isRegisterView) {
       // Validação do formulário 1
       const emailValidation = validateEmail(email);
       const passwordValidation = validatePassword(password, confirmPassword);
-
       if (emailValidation) {
         setEmailError(emailValidation);
         return;
@@ -150,12 +158,10 @@ export default function Register() {
       const birthdateValidation = validateBirthdate(birthdate);
       const phoneValidation = validatePhone(phone);
       const genderValidation = validateGender(gender);
-
       setNameError(nameValidation);
       setBirthdateError(birthdateValidation);
       setPhoneError(phoneValidation);
       setGenderError(genderValidation);
-
       if (
         nameValidation ||
         birthdateValidation ||
@@ -164,21 +170,27 @@ export default function Register() {
       ) {
         return;
       }
-
       setLoading(true);
       try {
-        // Lógica de cadastro completo
-        console.log("Cadastro completo:", {
+        // Monta o body conforme solicitado
+        const payload = {
+          nome: name,
           email,
-          password,
-          name,
-          birthdate,
-          phone,
-          gender,
-        });
-        // await api.register({ email, password, name, birthdate, phone, gender });
-      } catch (error) {
-        console.error("Erro no cadastro:", error);
+          senha: password,
+          confirmarSenha: confirmPassword,
+          data_nascimento: birthdate.split("/").reverse().join("-"), // dd/mm/yyyy -> yyyy-mm-dd
+          genero: gender,
+          telefone: phone,
+        };
+        await registerApi(payload);
+        setRegisteredEmail(email);
+        setShowVerify(true);
+      } catch (error: any) {
+        setApiError(
+          error?.response?.data?.message ||
+          error?.message ||
+          "Erro ao registrar. Tente novamente."
+        );
       } finally {
         setLoading(false);
       }
@@ -222,8 +234,20 @@ export default function Register() {
     return () => clearInterval(typingText);
   }, [isRegisterView]);
 
+  const router = useRouter();
+  if (showVerify) {
+    return (
+      <VerifyEmailModal
+        email={registeredEmail}
+        isOpen={true}
+        onClose={() => setShowVerify(false)}
+        onSuccess={() => router.push("/Questionnaire")}
+      />
+    );
+  }
   return (
     <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start lg:justify-between px-5">
+
       {isRegisterView ? (
         <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           <div className="hidden lg:flex flex-col items-center mt-8 relative">
@@ -332,14 +356,14 @@ export default function Register() {
         </div>
       ) : (
         <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
-            <div className="hidden md:flex absolute md:top-[1em] md:left-[0.745em] ">
-              <button className="cursor-pointer" onClick={toggleView}>
-                <ChevronLeft
-                  size={48}
-                  className={`${theme === "dark" ? "text-white" : "text-slate-900"} `}
-                />
-              </button>
-            </div>
+          <div className="hidden md:flex absolute md:top-[1em] md:left-[0.745em] ">
+            <button className="cursor-pointer" onClick={toggleView}>
+              <ChevronLeft
+                size={48}
+                className={`${theme === "dark" ? "text-white" : "text-slate-900"} `}
+              />
+            </button>
+          </div>
           <div className="hidden lg:flex flex-col items-center mt-8 relative">
 
             <div className="flex items-start">
@@ -449,6 +473,9 @@ export default function Register() {
                 error={phoneError}
               />
               <GenderSelect onChange={handleGenderChange} error={genderError} />
+              {apiError && (
+                <div className="w-full text-center text-red-500 text-sm mb-2">{apiError}</div>
+              )}
             </div>
 
 
