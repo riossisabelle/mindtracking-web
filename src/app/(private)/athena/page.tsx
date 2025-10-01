@@ -19,6 +19,7 @@ export default function Athena() {
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const chatCarouselRef = useRef<HTMLDivElement>(null);
 
     // Mensagens sugeridas
     const suggestedMessages = [
@@ -45,9 +46,65 @@ export default function Athena() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // Função para scroll horizontal com arrastar
+    const setupHorizontalScroll = (element: HTMLDivElement | null) => {
+        if (!element) return;
+        
+        let isDown = false;
+        let startX: number;
+        let scrollLeft: number;
+
+        const handleMouseDown = (e: MouseEvent) => {
+            isDown = true;
+            element.style.cursor = 'grabbing';
+            startX = e.pageX - element.offsetLeft;
+            scrollLeft = element.scrollLeft;
+        };
+
+        const handleMouseLeave = () => {
+            isDown = false;
+            element.style.cursor = 'grab';
+        };
+
+        const handleMouseUp = () => {
+            isDown = false;
+            element.style.cursor = 'grab';
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - element.offsetLeft;
+            const walk = (x - startX) * 2; // Velocidade do scroll
+            element.scrollLeft = scrollLeft - walk;
+        };
+
+        element.addEventListener('mousedown', handleMouseDown);
+        element.addEventListener('mouseleave', handleMouseLeave);
+        element.addEventListener('mouseup', handleMouseUp);
+        element.addEventListener('mousemove', handleMouseMove);
+        element.style.cursor = 'grab';
+
+        // Cleanup function
+        return () => {
+            element.removeEventListener('mousedown', handleMouseDown);
+            element.removeEventListener('mouseleave', handleMouseLeave);
+            element.removeEventListener('mouseup', handleMouseUp);
+            element.removeEventListener('mousemove', handleMouseMove);
+        };
+    };
+
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    useEffect(() => {
+        // Setup scroll apenas para carrossel do chat (quando há mensagens)
+        if (messages.length > 0) {
+            const cleanupChatCarousel = setupHorizontalScroll(chatCarouselRef.current);
+            return cleanupChatCarousel;
+        }
+    }, [messages.length]); // Re-setup quando mensagens mudam
 
     const simulateAthenaResponse = (userMessage: string) => {
         setIsTyping(true);
@@ -203,18 +260,23 @@ export default function Athena() {
                     {/* Carrossel de mensagens sugeridas durante o chat */}
                     {messages.length > 0 && (
                         <div className="mb-2 sm:mb-3">
-                            <div className="flex gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide pb-2">
+                            <div 
+                                ref={chatCarouselRef}
+                                className="flex gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide pb-2 select-none"
+                                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                            >
                                 {suggestedMessages.map((message, index) => (
                                     <button
                                         key={index}
                                         onClick={() => handleSuggestedMessageClick(message)}
                                         className={`
-                                            flex-shrink-0 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border text-xs font-medium transition-all duration-200 hover:scale-105
+                                            flex-shrink-0 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border text-xs font-medium transition-all duration-200 hover:scale-105 pointer-events-auto
                                             ${theme === "dark" 
                                                 ? "border-blue-500 text-slate-50 hover:bg-blue-500 hover:text-white" 
                                                 : "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
                                             }
                                         `}
+                                        onMouseDown={(e) => e.stopPropagation()}
                                     >
                                         {message}
                                     </button>
