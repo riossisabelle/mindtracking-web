@@ -52,7 +52,9 @@ export default function Sidebar({
       {/* Header mobile/tablet fixo no topo */}
       {!mobileOpen && (
         <div
-          className={`lg:hidden fixed top-9 left-0 right-0 z-50 flex items-center justify-between px-7 md:px-18.5 h-14 bg-transparent ${theme === "dark" ? "text-white" : "text-black"}`}
+          className={`lg:hidden fixed top-9 left-0 right-0 z-50 flex items-center justify-between px-7 md:px-18.5 h-16 ${
+            theme === "dark" ? "bg-gray-900" : "bg-white"
+          } ${theme === "dark" ? "text-white" : "text-black"}`}
         >
           <div className="flex items-center gap-3">
             <Image
