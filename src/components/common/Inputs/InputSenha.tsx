@@ -71,7 +71,11 @@ export default function PasswordInput({
           {/* Botão toggle */}
           <button
             type="button"
-            onClick={() => setShow(!show)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShow(!show);
+            }}
             className="ml-2 text-gray-500 hover:text-gray-700"
           >
             <Image
