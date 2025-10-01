@@ -1,8 +1,10 @@
 "use client";
 
+
 import { useState } from 'react';
 import Image from 'next/image';
 import { useTheme } from '@/contexts/ThemeContext';
+
 
 
 const questions = [
@@ -69,6 +71,7 @@ const Questionnaire = () => {
 
   return (
 
+
     <div className={`flex-1 flex flex-col min-h-screen max-h-screen overflow-hidden ${bgPrimary} transition-colors duration-200`}>
       {/* Header do Questionário
       <div className={`flex w-full pt-10 items-center justify-center md:justify-start px-4 md:px-28 ${bgPrimary}`}>
@@ -89,6 +92,7 @@ const Questionnaire = () => {
       {/* Conteúdo do Questionário */}
       <div className="flex-1 flex justify-center items-center overflow-hidden">
         <div className="w-full max-w-[90rem] px-4 md:px-12 lg:px-[80px] mx-auto space-y-8">
+
 
 
         {/* Barra de Progresso */}
