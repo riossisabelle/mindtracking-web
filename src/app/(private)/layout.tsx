@@ -14,7 +14,7 @@ export default function PrivateLayout({
   return (
     <div className="min-h-screen">
       {!isQuestionnairePage && <Sidebar />}
-      <main className={isQuestionnairePage ? "w-full" : "lg:ml-37.5 transition-all duration-300"}>
+      <main className={isQuestionnairePage ? "w-full min-h-screen h-full" : "lg:ml-37.5 min-h-screen h-full transition-all duration-300"}>
         {children}
       </main>
     </div>
