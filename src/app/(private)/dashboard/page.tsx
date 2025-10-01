@@ -9,9 +9,9 @@ export default function Dashboard() {
   const { theme } = useTheme();
 
   return (
-    <div className="ml-0 md:ml-37.5">
-      <div className="ml-10">
-        <h1 className="text-[32px] font-semibold mb-6 mt-5">
+    <div className="ml-0 md:ml-37.5 min-h-screen">
+      <div className="ml-6">
+        <h1 className="text-[32px] font-semibold my-5">
           Bem Vindo, [Nome do Usuário]!
         </h1>
         <p className="text-[22px] font-semibold mb-6">
