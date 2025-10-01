@@ -1,5 +1,8 @@
+"use client";
+
+import BaseCard from "./BaseCard";
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
 } from "recharts";
 
 const data = [
@@ -12,44 +15,59 @@ const data = [
   { name: "16/07", valor: 10 },
 ];
 
+const media = (data.reduce((acc, cur) => acc + cur.valor, 0) / data.length).toFixed(1);
+const melhorDiaIdx = data.reduce((best, val, idx, arr) => val.valor > arr[best].valor ? idx : best, 0);
+const melhorDia = data[melhorDiaIdx];
+
 export default function GraficoCard() {
   return (
-    <div className="w-full">
-      <div className="mb-3">
-        <div className="text-lg font-semibold">Seu Bem-Estar Esta Semana</div>
-        <div className="text-base font-medium text-white/90">
-          Média: 7.7 <span className="mx-2 text-white">|</span>
-          Melhor dia: 10.0 (sab)
+    <BaseCard>
+      <div className="mb-4">
+        <div className="text-lg font-semibold text-white">Seu Bem-Estar Esta Semana</div>
+        <div className="text-base font-medium text-white">
+          Média: {media} <span className="text-gray-300 mx-2">|</span>
+          Melhor dia: {melhorDia.valor.toFixed(1)} ({["dom", "seg", "ter", "qua", "qui", "sex", "sab"][melhorDiaIdx % 7]})
         </div>
       </div>
-      <div className="h-60 w-full">
+      <div className="h-100 flex justify-start w-full px-0">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
+          <LineChart
+            className="flex justify-start w-full"
             data={data}
-            margin={{ top: 10, left: 5, right: 10, bottom: 15 }}
+            margin={{ top: 10, right: 16, left: 0, bottom: 0 }}
+            style={{ display: "block", justifyContent: "start" }}
+
+
           >
-            <defs>
-              <linearGradient id="colorBemEstar" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#18293E" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 0" opacity={0.17} />
-            <XAxis dataKey="name" stroke="#d1e9ff" interval={0} />
-            <YAxis stroke="#d1e9ff" domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} interval={0} />
-            <Tooltip
-              contentStyle={{ backgroundColor: "#1e344e", border: "none", color: "#fff" }}
-              labelStyle={{ color: "#38bdf8" }}
+            <CartesianGrid stroke="rgba(59, 130, 246, 0.15)" vertical={true} />
+            <XAxis
+              dataKey="name"
+              stroke="#aaa"
+              interval={0}
+              tick={{ fontSize: 12, fontWeight: "regular" }}
+              scale="point"
+              padding={{ left: 0, right: 0 }}
+              allowDuplicatedCategory={false}
             />
-            <Area
+            <YAxis
+              stroke="#aaa"
+              domain={[0, 10]}
+              ticks={[0, 2, 4, 6, 8, 10]}
+              interval={0}
+              tick={{ fontSize: 12, fontWeight: "regular" }}
+              width={22}
+            />
+            <Tooltip
+              contentStyle={{ backgroundColor: "#1e344e", borderRadius: "10px", border: "none", color: "#fff" }}
+              labelStyle={{ color: "#fff" }}
+            />
+            <Line
               type="monotone"
               dataKey="valor"
-              stroke="#38bdf8"
+              stroke="#0890B1"
               strokeWidth={2}
-              fillOpacity={1}
-              fill="url(#colorBemEstar)"
               dot={{ stroke: "#38bdf8", strokeWidth: 2, r: 5, fill: "#18293E" }}
-              activeDot={{ r: 8, fill: "#38bdf8", stroke: "#fff", strokeWidth: 3 }}
+              activeDot={{ r: 8 }}
             />
             <Legend
               verticalAlign="bottom"
@@ -62,9 +80,10 @@ export default function GraficoCard() {
                 </div>
               )}
             />
-          </AreaChart>
+          </LineChart>
         </ResponsiveContainer>
+
       </div>
-    </div>
+    </BaseCard>
   );
 }
