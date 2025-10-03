@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   LineChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -37,7 +38,7 @@ type DotPositionProps = { cx?: number; cy?: number; size?: number };
 function CustomDot(props: DotPositionProps) {
   const { cx, cy, size: sizeProp } = props;
   if (typeof cx !== "number" || typeof cy !== "number") return null;
-  const size = typeof sizeProp === "number" ? sizeProp : 18; // dot size in px
+  const size = typeof sizeProp === "number" ? sizeProp : 18;
   const half = size / 2;
   return (
     <image
@@ -54,24 +55,22 @@ function CustomDot(props: DotPositionProps) {
 export default function GraficoCard() {
   return (
     <BaseCard>
-      <div className="mb-4">
-        <div className="text-lg font-semibold text-white">
+      <div className="mb-4 flex-shrink-0">
+        <div className="text-[20px] font-semibold text-white">
           Seu Bem-Estar Esta Semana
         </div>
-        <div className="text-base font-medium text-white">
+        <div className="text-lg font-semibold text-white">
           Média: {media} <span className="text-gray-300 mx-2">|</span>
           Melhor dia: {melhorDia.valor.toFixed(1)} (
           {["dom", "seg", "ter", "qua", "qui", "sex", "sab"][melhorDiaIdx % 7]})
         </div>
       </div>
-      <div className="h-[220px] sm:h-[250px] md:h-[200px] lg:h-[160px] xl:h-[320px] max-h-[calc(100vh-280px)] overflow-hidden pb-4">
+      <div className="flex-1 min-h-0 pb-4">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            className="flex justify-start w-full"
             data={data}
             margin={{ top: 10, right: 16, left: 0, bottom: 0 }}
-            style={{ display: "block", justifyContent: "start" }}
-          >
+          >           
             <CartesianGrid stroke="rgba(59, 130, 246, 0.15)" vertical={true} />
             <XAxis
               dataKey="name"

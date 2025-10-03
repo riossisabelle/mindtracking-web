@@ -4,28 +4,31 @@ import QuestionarioCard from "@/components/common/Cards/Cards_Dashboard/Question
 import EstadoEmocionalCard from "@/components/common/Cards/Cards_Dashboard/EstadoEmocionalCard";
 import RecomendacoesCard from "@/components/common/Cards/Cards_Dashboard/RecomendacoesCard";
 import GraficoCard from "@/components/common/Cards/Cards_Dashboard/GraficoCard";
+import DiarioEmocionalCard from "@/components/common/Cards/Cards_Dashboard/DiarioEmocionalCard";
 
 export default function Dashboard() {
   const { theme } = useTheme();
 
   return (
-    <div className="ml-0 md:ml-37.5 min-h-screen">
-      <div className="ml-6">
-        <h1 className="text-[32px] font-semibold my-5">
-          Bem Vindo, [Nome do Usuário]!
-        </h1>
-        <p className="text-[22px] font-semibold mb-6">
-          Seu resumo de saúde mental esta semana
-        </p>
+    <div className="ml-0 md:ml-37.5 h-screen overflow-y-auto">
+      <div className="ml-10 h-full flex flex-col">
+        <div className="flex-shrink-0">
+          <h1 className="text-[32px] font-semibold my-5">
+            Bem Vindo, [Nome do Usuário]!
+          </h1>
+          <p className="text-[22px] font-semibold mb-6">
+            Seu resumo de saúde mental esta semana
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[98%]">
           <QuestionarioCard />
           <EstadoEmocionalCard />
           <RecomendacoesCard />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[98%] mt-6">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[98%] mt-6 auto-rows-fr mb-4">
           <GraficoCard />
-
+          <DiarioEmocionalCard />
         </div>
       </div>
     </div>

@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`${inter.className} h-full overflow-x-hidden`}>
+      <body className={`${inter.className}`}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

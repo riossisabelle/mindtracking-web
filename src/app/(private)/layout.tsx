@@ -8,9 +8,9 @@ export default function PrivateLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
+    <div className="">
       <Sidebar />
-      <main className="min-h-screen">{children}</main>
+      <main className="">{children}</main>
     </div>
   );
 }
