@@ -241,7 +241,7 @@ export default function Register() {
         email={registeredEmail}
         isOpen={true}
         onClose={() => setShowVerify(false)}
-        onSuccess={() => router.push("/Questionnaire")}
+        onSuccess={() => router.push("/questionnaire")}
       />
     );
   }
