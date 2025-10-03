@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { login as loginApi } from "@/lib/api/auth";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -23,6 +23,7 @@ export default function Login() {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
+    setApiError(null); // Limpa erro da API ao digitar
     const error = validateEmail(value);
     setEmailError(error);
   };
@@ -30,21 +31,26 @@ export default function Login() {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
+    setApiError(null); // Limpa erro da API ao digitar
     setPasswordError(value.length === 0 ? "Senha obrigatória" : null);
   };
 
-  // Função para validar se o formulário está completo e válido
-  const isFormValid = () => {
-    return (
-      email.trim() !== "" &&
-      password.trim() !== "" &&
-      !emailError &&
-      !passwordError
-    );
-  };
+  // Memoiza a validação do formulário para melhor performance
+  const isFormValid = useMemo(() => {
+    const hasEmail = email.trim() !== "";
+    const hasPassword = password.trim() !== "";
+    const emailValid = !emailError && hasEmail;
+    const passwordValid = !passwordError && hasPassword;
+    
+    return hasEmail && hasPassword && emailValid && passwordValid;
+  }, [email, password, emailError, passwordError]);
 
   const handleLoginClick = async () => {
+    // Previne múltiplos cliques
+    if (loading) return;
+    
     setApiError(null);
+    
     // Validações finais antes de enviar
     const emailValidation = validateEmail(email);
     if (emailValidation) {
@@ -55,6 +61,7 @@ export default function Login() {
       setPasswordError("Senha obrigatória");
       return;
     }
+    
     setLoading(true);
     try {
       const res = await loginApi(email, password);
@@ -75,10 +82,14 @@ export default function Login() {
       } else {
         router.push("/dashboard");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+      const apiErrorMessage = 
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      
       setApiError(
-        error?.response?.data?.message ||
-        error?.message ||
+        apiErrorMessage ||
+        errorMessage ||
         "Erro ao fazer login. Tente novamente."
       );
     } finally {
@@ -161,8 +172,8 @@ export default function Login() {
             widthClass="w-full"
             type="button"
             onClick={handleLoginClick}
-            disabled={!isFormValid()} // Botão desabilitado se o formulário não for válido
-            loading={loading} // Mostra estado de carregamento
+            disabled={!isFormValid || loading}
+            loading={loading}
           />
         </div>
       </div>
