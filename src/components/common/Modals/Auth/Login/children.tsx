@@ -9,6 +9,7 @@ import IconInput from "@/components/common/Inputs/InputEmail";
 import PasswordInput from "@/components/common/Inputs/InputSenha";
 import Button from "@/components/common/Buttons";
 import { validateEmail } from "@/lib/validation";
+import dynamic from "next/dynamic";
 
 export default function Login() {
   const { theme } = useTheme();
@@ -19,6 +20,14 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [showVerify, setShowVerify] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [pendingToken, setPendingToken] = useState<string | null>(null);
+  const [pendingUser, setPendingUser] = useState<any | null>(null);
+  const VerifyEmailModal = dynamic(
+    () => import("@/components/features/Auth/Register/ModalCode"),
+    { ssr: false },
+  );
   const router = useRouter();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +75,49 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await loginApi(email, password);
-      // Armazena token e user
+      // debug: log response to help diagnose verification flow
+      // eslint-disable-next-line no-console
+      console.debug("login response:", res);
+
+      // Normalize user object: backend might return stringified JSON, array, camelCase or snake_case
+      let userObj: any = null;
+      try {
+        if (!res.user) userObj = null;
+        else if (typeof res.user === "string") {
+          userObj = JSON.parse(res.user);
+        } else if (Array.isArray(res.user)) {
+          userObj = res.user.length > 0 ? res.user[0] : null;
+        } else {
+          userObj = res.user;
+        }
+      } catch (e) {
+        userObj = res.user;
+      }
+
+      // support both snake_case and camelCase property names, on both top-level and nested user
+      const emailVerified =
+        (res as any)?.email_verificado ??
+        (res as any)?.emailVerified ??
+        (userObj && (userObj.email_verificado ?? userObj.emailVerified ?? null));
+      const questionarioInicial =
+        (res as any)?.questionario_inicial ??
+        (res as any)?.questionarioInicial ??
+        (userObj && (userObj.questionario_inicial ?? userObj.questionarioInicial ?? null));
+
+      // debug: values
+      // eslint-disable-next-line no-console
+      console.debug("normalized user:", userObj, { emailVerified, questionarioInicial });
+      // If email not verified, open verification modal and wait for code verification
+      if (emailVerified === false) {
+        // hold token & user until verification completes
+        setPendingToken(res.token ?? null);
+        setPendingUser(userObj ?? res.user ?? null);
+        setRegisteredEmail(email);
+        setShowVerify(true);
+        return;
+      }
+
+      // Armazena token e user (normal flow)
       localStorage.setItem("mt_token", res.token);
       sessionStorage.setItem("mt_token", res.token);
       // Aplica imediatamente o Authorization na instância axios (evita precisar recarregar)
@@ -76,16 +127,8 @@ export default function Login() {
         sessionStorage.setItem("mt_user", JSON.stringify(res.user));
       }
       // Redireciona conforme questionario_inicial
-      if (
-        res.user &&
-        typeof res.user === "object" &&
-        "questionario_inicial" in res.user
-      ) {
-        if (res.user.questionario_inicial === false) {
-          router.push("/questionnaire");
-        } else {
-          router.push("/dashboard");
-        }
+      if (questionarioInicial === false) {
+        router.push("/questionnaire");
       } else {
         router.push("/dashboard");
       }
@@ -104,6 +147,26 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleVerifySuccess = (codigo: string) => {
+    // Called after verifyEmail inside modal succeeds
+    if (pendingToken) {
+      localStorage.setItem("mt_token", pendingToken);
+      sessionStorage.setItem("mt_token", pendingToken);
+      setAuthToken(pendingToken);
+    }
+    if (pendingUser) {
+      localStorage.setItem("mt_user", JSON.stringify(pendingUser));
+      sessionStorage.setItem("mt_user", JSON.stringify(pendingUser));
+    }
+    // Após verificar o código com sucesso, enviar o usuário ao questionário inicial
+    // conforme requisito: "após o codigo estiver correto ele deve ser redirecionado para a tela de questionario."
+    router.push("/questionnaire");
+    // cleanup
+    setPendingToken(null);
+    setPendingUser(null);
+    setShowVerify(false);
   };
 
   return (
@@ -188,6 +251,14 @@ export default function Login() {
             loading={loading}
           />
         </div>
+          {showVerify && (
+            <VerifyEmailModal
+              email={registeredEmail}
+              isOpen={true}
+              onClose={() => setShowVerify(false)}
+              onSuccess={handleVerifySuccess}
+            />
+          )}
         
       </div>
     </div>
