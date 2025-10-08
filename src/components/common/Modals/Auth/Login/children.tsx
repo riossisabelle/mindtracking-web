@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { login as loginApi } from "@/lib/api/auth";
+import { setAuthToken } from "@/lib/api/axios";
 import { useTheme } from "@/contexts/ThemeContext";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,16 +42,16 @@ export default function Login() {
     const hasPassword = password.trim() !== "";
     const emailValid = !emailError && hasEmail;
     const passwordValid = !passwordError && hasPassword;
-    
+
     return hasEmail && hasPassword && emailValid && passwordValid;
   }, [email, password, emailError, passwordError]);
 
   const handleLoginClick = async () => {
     // Previne múltiplos cliques
     if (loading) return;
-    
+
     setApiError(null);
-    
+
     // Validações finais antes de enviar
     const emailValidation = validateEmail(email);
     if (emailValidation) {
@@ -61,20 +62,26 @@ export default function Login() {
       setPasswordError("Senha obrigatória");
       return;
     }
-    
+
     setLoading(true);
     try {
       const res = await loginApi(email, password);
       // Armazena token e user
       localStorage.setItem("mt_token", res.token);
       sessionStorage.setItem("mt_token", res.token);
+      // Aplica imediatamente o Authorization na instância axios (evita precisar recarregar)
+      setAuthToken(res.token);
       if (res.user) {
         localStorage.setItem("mt_user", JSON.stringify(res.user));
         sessionStorage.setItem("mt_user", JSON.stringify(res.user));
       }
       // Redireciona conforme questionario_inicial
-      if (res.user && typeof res.user === "object" && "questionario_inicial" in res.user) {
-        if ((res.user).questionario_inicial === false) {
+      if (
+        res.user &&
+        typeof res.user === "object" &&
+        "questionario_inicial" in res.user
+      ) {
+        if (res.user.questionario_inicial === false) {
           router.push("/questionnaire");
         } else {
           router.push("/dashboard");
@@ -83,14 +90,16 @@ export default function Login() {
         router.push("/dashboard");
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-      const apiErrorMessage = 
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
+      const apiErrorMessage = (
+        error as { response?: { data?: { message?: string } } }
+      )?.response?.data?.message;
+
       setApiError(
         apiErrorMessage ||
-        errorMessage ||
-        "Erro ao fazer login. Tente novamente."
+          errorMessage ||
+          "Erro ao fazer login. Tente novamente.",
       );
     } finally {
       setLoading(false);
@@ -100,9 +109,6 @@ export default function Login() {
   return (
     <div>
       <div className="flex flex-col items-center justify-between w-full md:w-[28.125em] gap-4">
-        {apiError && (
-          <div className="w-full text-center text-red-500 text-sm mb-2">{apiError}</div>
-        )}
         <Image
           src={
             theme === "dark"
@@ -166,6 +172,12 @@ export default function Login() {
           </Link>
         </div>
 
+        {apiError && (
+          <div className="w-full text-center text-red-500 text-sm ">
+            {apiError}
+          </div>
+        )}
+
         <div className="w-full flex flex-col items-center">
           <Button
             text="Entrar"
@@ -176,6 +188,7 @@ export default function Login() {
             loading={loading}
           />
         </div>
+        
       </div>
     </div>
   );
