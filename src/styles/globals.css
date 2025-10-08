@@ -5,7 +5,21 @@
   html {
     font-family: var(--font-inter), system-ui, sans-serif;
   }
+
+  html {
+    height: 100%;
+    overflow-x: hidden;
+  }
   
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
   /* Transições suaves para mudança de tema */
   * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
@@ -17,12 +31,14 @@
   }
 
   html.dark body {
-    background-color: #111827; /* bg-gray-900 */
+    background-color: #111827;
+    /* bg-gray-900 */
     color: #ffffff;
   }
 
-    html.dark .flex.min-h-screen {
-    background-color: #111827; /* bg-gray-900 */
+  html.dark .flex.min-h-screen {
+    background-color: #111827;
+    /* bg-gray-900 */
   }
 
 }
