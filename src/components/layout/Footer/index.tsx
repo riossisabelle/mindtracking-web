@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "../../../contexts/ThemeContext";
-import { useState } from "react";
+import Image from "next/image";
 
 export default function Footer() {
   const { darkMode } = useTheme();
@@ -15,10 +15,13 @@ export default function Footer() {
 
           {/* Logo + título */}
           <div className="flex items-center gap-3 mb-10 md:mb-5">
-            <img
+            <Image
               src={darkMode ? "/images/icons/Logo.svg" : "/images/icons/Logo.svg"}
               alt="Logo MindTracking"
+              width={40}
+              height={40}
               className="h-10 w-10 object-contain"
+              priority
             />
             <h1 className="font-bold text-[28px]">MindTracking</h1>
           </div>
@@ -65,9 +68,11 @@ export default function Footer() {
   rel="noopener noreferrer"
   className="w-9 h-9 md:w-6 md:h-6 lg:w-9 lg:h-9"
 >
-  <img
+  <Image
     src={darkMode ? "/images/icons/facebook.svg" : "/images/icons/facebook_p.svg"}
     alt="Facebook"
+    width={36}
+    height={36}
     className="w-full h-full object-contain"
   />
 </a>
@@ -78,9 +83,11 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="w-9 h-9 md:w-6 md:h-6 lg:w-9 lg:h-9"
                   >
-                    <img
+                    <Image
                       src={darkMode ? "/images/icons/instagram.svg" : "/images/icons/instagram_p.svg"}
                       alt="Instagram"
+                      width={36}
+                      height={36}
                       className="w-full h-full object-contain"
                     />
                   </a>
@@ -90,9 +97,11 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="w-9 h-9 md:w-6 md:h-6 lg:w-9 lg:h-9"
                   >
-                    <img
+                    <Image
                       src={darkMode ? "/images/icons/x.svg" : "/images/icons/x_p.svg"}
-                      alt="X"
+                      alt="X / Twitter"
+                      width={36}
+                      height={36}
                       className="w-full h-full object-contain"
                     />
                   </a>
@@ -120,14 +129,18 @@ export default function Footer() {
                   md:ml-0 lg:ml-0
                 "
               >
-                <img
+                <Image
                   src="/images/athena4.png"
                   alt="Athena"
+                  width={416}
+                  height={416}
                   className="
                     object-contain
                     md:w-[12rem] md:-mt-14 md:-ml-12
                     lg:w-[26rem] lg:-mt-15 lg:ml-0 lg:mr-8
+                    h-auto
                   "
+                  priority
                 />
               </div>
 

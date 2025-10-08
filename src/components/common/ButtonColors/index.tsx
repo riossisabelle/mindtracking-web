@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface Props {
   darkMode: boolean;
   toggleTheme: () => void;
@@ -16,10 +18,14 @@ export default function DarkModeToggle({ darkMode, toggleTheme }: Props) {
         className={`w-7 h-7 md:w-5 md:h-5 flex items-center justify-center rounded-full shadow-md transform transition-all duration-300 bg-slate-300
           ${darkMode ? "translate-x-0" : "md:translate-x-8 translate-x-10"}`}
       >
-        <img
+        <Image
           src={darkMode ? "/images/icons/Moon.svg" : "/images/icons/Sun.svg"}
           alt="modo"
+          width={20}
+            /* largura base; o Tailwind ajusta visualmente */
+          height={20}
           className="h-auto w-[1em] md:w-3"
+          priority
         />
       </div>
     </button>

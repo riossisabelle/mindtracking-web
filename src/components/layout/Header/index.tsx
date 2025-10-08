@@ -2,6 +2,7 @@
 
 import DarkModeToggle from "../../common/ButtonColors";
 import { useTheme } from "../../../contexts/ThemeContext";
+import Image from "next/image";
 
 export default function Header() {
   const { darkMode, toggleTheme } = useTheme(); // agora usa toggleTheme corretamente
@@ -12,10 +13,13 @@ export default function Header() {
         
         {/* Logo + Texto */}
         <div className="flex items-center gap-3">
-          <img
+          <Image
             src="/images/icons/Logo.svg"
-            alt="Logo"
-            className="h-10"
+            alt="Logo MindTracking"
+            width={40}
+            height={40}
+            className="h-10 w-auto"
+            priority
           />
           <span
             className={`font-bold font-Inter text-[22px] sm:text-[26px] lg:text-[28px] ${
