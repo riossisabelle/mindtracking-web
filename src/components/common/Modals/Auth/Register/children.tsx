@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { register as registerApi } from "@/lib/api/auth";
+import { register as registerApi, login as loginApi } from "@/lib/api/auth";
+import { setAuthToken } from "@/lib/api/axios";
 import { useTheme } from "@/contexts/ThemeContext";
 import Image from "next/image";
 import IconInput from "@/components/common/Inputs/InputEmail";
@@ -241,7 +242,25 @@ export default function Register() {
         email={registeredEmail}
         isOpen={true}
         onClose={() => setShowVerify(false)}
-        onSuccess={() => router.push("/questionnaire")}
+        onSuccess={async () => {
+          // Após verificar o e-mail com sucesso, faz login para obter JWT e dados do usuário
+          try {
+            const res = await loginApi(email, password);
+            const token = (res as any)?.token;
+            if (token) {
+              localStorage.setItem("mt_token", token);
+              sessionStorage.setItem("mt_token", token);
+              setAuthToken(token);
+            }
+            if ((res as any)?.user) {
+              localStorage.setItem("mt_user", JSON.stringify((res as any).user));
+              sessionStorage.setItem("mt_user", JSON.stringify((res as any).user));
+            }
+          } catch (e) {
+            // Se falhar o login automático, segue para questionário mesmo assim
+          }
+          router.push("/questionnaire");
+        }}
       />
     );
   }

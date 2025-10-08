@@ -42,7 +42,7 @@ export default function ConverseAthenaCard() {
         </p>
 
         {/* Botão */}
-        <a href="/AthenaChat">
+        <a href="/athena">
           <button
             className={`
               mb-4 w-full h-[50px]

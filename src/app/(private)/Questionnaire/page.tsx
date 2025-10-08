@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPerguntas, responderQuestionario, responderDiario } from '@/lib/api/questionario';
+import { setAuthToken } from '@/lib/api/axios';
 
 // Tipagens auxiliares para remover usos de 'any' sem alterar lógica
 interface AlternativaAPI {
@@ -78,6 +79,7 @@ const Questionnaire = () => {
   const [selected, setSelected] = useState<number | null>(null);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDiario, setIsDiario] = useState<boolean>(false);
 
   // pergunta atual (proteção para quando ainda não carregou)
   const question = questions[currentQuestion];
@@ -88,8 +90,41 @@ const Questionnaire = () => {
     const load = async () => {
       try {
         setLoadingQuestions(true);
-        // se user.questionario_inicial for true, chama endpoint como diário
-        const questionarioInicial = Boolean((user as UserLike | null)?.questionario_inicial) === true;
+        
+        // Aplica o token JWT antes de fazer a requisição
+        if (typeof window !== "undefined") {
+          const token = localStorage.getItem("mt_token");
+          if (token) {
+            setAuthToken(token);
+          }
+        }
+        
+        // Verifica questionario_inicial do contexto ou localStorage e fixa o modo diário/inicial
+        let questionarioInicial = Boolean((user as UserLike | null)?.questionario_inicial) === true;
+
+        // Fallback: busca do localStorage se o contexto não tiver os dados
+        if (!user && typeof window !== "undefined") {
+          try {
+            const userStr = localStorage.getItem("mt_user");
+            if (userStr) {
+              const userFromStorage = JSON.parse(userStr);
+              questionarioInicial = Boolean(userFromStorage.questionario_inicial) === true;
+              console.debug("User from localStorage:", userFromStorage, "questionario_inicial:", questionarioInicial);
+            }
+          } catch (e) {
+            console.debug("Erro ao parsear user do localStorage:", e);
+          }
+        }
+ 
+        // Verificação adicional: se o usuário já respondeu o questionário inicial
+        // (baseado no erro 400 que pode ocorrer)
+        if (!questionarioInicial) {
+          console.debug("Tentando questionário inicial - se der erro 400, usuário já respondeu");
+        }
+ 
+        // Fixamos o modo: true => diário; false => inicial
+        setIsDiario(questionarioInicial);
+        console.debug("User data:", user, "questionario_inicial:", questionarioInicial, "isDiario:", questionarioInicial);
         const data = (await getPerguntas(questionarioInicial)) as PerguntasResponse;
         console.debug("getPerguntas() raw data:", data, "diario:", questionarioInicial);
 
@@ -192,6 +227,14 @@ const Questionnaire = () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
+      // Aplica o token JWT antes de enviar as respostas
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("mt_token");
+        if (token) {
+          setAuthToken(token);
+        }
+      }
+      
       // tenta obter usuário id do contexto
       const maybeUser = user as UserLike | null;
       let usuarioId: number | null = null;
@@ -228,12 +271,30 @@ const Questionnaire = () => {
       }
 
       const payload = { usuario_id: usuarioId, respostas: respostasArr };
-  const questionarioInicial = Boolean((user as UserLike | null)?.questionario_inicial) === true;
-      console.debug('Enviando questionário', { questionarioInicial, payload });
-      if (questionarioInicial) {
+      console.debug('Enviando questionário', { isDiario, payload });
+      if (isDiario) {
+        // Modo diário
         await responderDiario(payload);
       } else {
+        // Modo inicial
         await responderQuestionario(payload);
+        
+        // Após completar o questionário inicial, atualiza o usuário no localStorage
+        if (typeof window !== "undefined") {
+          try {
+            const userStr = localStorage.getItem("mt_user");
+            if (userStr) {
+              const userFromStorage = JSON.parse(userStr);
+              userFromStorage.questionario_inicial = true;
+              localStorage.setItem("mt_user", JSON.stringify(userFromStorage));
+              console.debug("Atualizado questionario_inicial para true no localStorage");
+              // Atualiza o estado local para garantir consistência nas próximas operações
+              setIsDiario(true);
+            }
+          } catch (e) {
+            console.debug("Erro ao atualizar questionario_inicial no localStorage:", e);
+          }
+        }
       }
   // redireciona para dashboard
   router.push('/dashboard');
@@ -243,6 +304,44 @@ const Questionnaire = () => {
       const status = err?.response?.status;
       const data = err?.response?.data as unknown;
       console.error('Erro ao enviar questionário', err, data);
+      
+      // Tratamento específico para erro 400 - usuário já respondeu questionário inicial
+      if (status === 400) {
+        const extractMsg = (d: unknown): string | null => {
+          if (!d) return null;
+          if (typeof d === 'string') return d;
+          if (typeof d === 'object') {
+            const maybe = d as { message?: unknown; error?: unknown };
+            const msg = maybe.message;
+            const errTxt = maybe.error;
+            if (typeof msg === 'string') return msg;
+            if (typeof errTxt === 'string') return errTxt;
+          }
+          return null;
+        };
+        const serverMessage = extractMsg(data);
+        
+        // Se o erro indica que já respondeu o questionário inicial, atualiza o localStorage
+        if (serverMessage && serverMessage.includes("já respondeu o questionário inicial")) {
+          if (typeof window !== "undefined") {
+            try {
+              const userStr = localStorage.getItem("mt_user");
+              if (userStr) {
+                const userFromStorage = JSON.parse(userStr);
+                userFromStorage.questionario_inicial = true;
+                localStorage.setItem("mt_user", JSON.stringify(userFromStorage));
+                console.debug("Atualizado questionario_inicial para true após erro 400");
+                alert("Você já completou o questionário inicial. Redirecionando para o dashboard...");
+                router.push('/dashboard');
+                return;
+              }
+            } catch (e) {
+              console.debug("Erro ao atualizar questionario_inicial após erro 400:", e);
+            }
+          }
+        }
+      }
+      
       const extractMsg = (d: unknown): string | null => {
         if (!d) return null;
         if (typeof d === 'string') return d;

@@ -1,15 +1,24 @@
 "use client";
 import Image from "next/image";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useRouter } from "next/navigation";
 import BaseCard from "./BaseCard";
 
 // Propriedade para número de questionários e se já respondeu hoje
 export default function QuestionarioCard({
   respondidos = 0,
   respondeuHoje = false,
+  loading = false,
 }) {
   const { theme } = useTheme();
+  const router = useRouter();
   const isDark = theme === "dark";
+
+  const handleQuestionarioClick = () => {
+    if (!loading && !respondeuHoje) {
+      router.push("/questionnaire");
+    }
+  };
 
   return (
     <BaseCard>
@@ -51,6 +60,8 @@ export default function QuestionarioCard({
       ) : (
         <div className={`pt-4.5 pb-4.5`}>
           <button
+            onClick={handleQuestionarioClick}
+            disabled={loading}
             className={`
               md:w-full md:h-[50px] sm:w-[290px] sm:h-[50px] w-[290px] h-[50px]
               ${
@@ -64,7 +75,7 @@ export default function QuestionarioCard({
               active:drop-shadow-[0_0_15px_#0C4A6E]
             `}
           >
-            Responda seu questionário de hoje
+            {loading ? "Verificando..." : "Responda seu questionário de hoje"}
           </button>
         </div>
       )}
