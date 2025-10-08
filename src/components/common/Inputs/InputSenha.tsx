@@ -58,6 +58,9 @@ export default function PasswordInput({
             placeholder={label}
             aria-invalid={isError || undefined}
             aria-describedby={helperId}
+
+            maxLength={20}
+
             className={`w-full font-bold text-[15.37px] ml-1.5 bg-transparent placeholder-opacity-50 focus:outline-none ${
               theme === "dark"
                 ? "text-slate-50 placeholder-white"
@@ -68,7 +71,11 @@ export default function PasswordInput({
           {/* Botão toggle */}
           <button
             type="button"
-            onClick={() => setShow(!show)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShow(!show);
+            }}
             className="ml-2 text-gray-500 hover:text-gray-700"
           >
             <Image
@@ -84,7 +91,9 @@ export default function PasswordInput({
               alt={show ? "ocultar senha" : "mostrar senha"}
               width={26}
               height={26}
-              className="md:w-7 md:h-7"
+
+              className="md:size-7.5"
+
             />
           </button>
         </div>
@@ -105,4 +114,6 @@ export default function PasswordInput({
       )}
     </div>
   );
+
 }
+

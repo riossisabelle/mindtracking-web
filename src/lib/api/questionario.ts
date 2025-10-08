@@ -2,6 +2,7 @@
 import api from "./axios";
 
 export const getPerguntas = async (diario = false) => {
+  // chama rota específica para perguntas do diário quando `diario` for true
   const url = diario ? "/questionario/diario/perguntas" : "/questionario/perguntas";
   const { data } = await api.get(url);
   return data;

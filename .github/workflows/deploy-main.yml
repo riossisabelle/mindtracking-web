@@ -46,5 +46,5 @@ jobs:
             --restart always \
             --name mindtracking-web \
             --network mindtrack-net \
-            -p 80:3000 \
+            -p 80:80 \
             mindtrack/mindtracking-web:latest

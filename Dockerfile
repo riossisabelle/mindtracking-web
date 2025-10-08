@@ -50,7 +50,8 @@ RUN chown -R node:node /app
 # Copia artefatos de build do estágio anterior
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.ts ./  
+COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/next.config.ts ./ 
 COPY --from=builder /app/tsconfig.json ./   
 
 # Instala libcap para permitir porta 80 sem root
@@ -64,4 +65,4 @@ USER node
 EXPOSE 80
 
 # Comando para rodar
-CMD ["npm", "run", "start"]
+CMD ["node", ".next/standalone/server.js"]

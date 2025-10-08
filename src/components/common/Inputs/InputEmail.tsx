@@ -9,10 +9,13 @@ interface IconInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   iconClassName?: string;
   error?: string | null;
   helperText?: string;
+
+  width?: string;
   describedById?: string; // opcional para conectar aria-describedby externamente
 }
 
-const IconInput: React.FC<IconInputProps> = ({ label, icon, iconClassName, error, helperText, describedById, ...props }) => {
+const IconInput: React.FC<IconInputProps> = ({ label, icon, iconClassName, error, helperText, describedById, width, ...props }) => {
+
   const { theme } = useTheme();
   const isError = Boolean(error);
   const helperId = describedById || (helperText || isError ? `${props.id || props.name}-helper` : undefined);
@@ -45,7 +48,9 @@ const IconInput: React.FC<IconInputProps> = ({ label, icon, iconClassName, error
           placeholder={label}
           aria-invalid={isError || undefined}
           aria-describedby={helperId}
-          className={`w-full font-bold text-[15.37px] ml-1.5 bg-transparent placeholder-opacity-50 focus:outline-none ${
+
+          className={`${width} font-bold text-[15.37px] ml-1.5 bg-transparent placeholder-opacity-50 focus:outline-none ${
+
             theme === "dark" ? "text-slate-50 placeholder-white" : "text-gray-800 placeholder-slate-900"
           }`}
         />
