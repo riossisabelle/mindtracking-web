@@ -51,6 +51,7 @@ RUN chown -R node:node /app
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/next.config.ts ./ 
 COPY --from=builder /app/tsconfig.json ./   
 
 # Instala libcap para permitir porta 80 sem root
