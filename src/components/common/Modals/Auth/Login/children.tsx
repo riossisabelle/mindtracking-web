@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { login as loginApi } from "@/lib/api/auth";
+import { setAuthToken } from "@/lib/api/axios";
 import { useTheme } from "@/contexts/ThemeContext";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +9,7 @@ import IconInput from "@/components/common/Inputs/InputEmail";
 import PasswordInput from "@/components/common/Inputs/InputSenha";
 import Button from "@/components/common/Buttons";
 import { validateEmail } from "@/lib/validation";
+import dynamic from "next/dynamic";
 
 export default function Login() {
   const { theme } = useTheme();
@@ -18,6 +20,14 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [showVerify, setShowVerify] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [pendingToken, setPendingToken] = useState<string | null>(null);
+  const [pendingUser, setPendingUser] = useState<any | null>(null);
+  const VerifyEmailModal = dynamic(
+    () => import("@/components/features/Auth/Register/ModalCode"),
+    { ssr: false },
+  );
   const router = useRouter();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,16 +51,16 @@ export default function Login() {
     const hasPassword = password.trim() !== "";
     const emailValid = !emailError && hasEmail;
     const passwordValid = !passwordError && hasPassword;
-    
+
     return hasEmail && hasPassword && emailValid && passwordValid;
   }, [email, password, emailError, passwordError]);
 
   const handleLoginClick = async () => {
     // Previne múltiplos cliques
     if (loading) return;
-    
+
     setApiError(null);
-    
+
     // Validações finais antes de enviar
     const emailValidation = validateEmail(email);
     if (emailValidation) {
@@ -61,48 +71,107 @@ export default function Login() {
       setPasswordError("Senha obrigatória");
       return;
     }
-    
+
     setLoading(true);
     try {
       const res = await loginApi(email, password);
-      // Armazena token e user
+      // debug: log response to help diagnose verification flow
+      // eslint-disable-next-line no-console
+      console.debug("login response:", res);
+
+      // Normalize user object: backend might return stringified JSON, array, camelCase or snake_case
+      let userObj: any = null;
+      try {
+        if (!res.user) userObj = null;
+        else if (typeof res.user === "string") {
+          userObj = JSON.parse(res.user);
+        } else if (Array.isArray(res.user)) {
+          userObj = res.user.length > 0 ? res.user[0] : null;
+        } else {
+          userObj = res.user;
+        }
+      } catch (e) {
+        userObj = res.user;
+      }
+
+      // support both snake_case and camelCase property names, on both top-level and nested user
+      const emailVerified =
+        (res as any)?.email_verificado ??
+        (res as any)?.emailVerified ??
+        (userObj && (userObj.email_verificado ?? userObj.emailVerified ?? null));
+      const questionarioInicial =
+        (res as any)?.questionario_inicial ??
+        (res as any)?.questionarioInicial ??
+        (userObj && (userObj.questionario_inicial ?? userObj.questionarioInicial ?? null));
+
+      // debug: values
+      // eslint-disable-next-line no-console
+      console.debug("normalized user:", userObj, { emailVerified, questionarioInicial });
+      // If email not verified, open verification modal and wait for code verification
+      if (emailVerified === false) {
+        // hold token & user until verification completes
+        setPendingToken(res.token ?? null);
+        setPendingUser(userObj ?? res.user ?? null);
+        setRegisteredEmail(email);
+        setShowVerify(true);
+        return;
+      }
+
+      // Armazena token e user (normal flow)
       localStorage.setItem("mt_token", res.token);
       sessionStorage.setItem("mt_token", res.token);
+      // Aplica imediatamente o Authorization na instância axios (evita precisar recarregar)
+      setAuthToken(res.token);
       if (res.user) {
         localStorage.setItem("mt_user", JSON.stringify(res.user));
         sessionStorage.setItem("mt_user", JSON.stringify(res.user));
       }
       // Redireciona conforme questionario_inicial
-      if (res.user && typeof res.user === "object" && "questionario_inicial" in res.user) {
-        if ((res.user as any).questionario_inicial === false) {
-          router.push("/questionnaire");
-        } else {
-          router.push("/dashboard");
-        }
+      if (questionarioInicial === false) {
+        router.push("/questionnaire");
       } else {
         router.push("/dashboard");
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-      const apiErrorMessage = 
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
+      const apiErrorMessage = (
+        error as { response?: { data?: { message?: string } } }
+      )?.response?.data?.message;
+
       setApiError(
         apiErrorMessage ||
-        errorMessage ||
-        "Erro ao fazer login. Tente novamente."
+          errorMessage ||
+          "Erro ao fazer login. Tente novamente.",
       );
     } finally {
       setLoading(false);
     }
   };
 
+  const handleVerifySuccess = (codigo: string) => {
+    // Called after verifyEmail inside modal succeeds
+    if (pendingToken) {
+      localStorage.setItem("mt_token", pendingToken);
+      sessionStorage.setItem("mt_token", pendingToken);
+      setAuthToken(pendingToken);
+    }
+    if (pendingUser) {
+      localStorage.setItem("mt_user", JSON.stringify(pendingUser));
+      sessionStorage.setItem("mt_user", JSON.stringify(pendingUser));
+    }
+    // Após verificar o código com sucesso, enviar o usuário ao questionário inicial
+    // conforme requisito: "após o codigo estiver correto ele deve ser redirecionado para a tela de questionario."
+    router.push("/questionnaire");
+    // cleanup
+    setPendingToken(null);
+    setPendingUser(null);
+    setShowVerify(false);
+  };
+
   return (
     <div>
       <div className="flex flex-col items-center justify-between w-full md:w-[28.125em] gap-4">
-        {apiError && (
-          <div className="w-full text-center text-red-500 text-sm mb-2">{apiError}</div>
-        )}
         <Image
           src={
             theme === "dark"
@@ -166,6 +235,12 @@ export default function Login() {
           </Link>
         </div>
 
+        {apiError && (
+          <div className="w-full text-center text-red-500 text-sm ">
+            {apiError}
+          </div>
+        )}
+
         <div className="w-full flex flex-col items-center">
           <Button
             text="Entrar"
@@ -176,6 +251,15 @@ export default function Login() {
             loading={loading}
           />
         </div>
+          {showVerify && (
+            <VerifyEmailModal
+              email={registeredEmail}
+              isOpen={true}
+              onClose={() => setShowVerify(false)}
+              onSuccess={handleVerifySuccess}
+            />
+          )}
+        
       </div>
     </div>
   );

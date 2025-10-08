@@ -1,10 +1,53 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+// import Image from 'next/image'; // Import removido (código que usava está comentado)
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPerguntas, responderQuestionario, responderDiario } from '@/lib/api/questionario';
+
+// Tipagens auxiliares para remover usos de 'any' sem alterar lógica
+interface AlternativaAPI {
+  id?: number | string;
+  ID?: number | string;
+  value?: number | string;
+  texto?: string;
+  text?: string;
+  label?: string;
+  pontuacao?: number;
+  score?: number;
+  pontuation?: number; // grafia alternativa observada
+}
+
+interface PerguntaAPI {
+  id?: number | string;
+  _id?: number | string;
+  ID?: number | string;
+  texto?: string;
+  text?: string;
+  pergunta?: string;
+  enunciado?: string;
+  titulo?: string;
+  label?: string;
+  alternativas?: AlternativaAPI[];
+  options?: AlternativaAPI[];
+  opcoes?: AlternativaAPI[];
+  respostas?: AlternativaAPI[];
+  itens?: AlternativaAPI[];
+}
+
+type PerguntasResponse = PerguntaAPI[] | { data?: PerguntaAPI[]; perguntas?: PerguntaAPI[] } | null | undefined;
+
+interface UserLike {
+  id?: unknown;
+  usuario_id?: unknown;
+  user_id?: unknown;
+  usuarioId?: unknown;
+  ID?: unknown;
+  _id?: unknown;
+  questionario_inicial?: unknown;
+  sub?: unknown;
+}
 
 // Types
 type Alternativa = {
@@ -46,28 +89,28 @@ const Questionnaire = () => {
       try {
         setLoadingQuestions(true);
         // se user.questionario_inicial for true, chama endpoint como diário
-        const questionarioInicial = Boolean((user as any)?.questionario_inicial) === true;
-        const data = await getPerguntas(questionarioInicial);
+        const questionarioInicial = Boolean((user as UserLike | null)?.questionario_inicial) === true;
+        const data = (await getPerguntas(questionarioInicial)) as PerguntasResponse;
         console.debug("getPerguntas() raw data:", data, "diario:", questionarioInicial);
 
         // aceitar formatos comuns: array direto, { data: [...] } ou { perguntas: [...] }
-        let raw: any[] = [];
+        let raw: PerguntaAPI[] = [];
         if (Array.isArray(data)) raw = data;
-        else if (Array.isArray((data as any).data)) raw = (data as any).data;
-        else if (Array.isArray((data as any).perguntas)) raw = (data as any).perguntas;
+        else if (data && Array.isArray(data.data)) raw = data.data;
+        else if (data && Array.isArray(data.perguntas)) raw = data.perguntas;
         else raw = [];
         console.debug("Parsed perguntas count:", raw.length);
 
         // Normaliza cada item para o formato { id, text, alternativas[] }
-        const normalize = (item: any): Pergunta | null => {
+        const normalize = (item: PerguntaAPI): Pergunta | null => {
           if (!item) return null;
           const id = item.id ?? item._id ?? item.ID ?? null;
           // aceitar campo 'texto' (API devolve 'texto') além de outros nomes
           const text = item.texto ?? item.text ?? item.pergunta ?? item.enunciado ?? item.titulo ?? item.label ?? '';
 
-          const rawOptions = item.alternativas ?? item.options ?? item.opcoes ?? item.respostas ?? item.itens ?? [];
+          const rawOptions: AlternativaAPI[] = (item.alternativas ?? item.options ?? item.opcoes ?? item.respostas ?? item.itens ?? []) as AlternativaAPI[];
           const alternativas: Alternativa[] = Array.isArray(rawOptions)
-            ? rawOptions.map((o: any) => ({
+            ? rawOptions.map((o) => ({
                 id: Number(o.id ?? o.ID ?? o.value ?? 0),
                 texto: (o.texto ?? o.text ?? o.label ?? '').toString(),
                 pontuacao: o.pontuacao ?? o.score ?? o.pontuation ?? undefined,
@@ -150,7 +193,7 @@ const Questionnaire = () => {
     setIsSubmitting(true);
     try {
       // tenta obter usuário id do contexto
-      const maybeUser = user as any;
+      const maybeUser = user as UserLike | null;
       let usuarioId: number | null = null;
       if (maybeUser) {
         usuarioId = Number(maybeUser.id ?? maybeUser.usuario_id ?? maybeUser.user_id ?? maybeUser.usuarioId ?? maybeUser.ID ?? maybeUser._id ?? null) || null;
@@ -185,7 +228,7 @@ const Questionnaire = () => {
       }
 
       const payload = { usuario_id: usuarioId, respostas: respostasArr };
-      const questionarioInicial = Boolean((user as any)?.questionario_inicial) === true;
+  const questionarioInicial = Boolean((user as UserLike | null)?.questionario_inicial) === true;
       console.debug('Enviando questionário', { questionarioInicial, payload });
       if (questionarioInicial) {
         await responderDiario(payload);
@@ -194,13 +237,25 @@ const Questionnaire = () => {
       }
   // redireciona para dashboard
   router.push('/dashboard');
-    } catch (error) {
-      const err: any = error;
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: unknown } ; message?: string };
       // tenta extrair informação útil do erro
       const status = err?.response?.status;
-      const data = err?.response?.data;
+      const data = err?.response?.data as unknown;
       console.error('Erro ao enviar questionário', err, data);
-      const serverMessage = data?.message || data?.error || (typeof data === 'string' ? data : null);
+      const extractMsg = (d: unknown): string | null => {
+        if (!d) return null;
+        if (typeof d === 'string') return d;
+        if (typeof d === 'object') {
+          const maybe = d as { message?: unknown; error?: unknown };
+          const msg = maybe.message;
+          const errTxt = maybe.error;
+          if (typeof msg === 'string') return msg;
+          if (typeof errTxt === 'string') return errTxt;
+        }
+        return null;
+      };
+      const serverMessage = extractMsg(data);
       alert(`Erro ao enviar questionário. ${status ? `(${status}) ` : ''}${serverMessage ?? err?.message ?? 'Tente novamente.'}`);
     } finally {
       setIsSubmitting(false);
