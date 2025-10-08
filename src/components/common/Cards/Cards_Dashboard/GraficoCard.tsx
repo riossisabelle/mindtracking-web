@@ -1,11 +1,10 @@
 "use client";
-
+import { useTheme } from "@/contexts/ThemeContext";
 import BaseCard from "./BaseCard";
 import Image from "next/image";
 import {
   LineChart,
   Line,
-  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -27,6 +26,7 @@ const data = [
 const media = (
   data.reduce((acc, cur) => acc + cur.valor, 0) / data.length
 ).toFixed(1);
+
 const melhorDiaIdx = data.reduce(
   (best, val, idx, arr) => (val.valor > arr[best].valor ? idx : best),
   0,
@@ -53,14 +53,20 @@ function CustomDot(props: DotPositionProps) {
 }
 
 export default function GraficoCard() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const mainText = isDark ? "text-white" : "text-slate-800";
+  const secondaryText = isDark ? "text-gray-300" : "text-slate-800";
+  const axisColor = isDark ? "#e3eafc" : "#64748b";
+
   return (
     <BaseCard>
       <div className="mb-4 flex-shrink-0">
-        <div className="text-[20px] font-semibold text-white">
+        <div className={`text-[20px] font-semibold ${mainText}`}>
           Seu Bem-Estar Esta Semana
         </div>
-        <div className="text-lg font-semibold text-white">
-          Média: {media} <span className="text-gray-300 mx-2">|</span>
+        <div className={`text-lg font-semibold ${mainText}`}>
+          Média: {media} <span className={`${secondaryText} mx-2`}>|</span>
           Melhor dia: {melhorDia.valor.toFixed(1)} (
           {["dom", "seg", "ter", "qua", "qui", "sex", "sab"][melhorDiaIdx % 7]})
         </div>
@@ -70,23 +76,28 @@ export default function GraficoCard() {
           <LineChart
             data={data}
             margin={{ top: 10, right: 16, left: 0, bottom: 0 }}
-          >           
-            <CartesianGrid stroke="rgba(59, 130, 246, 0.15)" vertical={true} />
+          >
+            <CartesianGrid
+              stroke={
+                isDark ? "rgba(59,130,246,0.15)" : "rgba(120,120,154,0.18)"
+              }
+              vertical
+            />
             <XAxis
               dataKey="name"
-              stroke="#aaa"
+              stroke={axisColor}
               interval={0}
-              tick={{ fontSize: 12, fontWeight: "regular" }}
+              tick={{ fontSize: 12, fontWeight: "regular", fill: axisColor }}
               scale="point"
               padding={{ left: 0, right: 0 }}
               allowDuplicatedCategory={false}
             />
             <YAxis
-              stroke="#aaa"
+              stroke={axisColor}
               domain={[0, 10]}
               ticks={[0, 2, 4, 6, 8, 10]}
               interval={0}
-              tick={{ fontSize: 12, fontWeight: "regular" }}
+              tick={{ fontSize: 12, fontWeight: "regular", fill: axisColor }}
               width={22}
             />
             <Tooltip
@@ -110,8 +121,14 @@ export default function GraficoCard() {
               verticalAlign="bottom"
               content={() => (
                 <div className="flex justify-center mt-0 text-blue-300 text-sm">
-                  <div className="flex items-center">
-                    <Image src="/images/icons/DotGrafico.svg" alt="Ponto" width={15} height={15} className="mr-2" />
+                  <div className={`flex items-center ${isDark ? "text-slate-50" : "text-gray-500"}`}>
+                    <Image
+                      src="/images/icons/DotGrafico.svg"
+                      alt="Ponto"
+                      width={15}
+                      height={15}
+                      className="mr-2"
+                    />
                     Esta semana
                   </div>
                 </div>
