@@ -4,6 +4,58 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Send } from "lucide-react";
+import { sendChat } from "@/lib/api/chat";
+import { setAuthToken } from "@/lib/api/axios";
+
+// Componente para formatar texto da IA
+const FormattedText = ({ text }: { text: string }) => {
+    const { theme } = useTheme();
+    
+    const formatText = (text: string) => {
+        // Quebra de linha dupla vira parágrafo
+        let formatted = text.replace(/\n\n/g, '</p><p>');
+        
+        // Quebra de linha simples vira <br>
+        formatted = formatted.replace(/\n/g, '<br>');
+        
+        // Negrito **texto** -> <strong>texto</strong>
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Itálico *texto* -> <em>texto</em>
+        formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Lista com - ou * -> <ul><li>
+        formatted = formatted.replace(/^[\s]*[-*]\s(.+)$/gm, '<li>$1</li>');
+        formatted = formatted.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>');
+        
+        // Lista numerada 1. -> <ol><li>
+        formatted = formatted.replace(/^[\s]*\d+\.\s(.+)$/gm, '<li>$1</li>');
+        formatted = formatted.replace(/(<li>.*<\/li>)/g, '<ol>$1</ol>');
+        
+        // Código `texto` -> <code>texto</code>
+        formatted = formatted.replace(/`(.*?)`/g, '<code>$1</code>');
+        
+        // Envolve em parágrafo se não estiver em lista
+        if (!formatted.includes('<ul>') && !formatted.includes('<ol>')) {
+            formatted = `<p>${formatted}</p>`;
+        }
+        
+        return formatted;
+    };
+    
+    return (
+        <div 
+            className={`prose prose-sm max-w-none ${
+                theme === "dark" 
+                    ? "prose-invert text-white" 
+                    : "text-gray-900"
+            }`}
+            dangerouslySetInnerHTML={{ 
+                __html: formatText(text) 
+            }}
+        />
+    );
+};
 
 interface Message {
     id: string;
@@ -132,23 +184,103 @@ export default function Athena() {
         setInputValue(e.target.value);
     };
 
-    const handleSendMessage = () => {
-        if (inputValue.trim()) {
-            const userMessage: Message = {
-                id: Date.now().toString(),
-                content: inputValue.trim(),
-                sender: "user",
+    const handleSendMessage = async () => {
+        const trimmed = inputValue.trim();
+        if (!trimmed || isTyping) return;
+
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            content: trimmed,
+            sender: "user",
+            timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setInputValue("");
+        setIsTyping(true);
+
+        try {
+            // garante que o JWT seja enviado no header Authorization
+            if (typeof window !== "undefined") {
+                const token = localStorage.getItem("mt_token");
+                if (token) {
+                    setAuthToken(token);
+                } else {
+                    // Sem token, retorna feedback imediato
+                    throw { response: { data: { message: "Sessão expirada. Faça login novamente." } } };
+                }
+            }
+            const data = await sendChat({ message: trimmed });
+            // Verifica se a resposta indica erro do backend
+            if (data && data.success === false && data.message) {
+                throw { response: { data: { message: data.message } } };
+            }
+
+            // Normaliza possíveis formatos de resposta
+            let reply: string | undefined;
+            
+            // Tenta diferentes formatos de resposta
+            if (data) {
+                if (data.reply) reply = data.reply;
+                else if (data.message) reply = data.message;
+                else if (data.text) reply = data.text;
+                else if (data.response) reply = data.response;
+                else if (data.answer) reply = data.answer;
+                else if (data.content) reply = data.content;
+                else if (Array.isArray(data.choices) && data.choices[0]?.message?.content) {
+                    reply = data.choices[0].message.content;
+                } else if (typeof data === "string") {
+                    reply = data;
+                } else {
+                    // Se não encontrou nenhum campo conhecido, mostra a estrutura da resposta para debug
+                    reply = `Resposta recebida: ${JSON.stringify(data)}`;
+                }
+            }
+
+            if (!reply) reply = "Desculpe, não consegui entender. Pode reformular?";
+
+            const athenaMessage: Message = {
+                id: Date.now().toString() + "_athena",
+                content: String(reply),
+                sender: "athena",
                 timestamp: new Date()
             };
+            setMessages(prev => [...prev, athenaMessage]);
+        } catch (e: any) {
+            // Diagnóstico detalhado do erro
+            let errorMessage = "Tive um problema para responder agora. Tente novamente em instantes.";
             
-            setMessages(prev => [...prev, userMessage]);
-            simulateAthenaResponse(inputValue.trim());
-            setInputValue("");
+            if (e?.message === "Token não encontrado. Faça login novamente.") {
+                errorMessage = "Sessão expirada. Faça login novamente.";
+            } else if (e?.response?.status === 401) {
+                errorMessage = "Sessão expirada. Faça login novamente.";
+            } else if (e?.response?.status === 403) {
+                errorMessage = "Acesso negado. Verifique suas permissões.";
+            } else if (e?.response?.status === 404) {
+                errorMessage = "Serviço não encontrado. Tente novamente mais tarde.";
+            } else if (e?.response?.status === 500) {
+                errorMessage = "Erro interno do servidor. Tente novamente mais tarde.";
+            } else if (e?.response?.data?.message) {
+                errorMessage = e.response.data.message;
+            } else if (e?.message) {
+                errorMessage = e.message;
+            }
+
+            const athenaMessage: Message = {
+                id: Date.now().toString() + "_athena_error",
+                content: errorMessage,
+                sender: "athena",
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, athenaMessage]);
+        } finally {
+            setIsTyping(false);
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
+            e.preventDefault();
             handleSendMessage();
         }
     };
@@ -225,7 +357,11 @@ export default function Athena() {
                                             <span className="text-xs font-semibold">Athena</span>
                                         </div>
                                     )}
-                                    <p className="text-xs sm:text-sm leading-relaxed">{message.content}</p>
+                                    {message.sender === "athena" ? (
+                                        <FormattedText text={message.content} />
+                                    ) : (
+                                        <p className="text-xs sm:text-sm leading-relaxed">{message.content}</p>
+                                    )}
                                     <p className={`text-xs mt-1 ${message.sender === "user" ? "text-blue-100" : theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                                         {message.timestamp.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                                     </p>
@@ -296,7 +432,7 @@ export default function Athena() {
                             placeholder="Compartilhe o que está acontecendo agora..."
                             value={inputValue}
                             onChange={handleInputChange}
-                            onKeyPress={handleKeyPress}
+                            onKeyDown={handleKeyDown}
                         />
                         <button
                             onClick={handleSendMessage}
