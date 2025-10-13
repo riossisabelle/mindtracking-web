@@ -93,7 +93,7 @@ export default function Login() {
       } catch (e) {
         userObj = res.user;
       }
-
+      
       // support both snake_case and camelCase property names, on both top-level and nested user
       const emailVerified =
         (res as any)?.email_verificado ??
