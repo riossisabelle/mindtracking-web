@@ -33,6 +33,11 @@ export const verificarDiario = async (usuarioId: string) => {
   return data;
 };
 
+export const corelacoes = async (usuarioId: string) => {
+  const { data } = await api.get(`/questionario/correlacoes/${usuarioId}`);
+  return data;
+};
+
 export const responderDiario = async (payload: unknown) => {
   const { data } = await api.post("/questionario/diario/responder", payload);
   return data;
