@@ -1,7 +1,7 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
-import Modal from "../../../../common/Modals/ModalRedefinicaoSenha";
+import Modal from "../../../../common/Modals/perfil/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
 import PasswordInput from "../../../../common/Inputs/InputSenha";
 import { useTheme } from "@/contexts/ThemeContext";
