@@ -8,8 +8,10 @@ import { setAuthToken } from "@/lib/api/axios";
 
 interface Correlacao {
   total_ocorrencias: number;
-  classificacao: string;
+  // agora usamos pontuacao (1-4) quando disponível
+  pontuacao?: number | string;
   texto_alternativa: string;
+  texto_pergunta?: string;
   icone: string;
 }
 
@@ -30,25 +32,31 @@ export default function CorrelacoesCard() {
       return parseInt(b.total_ocorrencias) - parseInt(a.total_ocorrencias);
     });
     
-    // Mapear classificação para ícone
-    const obterIcone = (classificacao: string): string => {
-      const classLower = classificacao.toLowerCase();
-      if (classLower === 'boa' || classLower === 'neutra') {
-        return "/images/icons/thumbs-up-green.svg";
-      } else if (classLower === 'ruim') {
+    // Mapear pontuação para ícone: 1 or 2 => thumbs-down, 3 or 4 => thumbs-up
+    const obterIcone = (pontuacao?: number | string): string => {
+      const p = typeof pontuacao === 'number' ? pontuacao : parseInt(String(pontuacao || ''), 10);
+      if (p === 1 || p === 2) {
         return "/images/icons/thumbs-down-red.svg";
+      } else if (p === 3 || p === 4) {
+        return "/images/icons/thumbs-up-green.svg";
       } else {
         return "/images/icons/thumbs-up-green.svg"; // Default
       }
     };
     
     // Processar dados
-    return correlacoesOrdenadas.map(correlacao => ({
-      total_ocorrencias: parseInt(correlacao.total_ocorrencias),
-      classificacao: correlacao.classificacao,
-      texto_alternativa: correlacao.texto_alternativa,
-      icone: obterIcone(correlacao.classificacao)
-    }));
+    return correlacoesOrdenadas.map(correlacao => {
+      // tente extrair pontuacao numérica; alguns retornos podem usar 'classificacao' em vez de 'pontuacao'
+      const rawPont = correlacao.pontuacao ?? correlacao.classificacao ?? '';
+      const pontNum = rawPont !== '' ? (isNaN(Number(rawPont)) ? undefined : Number(rawPont)) : undefined;
+      return {
+        total_ocorrencias: parseInt(correlacao.total_ocorrencias),
+        pontuacao: pontNum ?? rawPont,
+        texto_alternativa: correlacao.texto_alternativa || '',
+        texto_pergunta: correlacao.texto_pergunta || '',
+        icone: obterIcone(pontNum ?? rawPont)
+      } as Correlacao;
+    });
   };
 
   useEffect(() => {
@@ -127,7 +135,7 @@ export default function CorrelacoesCard() {
       <BaseCard>
         <div className="flex flex-col">
           <h1 className={`text-[20px] font-semibold mb-4 ${textColor}`}>
-            Correlações detectadas:
+            Respostas frequentes:
           </h1>
           <div className={`text-sm ${textColor} text-center py-8`}>
             Nenhuma correlação encontrada ainda.
@@ -144,7 +152,7 @@ export default function CorrelacoesCard() {
       <div className="flex flex-col">
         {/* Título */}
         <h1 className={`text-[20px] font-semibold mb-4 ${textColor}`}>
-          Correlações detectadas:
+          Respostas frequentes:
         </h1>
 
         {/* Lista de correlações */}
@@ -152,16 +160,21 @@ export default function CorrelacoesCard() {
           className={`space-y-4 text-[16px] font-semibold font-inter mb-5 mt-2 ${textColor}`}
         >
           {correlacoes.map((correlacao, index) => (
-            <div key={index} className="flex items-center gap-3">
-              <Image
-                src={correlacao.icone}
-                alt={`Ícone ${correlacao.classificacao.toLowerCase()}`}
-                width={28}
-                height={28}
-              />
-              <span>
-                {correlacao.texto_alternativa}: {correlacao.total_ocorrencias} {correlacao.total_ocorrencias === 1 ? 'vez' : 'vezes'}
-              </span>
+            <div key={index} className="flex flex-col gap-2">
+              {correlacao.texto_pergunta && (
+                <div className={`text-sm font-medium ${textColor}`}>{correlacao.texto_pergunta}</div>
+              )}
+              <div className="flex items-center gap-3">
+                <Image
+                  src={correlacao.icone}
+                  alt={`Ícone ${correlacao.pontuacao ?? correlacao.texto_alternativa}`}
+                  width={28}
+                  height={28}
+                />
+                <span>
+                  {correlacao.texto_alternativa}: {correlacao.total_ocorrencias} {correlacao.total_ocorrencias === 1 ? 'vez' : 'vezes'}
+                </span>
+              </div>
             </div>
           ))}
         </div>

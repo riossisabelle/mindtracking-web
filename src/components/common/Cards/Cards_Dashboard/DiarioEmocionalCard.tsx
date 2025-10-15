@@ -112,8 +112,11 @@ export default function DiarioEmocionalCard() {
             <div className={`mt-4 space-y-2 text-[15px] font-semibold font-inter ${textColor}`}>
               <p>
                 Último diário registrado:
-                <br />
-                “{entrada.texto.slice(0, 60)}{entrada.texto.length > 60 ? "…" : ""}”
+                {entrada.titulo ? (
+                  <span className="font-normal">{entrada.titulo}</span>
+                ) : (
+                  <span className="font-normal">Sem título</span>
+                )}
               </p>
               <p>{formatarDataHora(entrada.data_hora)}</p>
               {entrada.emocao_predominante && (
