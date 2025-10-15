@@ -9,6 +9,8 @@ import LogoutModal from "@/components/common/Modals/perfil/sairdaConta";
 import ModalRedefinicaoSenha from "@/components/common/Modals/perfil/ModalRedefinicaoSenha";
 import ButtonEsqueceuSenha from "@/components/common/Buttons/ButtonEsqueceuSenha";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { dadosUser } from "@/lib/api/auth";
+import { useEffect } from "react";
 
 export default function PerfilPage() {
   const [fotoPaisagem, setFotoPaisagem] = useState<string | null>(null);
@@ -17,12 +19,34 @@ export default function PerfilPage() {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
 
-  // ⚡ Simulação de dados do usuário — no real viria da API / contexto
-  const userData = {
-    name: "João Henrique",
-    email: "joao@email.com",
-    // fotoPerfil: "/images/avatar.jpg" // opcional - se tiver foto
-  };
+  // estado do usuário vindo da API
+  const [userData, setUserData] = useState<{
+    id?: number | string;
+    nome?: string;
+    email?: string;
+    data_nascimento?: string | null;
+    idade?: number | null;
+    telefone?: string | null;
+    genero?: string | null;
+  } | null>(null);
+  const [loadingUser, setLoadingUser] = useState<boolean>(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoadingUser(true);
+        const resp = await dadosUser();
+        // resp expected { success: true, user: { ... } }
+        setUserData(resp?.user ?? null);
+      } catch (err) {
+        console.error("Erro ao carregar perfil:", err);
+        setUserData(null);
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+    load();
+  }, []);
 
   const handleLogout = () => {
     console.log("Logging out...");
@@ -74,7 +98,7 @@ export default function PerfilPage() {
               {/* Se tiver foto de perfil */}
               {/* <AvatarImage src={userData.fotoPerfil} alt={userData.name} /> */}
               <AvatarFallback className="bg-blue-600 text-white">
-                {getUserInitials(userData.name)}
+                {getUserInitials(userData?.nome ?? "")}
               </AvatarFallback>
             </Avatar>
 
@@ -82,7 +106,7 @@ export default function PerfilPage() {
               <Image src="/images/icons/editar.svg" alt="editar" width={14} height={14} />
             </button>
           </div>
-          <h2 className="mt-3 text-2xl font-semibold">{userData.name}</h2>
+            <h2 className="mt-3 text-2xl font-semibold">{userData?.nome ?? "Usuário"}</h2>
         </div>
 
         {/* Botões responsivos */}
@@ -151,25 +175,26 @@ export default function PerfilPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 lg:gap-x-14 py-8">
           <div className={fieldClasses}>
             <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Gênero</p>
-            <p className="text-lg text-white font-semibold">Masculino</p>
+            <p className="text-lg text-white font-semibold">{userData?.genero ?? '—'}</p>
           </div>
           <div className={fieldClasses}>
             <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Idade</p>
-            <p className="text-lg text-white font-semibold">28 Anos</p>
+            <p className="text-lg text-white font-semibold">{userData?.idade ? `${userData.idade} Anos` : '—'}</p>
           </div>
           <div className={fieldClasses}>
             <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Telefone</p>
-            <p className="text-lg text-white font-semibold">(11) 99999-9999</p>
+            <p className="text-lg text-white font-semibold">{userData?.telefone ?? '—'}</p>
           </div>
           <div className={fieldClasses}>
             <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">E-mail</p>
-            <p className="text-lg text-white font-semibold">{userData.email}</p>
+            <p className="text-lg text-white font-semibold">{userData?.email ?? '—'}</p>
           </div>
         </div>
       </div>
     </div>
   );
 
+  // main layout (uses ProfileCard variable defined above)
   return (
     <div className="min-h-screen transition-colors duration-300 bg-transparent">
       {/* Sidebar fixa no topo em mobile */}
