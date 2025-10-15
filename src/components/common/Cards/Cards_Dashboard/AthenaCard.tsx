@@ -1,18 +1,41 @@
 "use client";
 import Image from "next/image";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useEffect, useState } from "react";
+import { getQtdConversas } from "@/lib/api/dica";
 import BaseCard from "./BaseCard";
 
-// Exemplo estático; troque pelo valor real
-const conversasComAthena = 5;  // Ou o valor real derivado de props/contexto/api
+// conversasComAthena será buscado da API
 
 export default function ConverseAthenaCard() {
   const { theme } = useTheme();
   const textColor = theme === "dark" ? "text-white" : "text-slate-800";
+  const [conversasComAthena, setConversasComAthena] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchQtd = async () => {
+      try {
+        setLoading(true);
+        const resp = await getQtdConversas();
+        // resp expected shape: { success: true, total: number }
+        if (mounted) setConversasComAthena(typeof resp.total === 'number' ? resp.total : 0);
+      } catch (err: any) {
+        console.error('Erro ao buscar qtd conversas:', err);
+        if (mounted) setError(err?.message || 'Erro');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchQtd();
+    return () => { mounted = false; };
+  }, []);
 
   // Texto dinâmico baseado na quantidade de conversas
   const textoConversa =
-    conversasComAthena > 0
+    !loading && !error && (conversasComAthena ?? 0) > 0
       ? `É muito bom conversar com você! Já tivemos ${conversasComAthena} conversas juntos.`
       : "Fale livremente sobre como está se sentindo, Athena está aqui para ouvir e apoiar você.";
 
@@ -38,7 +61,7 @@ export default function ConverseAthenaCard() {
 
         {/* Texto Dinâmico */}
         <p className={`text-[15px] font-semibold font-inter mb-6 ${textColor}`}>
-          {textoConversa}
+          {loading ? 'Carregando...' : (error ? 'Fale livremente sobre como está se sentindo, Athena está aqui para ouvir e apoiar você.' : textoConversa)}
         </p>
 
         {/* Botão */}
