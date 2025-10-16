@@ -58,3 +58,8 @@ export const deleteAccount = async () => {
   const { data } = await api.delete("/auth/delete-account");
   return data;
 };
+
+export const dadosUser = async () => {
+  const { data } = await api.get("/auth/profile");
+  return data;
+};
