@@ -4,12 +4,18 @@ import Image from "next/image";
 import { useTheme } from "@/contexts/ThemeContext";
 import BaseCard from "./BaseCard";
 import { getDica } from "@/lib/api/dica";
+
 interface DicaResponse {
   success: boolean;
   dica: string;
+  recomendacao?: string;
 }
 
-export default function RecomendacoesCard() {
+interface RecomendacoesCardProps {
+  recomendacao?: string;
+}
+
+export default function RecomendacoesCard({ recomendacao }: RecomendacoesCardProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const mainText = isDark ? "text-white" : "text-slate-800";
@@ -19,12 +25,20 @@ export default function RecomendacoesCard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If a recommendation prop is provided, use it and skip fetching from API
+    if (recomendacao) {
+      setDica(recomendacao);
+      setLoading(false);
+      return;
+    }
+
     async function fetchDica() {
       setLoading(true);
       try {
         const response: DicaResponse = await getDica();
         if (response.success) {
-          setDica(response.dica);
+          // prefer response.dica but allow response.recomendacao if present
+          setDica(response.dica ?? response.recomendacao ?? null);
         } else {
           setDica(null);
         }
@@ -36,7 +50,7 @@ export default function RecomendacoesCard() {
       }
     }
     fetchDica();
-  }, []);
+  }, [recomendacao]);
 
   return (
     <BaseCard>
@@ -57,7 +71,9 @@ export default function RecomendacoesCard() {
         />
       </div>
       <p className={`mt-2 text-[15px] font-medium ${secondaryText}`}>
-        {loading
+        {recomendacao
+          ? recomendacao
+          : loading
           ? "Carregando dica..."
           : dica ?? "Bem-vindo à MindTracking! Que tal começar conhecendo mais sobre como você está sentindo hoje?"}
       </p>

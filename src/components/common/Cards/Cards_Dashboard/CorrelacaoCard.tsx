@@ -50,7 +50,6 @@ export default function CorrelacoesCard() {
       const rawPont = correlacao.pontuacao ?? correlacao.classificacao ?? '';
       const pontNum = rawPont !== '' ? (isNaN(Number(rawPont)) ? undefined : Number(rawPont)) : undefined;
       return {
-        total_ocorrencias: parseInt(correlacao.total_ocorrencias),
         pontuacao: pontNum ?? rawPont,
         texto_alternativa: correlacao.texto_alternativa || '',
         texto_pergunta: correlacao.texto_pergunta || '',
@@ -162,17 +161,17 @@ export default function CorrelacoesCard() {
           {correlacoes.map((correlacao, index) => (
             <div key={index} className="flex flex-col gap-2">
               {correlacao.texto_pergunta && (
-                <div className={`text-sm font-medium ${textColor}`}>{correlacao.texto_pergunta}</div>
+                <div className={`text-[18px] font-semibold ${textColor}`}>{correlacao.texto_pergunta}</div>
               )}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 text-[16px] font-light">
                 <Image
                   src={correlacao.icone}
                   alt={`Ícone ${correlacao.pontuacao ?? correlacao.texto_alternativa}`}
-                  width={28}
-                  height={28}
+                  width={20}
+                  height={20}
                 />
                 <span>
-                  {correlacao.texto_alternativa}: {correlacao.total_ocorrencias} {correlacao.total_ocorrencias === 1 ? 'vez' : 'vezes'}
+                  {correlacao.texto_alternativa}
                 </span>
               </div>
             </div>

@@ -2,8 +2,10 @@
 import Image from "next/image";
 import { useTheme } from "@/contexts/ThemeContext";
 import BaseCard from "./BaseCard";
+import ModalDiario from "@/components/common/Modals/Diario/ModalEscreverDiario";
 import { useState, useEffect } from "react";
-import { getDiarios } from "@/lib/api/diario";
+import { useRouter } from "next/navigation";
+import { getDiarios, createDiario, getDiarioById } from "@/lib/api/diario";
 import { setAuthToken } from "@/lib/api/axios";
 
 interface DiarioEntrada {
@@ -68,6 +70,9 @@ export default function DiarioEmocionalCard() {
   }, []);
 
   const [modalAberto, setModalAberto] = useState(false);
+  const [textoDiario, setTextoDiario] = useState("");
+  const [tituloDiario, setTituloDiario] = useState("");
+  const router = useRouter();
 
   if (loading) {
     return (
@@ -153,18 +158,23 @@ export default function DiarioEmocionalCard() {
               Diário já registrado
             </button>
           ) : (
-            <a href="/diarios">
+            <>
               <button
                 className="my-6 w-full h-[50px] bg-blue-600 hover:bg-blue-500 text-white font-bold text-[16px] py-2 rounded-3xl border-4 border-transparent transition-all duration-200 cursor-pointer active:scale-[0.98] active:brightness-95 active:border-blue-700 active:drop-shadow-[0_0_15px_#0C4A6E]"
+                onClick={() => {
+                  // Primeiro navega para a página de diários e inclui query param para abrir o modal lá
+                  router.push('/diario?openModal=1');
+                }}
               >
                 Escrever no diário
               </button>
-            </a>
+            </>
           )}
         </div>
       </BaseCard>
-      {/* Modal */}
-      {modalAberto && (
+      {/* Modal(es) */}
+      {/* Quando já há diário hoje mostramos modal informativo */}
+      {modalAberto && diarioHoje && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className={`rounded-xl border p-6 w-full max-w-md shadow-lg ${modalBg}`}>
             <h2 className={`text-xl font-bold mb-2 ${textColor}`}>
@@ -183,6 +193,68 @@ export default function DiarioEmocionalCard() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Modal para escrever no diário */}
+      {modalAberto && !diarioHoje && (
+        <ModalDiario
+          isOpen={modalAberto}
+          onClose={() => setModalAberto(false)}
+          value={textoDiario}
+          onChange={(v: string) => setTextoDiario(v)}
+          title={tituloDiario}
+          onTitleChange={(t: string) => setTituloDiario(t)}
+          onSave={(created?: any) => {
+            // O modal já chama a API; aqui apenas atualizamos estado local com o result
+            if (created) {
+              const createdTitulo = created.titulo ?? created.title ?? (tituloDiario || textoDiario.split('\n')[0] || 'Sem título');
+              const createdTexto = created.texto ?? created.text ?? textoDiario;
+              setDiarioHoje(true);
+              setEntrada({
+                data_hora: created.data_hora ?? created.createdAt ?? new Date().toISOString(),
+                titulo: createdTitulo,
+                texto: createdTexto,
+                emocao_predominante: created.emocao_predominante ?? null,
+                intensidade_emocional: created.intensidade_emocional ?? null,
+                comentario_athena: created.comentario_athena ?? null,
+              });
+              setTextoDiario("");
+              setTituloDiario("");
+              setModalAberto(false);
+
+              // Se a API criou a entrada mas ainda não retornou a análise, tenta reconsultar por alguns segundos
+              const needsAnalysis = !(
+                created.comentario_athena || created.comentario || created.athena || created.emocao_predominante || created.intensidade_emocional
+              );
+              if (needsAnalysis && (created.id || created._id)) {
+                const id = created.id ?? created._id;
+                (async function poll() {
+                  for (let i = 0; i < 6; i++) {
+                    try {
+                      const fresh = await getDiarioById(String(id));
+                      const entry = fresh?.entrada ?? fresh;
+                      if (entry && (entry.comentario_athena || entry.emocao_predominante || entry.intensidade_emocional)) {
+                        setEntrada((prev) => ({
+                          ...(prev ?? {}),
+                          data_hora: entry.data_hora ?? entry.createdAt ?? (prev?.data_hora ?? new Date().toISOString()),
+                          titulo: entry.titulo ?? prev?.titulo ?? createdTitulo,
+                          texto: entry.texto ?? prev?.texto ?? createdTexto,
+                          emocao_predominante: entry.emocao_predominante ?? entry.emocao ?? prev?.emocao_predominante ?? null,
+                          intensidade_emocional: entry.intensidade_emocional ?? entry.intensidade ?? prev?.intensidade_emocional ?? null,
+                          comentario_athena: entry.comentario_athena ?? entry.comentario ?? entry.athena ?? prev?.comentario_athena ?? null,
+                        }));
+                        break;
+                      }
+                    } catch (e) {
+                      // ignora e aguarda
+                    }
+                    await new Promise((r) => setTimeout(r, 2000));
+                  }
+                })();
+              }
+            }
+          }}
+        />
       )}
     </>
   );
