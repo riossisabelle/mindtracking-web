@@ -68,16 +68,16 @@ export default function Dashboard() {
           />
           {/* Passa usuarioId em vez de valor fixo */}
           {usuarioId && <EstadoEmocionalCard usuarioId={usuarioId} />}
-          <RecomendacoesCard recomendacao="Seus diálogos têm foco em ansiedade. Experimente nossa meditação guiada!" />
+          <RecomendacoesCard />
         </div>
 
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-[98%] my-4 auto-rows-fr min-h-0">
           <GraficoCard />
           <DiarioEmocionalCard />
-          <div className="flex flex-col gap-4 min-h-0 flex-1">
+          
             <CorrelacaoCard />
-            <AthenaCard />
-          </div>
+            
+          
         </div>
       </div>
     </div>

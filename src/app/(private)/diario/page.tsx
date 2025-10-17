@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getDiarios } from "@/lib/api/diario";
+import { getDiarios, getDiarioById } from "@/lib/api/diario";
+import ModalDiario from "@/components/common/Modals/Diario/ModalEscreverDiario";
+import { createDiario } from "@/lib/api/diario";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTheme } from "../../../contexts/ThemeContext";
 import Sidebar from "@/components/layout/Sidebar";
@@ -36,6 +39,11 @@ export default function Diario() {
   const [cards, setCards] = useState<Card[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [openModal, setOpenModal] = useState(false);
+  const [tituloModal, setTituloModal] = useState("");
+  const [textoModal, setTextoModal] = useState("");
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -93,6 +101,17 @@ export default function Diario() {
 
     fetchCards();
   }, []);
+
+  useEffect(() => {
+    const open = searchParams?.get?.("openModal");
+    if (open === "1") {
+      setOpenModal(true);
+      // remove query param from URL to avoid re-opening on navigation back
+      const url = new URL(window.location.href);
+      url.searchParams.delete('openModal');
+      router.replace(url.pathname + url.search);
+    }
+  }, [searchParams]);
 
   return (
     <div className="h-screen overflow-y-auto lg:ml-37.5 md:mt-20 mt-25 lg:mt-0">
@@ -194,6 +213,74 @@ export default function Diario() {
         isOpen={!!selectedAnalysis}
         onClose={() => setSelectedAnalysis(null)}
         analysis={selectedAnalysis}
+      />
+
+      <ModalDiario
+        isOpen={openModal}
+        onClose={() => setOpenModal(false)}
+        value={textoModal}
+        onChange={(v: string) => setTextoModal(v)}
+        title={tituloModal}
+        onTitleChange={(t: string) => setTituloModal(t)}
+        onSave={(created?: any) => {
+          // Atualiza a lista local com o item criado (se o modal retornou algo)
+          if (created) {
+            const titulo = created.titulo ?? created.title ?? 'Diário';
+            const texto = created.texto ?? created.text ?? created.descricao ?? '';
+            const data_hora = created.data_hora ?? created.createdAt ?? new Date().toISOString();
+            const hasAnalysis = Boolean(
+              created?.comentario_athena || created?.comentario || created?.athena || created?.emocao_predominante || created?.emocao || created?.intensidade_emocional || created?.intensidade
+            );
+
+            const newCard: Card = {
+              id: created.id ?? created._id ?? Math.random(),
+              title: titulo,
+              date: data_hora ? formatDate(data_hora) : '',
+              description: texto,
+              analysis: hasAnalysis
+                ? {
+                    message: texto,
+                    emotion: (created.emocao_predominante ?? created.emocao) ?? "",
+                    intensity: (created.intensidade_emocional ?? created.intensidade) ?? "",
+                    athena: (created.comentario_athena ?? created.comentario ?? created.athena) ?? "",
+                  }
+                : undefined,
+            };
+            setCards((prev) => [newCard, ...prev]);
+
+            // Se ainda não houver análise, tenta reconsultar algumas vezes
+            const hasAnalysisNow = Boolean(newCard.analysis);
+            if (!hasAnalysisNow && (created.id || created._id)) {
+              const id = created.id ?? created._id;
+              (async function poll() {
+                for (let i = 0; i < 6; i++) {
+                  try {
+                    const fresh = await getDiarioById(String(id));
+                    const entry = fresh?.entrada ?? fresh;
+                    if (entry && (entry.comentario_athena || entry.emocao_predominante || entry.intensidade_emocional)) {
+                      setCards((prev) => prev.map((c) => c.id === (entry.id ?? entry._id) ? {
+                        ...c,
+                        date: formatDate(entry.data_hora ?? entry.createdAt ?? new Date().toISOString()),
+                        description: entry.texto ?? entry.text ?? c.description,
+                        analysis: {
+                          message: entry.texto ?? entry.text ?? c.description,
+                          emotion: entry.emocao_predominante ?? entry.emocao ?? "",
+                          intensity: entry.intensidade_emocional ?? entry.intensidade ?? "",
+                          athena: entry.comentario_athena ?? entry.comentario ?? entry.athena ?? "",
+                        }
+                      } : c));
+                      break;
+                    }
+                  } catch (e) {
+                    // ignore
+                  }
+                  await new Promise((r) => setTimeout(r, 2000));
+                }
+              })();
+            }
+          }
+          setOpenModal(false);
+        }}
       />
     </div>
   );

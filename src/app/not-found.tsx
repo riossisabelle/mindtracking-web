@@ -7,7 +7,7 @@ export default function NotFound() {
 
   // Exemplo estático para simular o estado de autenticação do usuário
   // Em uma aplicação real, você pode obter isso de um contexto de autenticação ou similar
-  const userLogado = false; 
+  const userLogado = true; 
 
   // A imagem de fundo e a camada escura são comuns a ambos os casos
   const backgroundStyle = {
