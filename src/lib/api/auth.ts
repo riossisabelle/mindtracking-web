@@ -63,3 +63,13 @@ export const dadosUser = async () => {
   const { data } = await api.get("/auth/profile");
   return data;
 };
+
+export const updateDadosUser = async (payload: {
+  nome: string;
+  telefone: string;
+  data_nascimento: string;
+  genero: string;
+}) => {
+  const { data } = await api.put("/auth/profile", payload);
+  return data;
+};
