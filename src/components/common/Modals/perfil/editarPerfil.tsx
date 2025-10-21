@@ -6,6 +6,9 @@ import {
   validatePhone,
   validateGender
 } from '@/lib/validation';
+import { updateDadosUser } from '@/lib/api/auth';
+// @ts-ignore
+import { toast } from 'react-toastify';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -14,6 +17,7 @@ interface EditProfileModalProps {
 
 export default function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
   const { theme } = useTheme();
+
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const [birthDate, setBirthDate] = useState('');
@@ -23,7 +27,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
   const [gender, setGender] = useState('');
   const [genderError, setGenderError] = useState<string | null>(null);
 
-  // Resetar gênero ao abrir o modal
+  // Resetar campos ao abrir o modal
   useEffect(() => {
     if (isOpen) {
       setName('');
@@ -50,9 +54,41 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
   const borderColor = theme === 'dark' ? 'border-blue-600' : 'border-blue-900';
   const iconSize = 'w-6 h-6';
-
   const fieldBgClass = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200';
   const cancelBtnBg = theme === 'dark' ? 'bg-slate-700' : 'bg-gray-300';
+
+  // Função de submit
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (nameError || birthDateError || phoneError || genderError) return;
+
+    try {
+      // Converter dd/mm/yyyy → yyyy-mm-dd
+      const [dia, mes, ano] = birthDate.split('/');
+      const data_nascimento = `${ano}-${mes}-${dia}`;
+
+      const payload = {
+        nome: name,
+        telefone: phone.replace(/\D/g, ""),
+        data_nascimento,
+        genero: gender
+      };
+
+      const response = await updateDadosUser(payload);
+
+      if (response.success) {
+        toast.success("Perfil atualizado com sucesso!");
+        onClose();
+      } else {
+        toast.error("Erro ao atualizar perfil. Tente novamente.");
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao atualizar perfil.");
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -65,7 +101,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
           theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
         }`}
       >
-        {/* Botão fechar no canto superior direito */}
         <button
           onClick={onClose}
           className="absolute top-5 right-4 p-1 rounded-full"
@@ -74,14 +109,12 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
           <img src={icons.fechar} alt="Fechar" className="w-10 h-10" />
         </button>
 
-        {/* Header */}
         <div className="flex flex-col items-center mb-6 mt-6">
           <img src={icons.logo} alt="Ícone" className="w-16 h-16 mb-1" />
           <h2 className="text-xl font-semibold">Editar Perfil</h2>
         </div>
 
-        {/* Form */}
-  <form className="flex flex-col gap-4 max-w-md mx-auto w-full">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md mx-auto w-full">
           {/* Nome */}
           <div className={`flex flex-col gap-1`}>
             <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-3 ${fieldBgClass}`}>
@@ -91,7 +124,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 placeholder="Nome"
                 value={name}
                 onChange={(e) => {
-                  // Permite apenas letras, espaços e acentos agudo, circunflexo, til, grave, apóstrofo
                   const value = e.target.value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s'´^~`]/g, "");
                   setName(value);
                   setNameError(validateName(value));
@@ -183,7 +215,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
             {genderError && <span className="text-red-500 text-xs ml-2">{genderError}</span>}
           </div>
 
-          {/* Buttons */}
+          {/* Botões */}
           <div className="flex justify-end gap-3 mt-4">
             <button
               type="button"

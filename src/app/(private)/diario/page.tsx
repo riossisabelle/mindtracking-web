@@ -161,23 +161,15 @@ export default function Diario() {
                         </div>
                         <div className="flex flex-col items-end">
                           <span className="text-sm text-gray-400 font-inter">{card.date}</span>
-                          <span className={`mt-2 px-2 py-1 rounded text-xs ${card.analysis ? 'bg-blue-600 text-white' : 'bg-gray-600 text-white/80'}`}>
-                            {card.analysis ? 'Análise disponível' : 'Sem análise'}
-                          </span>
                         </div>
                       </div>
 
+                      {/* Mostrar apenas o texto da análise da Athena (ou aviso) no cartão */}
                       <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line">
-                        {card.description}
+                        {card.analysis && card.analysis.athena
+                          ? card.analysis.athena
+                          : 'Análise ainda não disponível.'}
                       </p>
-
-                      {card.analysis && (
-                        <div className="mb-2 text-sm text-gray-200">
-                          <div className="text-xs text-gray-300">Emoção: <span className="font-medium">{card.analysis.emotion || '—'}</span></div>
-                          <div className="text-xs text-gray-300">Intensidade: <span className="font-medium">{card.analysis.intensity || '—'}</span></div>
-                          <div className="text-xs text-gray-300">Athena: <span className="font-medium">{card.analysis.athena ? card.analysis.athena.slice(0,80) + (card.analysis.athena.length>80?'...':'') : '—'}</span></div>
-                        </div>
-                      )}
 
                       {card.analysis && (
                         <div className="mt-2">
