@@ -53,7 +53,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
   };
 
   const borderColor = theme === 'dark' ? 'border-blue-600' : 'border-blue-900';
-  const iconSize = 'w-6 h-6';
+  const iconSize = 'w-6 h-6 shrink-0'; // padroniza tamanho dos ícones dos campos
   const fieldBgClass = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200';
   const cancelBtnBg = theme === 'dark' ? 'bg-slate-700' : 'bg-gray-300';
 
@@ -111,14 +111,15 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
         <div className="flex flex-col items-center mb-6 mt-6">
           <img src={icons.logo} alt="Ícone" className="w-16 h-16 mb-1" />
-          <h2 className="text-xl font-semibold">Editar Perfil</h2>
+          <h2 className="text-2xl font-semibold">Editar Perfil</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md mx-auto w-full">
+          
           {/* Nome */}
-          <div className={`flex flex-col gap-1`}>
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-3 ${fieldBgClass}`}>
-              <img src={icons.nome} alt="Nome" className={iconSize} />
+          <div className="flex flex-col gap-1">
+            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
+              <img src={icons.nome} alt="Nome" className={iconSize}/>
               <input
                 type="text"
                 placeholder="Nome"
@@ -135,9 +136,9 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
           </div>
 
           {/* Data de nascimento */}
-          <div className={`flex flex-col gap-1`}>
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-3 ${fieldBgClass}`}>
-              <img src={icons.data} alt="Data" className={iconSize} />
+          <div className="flex flex-col gap-1">
+            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
+              <img src={icons.data} alt="Data" className={iconSize}/>
               <input
                 type="text"
                 placeholder="Data de nascimento"
@@ -163,9 +164,9 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
           </div>
 
           {/* Telefone */}
-          <div className={`flex flex-col gap-1`}>
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-3 ${fieldBgClass}`}>
-              <img src={icons.telefone} alt="Telefone" className={iconSize} />
+          <div className="flex flex-col gap-1">
+            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
+              <img src={icons.telefone} alt="Telefone" className={iconSize}/>
               <input
                 type="tel"
                 placeholder="Telefone"
@@ -194,9 +195,9 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
           </div>
 
           {/* Gênero */}
-          <div className={`flex flex-col gap-1`}>
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-3 ${fieldBgClass}`}>
-              <img src={icons.genero} alt="Gênero" className={iconSize} />
+          <div className="flex flex-col gap-1">
+            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
+              <img src={icons.genero} alt="Gênero" className={iconSize}/>
               <select
                 value={gender}
                 onChange={(e) => {

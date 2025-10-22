@@ -53,7 +53,7 @@ export default function ModalDiario({
         <div className="flex flex-col items-center gap-4 text-center">
           {/* Ícone diário */}
           <Image
-            src="/images/icons/diario.svg" // Troque pelo ícone desejado
+            src="/images/icons/IconeDiario.svg" 
             alt="Ícone Diário"
             width={42}
             height={42}

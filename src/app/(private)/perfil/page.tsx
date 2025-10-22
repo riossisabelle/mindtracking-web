@@ -119,11 +119,12 @@ export default function PerfilPage() {
               >
                 Editar Perfil
               </button>
-              <ButtonEsqueceuSenha
-                className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-0.5 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap flex items-center justify-center"
-              >
-                Redefinir Senha
-              </ButtonEsqueceuSenha>
+             <ButtonEsqueceuSenha
+  className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-0.5 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap flex items-center justify-center"
+>
+  Redefinir Senha
+</ButtonEsqueceuSenha>
+
             </div>
             <button
               className="min-w-[120px] w-full bg-red-600 px-6 py-0.5 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap text-center mx-auto"
@@ -171,27 +172,37 @@ export default function PerfilPage() {
       <hr className={`my-4 mx-6 mb-0 border-t ${darkMode ? "border-gray-600" : "border-gray-300"}`} />
 
       {/* Campos do perfil */}
-      <div className="px-6 md:px-8 lg:-mx-8 xl:-mx-2 2xl:-mx-2 gap-2">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 lg:gap-x-14 py-8">
-          <div className={fieldClasses}>
-            <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Gênero</p>
-            <p className="text-lg text-white font-semibold">{userData?.genero ?? '—'}</p>
-          </div>
-          <div className={fieldClasses}>
-            <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Idade</p>
-            <p className="text-lg text-white font-semibold">{userData?.idade ? `${userData.idade} Anos` : '—'}</p>
-          </div>
-          <div className={fieldClasses}>
-            <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Telefone</p>
-            <p className="text-lg text-white font-semibold">{userData?.telefone ?? '—'}</p>
-          </div>
-          <div className={fieldClasses}>
-            <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">E-mail</p>
-            <p className="text-lg text-white font-semibold">{userData?.email ?? '—'}</p>
-          </div>
-        </div>
-      </div>
+    <div className="px-6 md:px-8 lg:-mx-8 xl:-mx-2 2xl:-mx-2 gap-2">
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 lg:gap-x-14 py-8">
+    <div className={fieldClasses}>
+      <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Gênero</p>
+      <p className="text-lg font-semibold dark:text-white text-black">
+        {userData?.genero ?? "—"}
+      </p>
     </div>
+    <div className={fieldClasses}>
+      <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Idade</p>
+      <p className="text-lg font-semibold dark:text-white text-black">
+        {userData?.idade ? `${userData.idade} Anos` : "—"}
+      </p>
+    </div>
+    <div className={fieldClasses}>
+      <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Telefone</p>
+      <p className="text-lg font-semibold dark:text-white text-black">
+        {userData?.telefone ?? "—"}
+      </p>
+    </div>
+    <div className={fieldClasses}>
+      <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">E-mail</p>
+      <p className="text-lg font-semibold dark:text-white text-black">
+        {userData?.email ?? "—"}
+      </p>
+    </div>
+  </div>
+</div>
+
+        </div>
+
   );
 
   // main layout (uses ProfileCard variable defined above)

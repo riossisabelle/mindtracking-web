@@ -173,23 +173,24 @@ export default function Diario() {
 
                       {card.analysis && (
                         <div className="mt-2">
-                          <button
-                            onClick={() => {
-                              if (card.analysis) {
-                                setSelectedAnalysis({
-                                  message: card.analysis.message ?? "",
-                                  emotion: card.analysis.emotion ?? "",
-                                  intensity: card.analysis.intensity ?? "",
-                                  athena: card.analysis.athena ?? "",
-                                });
-                              }
-                            }}
-                            className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition duration-200 ease-in-out"
-                            aria-label={`Ver análise de ${card.title}`}
-                          >
-                            <Image src="/images/icons/lupa.svg" alt="Lupa" width={16} height={16} />
-                            <span>Ver Análise</span>
-                          </button>
+                                  <button
+            onClick={() => {
+              if (card.analysis) {
+                setSelectedAnalysis({
+                  message: card.analysis.message ?? "",
+                  emotion: card.analysis.emotion ?? "",
+                  intensity: card.analysis.intensity ?? "",
+                  athena: card.analysis.athena ?? "",
+                });
+              }
+            }}
+            className="inline-flex items-center gap-2 px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm transition duration-200 ease-in-out shadow-md hover:shadow-lg"
+            aria-label={`Ver análise de ${card.title}`}
+          >
+            <Image src="/images/icons/lupa.svg" alt="Lupa" width={14} height={14} />
+            <span>Ver Análise</span>
+          </button>
+
                         </div>
                       )}
                     </div>
