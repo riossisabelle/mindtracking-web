@@ -4,20 +4,56 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as authService from "@/lib/api/auth";
 import { setAuthToken } from "@/lib/api/axios";
 
+export interface UserData {
+  id?: number | string;
+  nome?: string;
+  email?: string;
+  data_nascimento?: string | null;
+  idade?: number | null;
+  telefone?: string | null;
+  genero?: string | null;
+  fotoPerfil?: string | null;
+}
+
 type AuthContextType = {
   token: string | null;
-  user: unknown | null;
+  user: UserData | null;
   loading: boolean;
   login: (email: string, senha: string) => Promise<void>;
   logout: () => void;
+  fetchUserData: () => Promise<void>;
+  updateUserData: (newData: Partial<UserData>) => void;
+  getUserInitials: (name?: string) => string;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<unknown | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await authService.dadosUser();
+      setUser(response?.user ?? null);
+    } catch (err) {
+      console.error("Erro ao carregar dados do usuário:", err);
+      setUser(null);
+    }
+  };
+
+  const updateUserData = (newData: Partial<UserData>) => {
+    setUser(prev => prev ? { ...prev, ...newData } : null);
+  };
+
+  const getUserInitials = (name?: string) => {
+    if (!name) return "?";
+    const parts = name.trim().split(" ");
+    const first = parts[0]?.charAt(0).toUpperCase();
+    const second = parts.length > 1 ? parts[1]?.charAt(0).toUpperCase() : "";
+    return `${first}${second}`;
+  };
 
   useEffect(() => {
     // restore token on mount
@@ -25,8 +61,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (t) {
       setToken(t);
       setAuthToken(t);
-      // opcional: buscar perfil do usuário se existir endpoint /auth/me
-      // setUser(...)
+      // Buscar dados do usuário quando há token
+      fetchUserData();
     }
     setLoading(false);
   }, []);
@@ -39,7 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem("mt_token", t);
       setAuthToken(t);
       setToken(t);
-      setUser(res.user ?? null);
+      // Buscar dados completos do usuário após login
+      await fetchUserData();
     } finally {
       setLoading(false);
     }
@@ -50,11 +87,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthToken(null);
     setToken(null);
     setUser(null);
-    // redirecionar se quiser: window.location.href = "/login";
+    // Redirecionar para a landing page
+    window.location.href = "/";
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      token, 
+      user, 
+      loading, 
+      login, 
+      logout, 
+      fetchUserData, 
+      updateUserData, 
+      getUserInitials 
+    }}>
       {children}
     </AuthContext.Provider>
   );
