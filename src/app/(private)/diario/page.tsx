@@ -166,8 +166,8 @@ export default function Diario() {
 
                       {/* Mostrar apenas o texto da análise da Athena (ou aviso) no cartão */}
                       <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line">
-                        {card.analysis && card.analysis.athena
-                          ? card.analysis.athena
+                        {card.analysis && card.analysis.message
+                          ? card.analysis.message
                           : 'Análise ainda não disponível.'}
                       </p>
 
