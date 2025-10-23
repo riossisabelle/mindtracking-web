@@ -1,7 +1,7 @@
 // src/lib/api/diario.ts
 import api from "./axios";
 
-export const createDiario = async (payload: unknown) => {
+export const createDiario = async (payload: { titulo: string; texto: string }) => {
   const { data } = await api.post("/api/diario", payload);
   return data;
 };

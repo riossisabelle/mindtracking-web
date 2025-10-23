@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useTheme } from "../../../../contexts/ThemeContext";
-import { createDiario } from "@/lib/api/diario";
+import { createDiario } from "@/lib/api/diario"
+import { hasEmoji } from "@/lib/validation";
 
 interface ModalDiarioProps {
   isOpen: boolean;
@@ -30,17 +31,67 @@ export default function ModalDiario({
 
   if (!isOpen) return null;
 
+  const validateTitle = (t: string): string | null => {
+    const trimmed = t.trim();
+    if (!trimmed) return "Título é obrigatório";
+    if (hasEmoji(trimmed)) return "O título não pode conter emoji";
+    if (trimmed.length > 25) return "Título muito longo (máximo 25 caracteres)";
+    return null;
+  };
+
+  const validateTexto = (txt: string): string | null => {
+    if (!txt || txt.trim().length === 0) return "Texto é obrigatório";
+    return null;
+  };
+
+  const onTitleChangeHandler = (t: string) => {
+    onTitleChange(t);
+    const validationError = validateTitle(t);
+    setError(validationError);
+  };
+
+  const onTextoChangeHandler = (txt: string) => {
+    onChange(txt);
+    if (error === "Texto é obrigatório" && txt.trim().length > 0) {
+      setError(null);
+    }
+  };
+
+  const handleSave = async () => {
+  const titleError = validateTitle(title);
+  if (titleError) {
+    setError(titleError);
+    return;
+  }
+  const textoError = validateTexto(value);
+  if (textoError) {
+    setError(textoError);
+    return;
+  }
+  setSaving(true);
+  setError(null);
+  try {
+    const resp = await createDiario({ texto: value, titulo: title });
+    const created = (resp && (resp.entrada ?? resp)) as any;
+    if (resp && typeof resp.success !== "undefined" && !resp.success) {
+      throw new Error(resp.message || "Erro ao criar entrada");
+    }
+    onSave?.(created);
+    onClose();
+  } catch (err: any) {
+    setError("Não foi possível salvar seu diário. Por favor, tente novamente.");
+  } finally {
+    setSaving(false);
+  }
+};
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4 py-[70px]">
       <div
         className={`p-8 rounded-2xl w-full max-w-[600px] relative shadow-xl transition-all duration-300 mt-[50px] mb-[50px]
-        ${theme === "dark" ? "bg-slate-900 text-white" : "bg-white text-gray-900"}`}
+          ${theme === "dark" ? "bg-slate-900 text-white" : "bg-white text-gray-900"}`}
       >
-        {/* Botão fechar */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 transition-colors p-1"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4 transition-colors p-1">
           <Image
             src={theme === "dark" ? "/images/icons/fechar_b.svg" : "/images/icons/fechar.svg"}
             alt="Fechar"
@@ -51,53 +102,47 @@ export default function ModalDiario({
         </button>
 
         <div className="flex flex-col items-center gap-4 text-center">
-          {/* Ícone diário */}
           <Image
-            src="/images/icons/IconeDiario.svg" 
+            src="/images/icons/IconeDiario.svg"
             alt="Ícone Diário"
             width={42}
             height={42}
             className="mb-2"
           />
 
-          {/* Título */}
           <h2 className="text-2xl md:text-3xl font-bold">Escrita no Diário</h2>
           <p className="text-base text-slate-400">Escreva livremente – somente você verá isso.</p>
         </div>
 
-        {/* Campo de título */}
         <div className="mt-6">
           <input
             type="text"
             value={title}
-            onChange={(e) => onTitleChange?.(e.target.value)}
+            onChange={(e) => onTitleChangeHandler(e.target.value)}
             placeholder="Escreva o título do seu diário aqui..."
+            maxLength={25}
             className={`w-full rounded-xl p-3 outline-none border transition-all mb-3
               ${theme === "dark"
                 ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
-                : "bg-slate-100 border-slate-200 text-slate-800 placeholder:text-slate-400"
-              }`}
+                : "bg-slate-100 border-slate-200 text-slate-800 placeholder:text-slate-400"}`}
           />
         </div>
 
-        {/* Área de texto */}
         <div className="mt-6">
           <textarea
             className={`w-full min-h-[160px] max-h-[270px] resize-none rounded-xl p-4 outline-none border transition-all
               ${theme === "dark"
                 ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
-                : "bg-slate-100 border-slate-200 text-slate-800 placeholder:text-slate-400"
-              }`}
+                : "bg-slate-100 border-slate-200 text-slate-800 placeholder:text-slate-400"}`}
             placeholder="Descreva aqui seu texto do diário..."
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onTextoChangeHandler(e.target.value)}
+            maxLength={1000} // opcional limite para texto
           />
         </div>
 
-        {/* Erro */}
         {error && <div className="text-red-400 mt-2">{error}</div>}
 
-        {/* Botões */}
         <div className="flex justify-end gap-4 mt-8">
           <button
             onClick={onClose}
@@ -109,33 +154,13 @@ export default function ModalDiario({
             Cancelar
           </button>
           <button
-            onClick={async () => {
-              setSaving(true);
-              setError(null);
-              try {
-                // Envia payload com os campos solicitados pela API: { texto, titulo }
-                const resp = await createDiario({ texto: value, titulo: title });
-                // Se a API retorna { success: true, entrada: { ... } }, extrai a entrada
-                const created = (resp && (resp.entrada ?? resp)) as any;
-                // Se a API sinaliza falha, lança para cair no catch
-                if (resp && typeof resp.success !== 'undefined' && !resp.success) {
-                  throw new Error(resp.message || 'Erro ao criar entrada');
-                }
-                onSave?.(created);
-                onClose();
-              } catch (err: any) {
-                console.error('Erro ao salvar diário (modal):', err);
-                setError(err?.message || 'Erro ao salvar diário');
-              } finally {
-                setSaving(false);
-              }
-            }}
+            onClick={handleSave}
             className={`rounded-xl px-6 py-3 font-semibold transition-colors flex items-center gap-2
               ${theme === "dark" ? "bg-blue-700 text-white hover:bg-blue-800" : "bg-blue-600 text-white hover:bg-blue-700"}`}
             type="button"
-            disabled={saving || value.trim().length === 0}
+            disabled={saving || !title || value.trim().length === 0}
           >
-            {saving ? 'Salvando...' : 'Salvar'}
+            {saving ? "Salvando..." : "Salvar"}
           </button>
         </div>
       </div>
