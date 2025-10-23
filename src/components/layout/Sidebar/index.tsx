@@ -10,10 +10,12 @@ import {
   MessageSquareHeart,
   Moon,
   Sun,
-  HelpCircle,
   LogOut,
 } from "lucide-react";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { useAuth } from "../../../contexts/AuthContext";
+import LogoutModal from "../../common/Modals/perfil/sairdaConta";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 
 const menuItems = [
   {
@@ -30,12 +32,12 @@ const menuItems = [
 ];
 
 const bottomItems = [
-  {
-    title: "Perguntas Frequentes",
-    icon: <HelpCircle size={24} />,
-    href: "/faq",
+  { 
+    title: "Sair da conta", 
+    icon: <LogOut size={24} />, 
+    href: null,
+    isLogout: true 
   },
-  { title: "Sair da conta", icon: <LogOut size={24} />, href: "/logout" },
 ];
 
 export default function Sidebar({
@@ -45,7 +47,22 @@ export default function Sidebar({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { logout, user, getUserInitials } = useAuth();
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    logout();
+    setShowLogoutModal(false);
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
 
   return (
     <>
@@ -163,33 +180,63 @@ export default function Sidebar({
           </button>
 
           {bottomItems.map((item, idx) => (
-            <SidebarItem
-              key={idx}
-              href={item.href}
-              icon={item.icon}
-              label={item.title}
-              isOpen={isOpen}
-              theme={theme}
-              className="whitespace-nowrap"
-            />
+            item.isLogout ? (
+              <button
+                key={idx}
+                onClick={handleLogoutClick}
+                className={`flex items-center gap-3 p-3 mx-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer
+                  ${isOpen ? "justify-start" : "justify-center"}
+                  ${theme === "dark" ? "text-gray-100 hover:bg-gray-700" : "text-[#0F172A] hover:bg-gray-100"}`}
+              >
+                <span className="shrink-0 w-6 h-6 flex items-center justify-center">
+                  {item.icon}
+                </span>
+                {isOpen && (
+                  <span className={`font-semibold text-[17px] md:text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    {item.title}
+                  </span>
+                )}
+              </button>
+            ) : (
+              <SidebarItem
+                key={idx}
+                href={item.href!}
+                icon={item.icon}
+                label={item.title}
+                isOpen={isOpen}
+                theme={theme}
+                className="whitespace-nowrap"
+              />
+            )
           ))}
 
           <div
             className={`flex px-3 mt-4 ${isOpen ? "justify-start" : "justify-center"}`}
           >
             <Link href="/perfil" aria-label="Ir para o perfil">
-              <Image
-                src="/images/Perfil.png"
-                alt="User"
-                width={60}
-                height={60}
-                className="rounded-full border cursor-pointer"
-              />
+              <Avatar 
+                className={`w-15 h-15 cursor-pointer border-none ${
+                  theme === "dark" ? "border-gray-600" : "border-gray-200"
+                }`}
+              >
+                <AvatarImage 
+                  src={user?.fotoPerfil || undefined} 
+                  alt={user?.nome || "Usuário"} 
+                />
+                <AvatarFallback 
+                  className={`text-sm font-semibold ${
+                    theme === "dark" 
+                      ? "bg-blue-600 text-white" 
+                      : "bg-blue-600 text-white"
+                  }`}
+                >
+                  {getUserInitials(user?.nome)}
+                </AvatarFallback>
+              </Avatar>
             </Link>
           </div>
         </div>
       </aside>
-
       {/* Sidebar mobile (overlay) */}
       {mobileOpen && (
         <div
@@ -262,34 +309,72 @@ export default function Sidebar({
 
               <div className="mt-0">
                 {bottomItems.map((item, idx) => (
-                  <SidebarItem
-                    key={idx}
-                    label={item.title}
-                    href={item.href}
-                    icon={item.icon}
-                    isOpen={true}
-                    theme={theme}
-                    className="whitespace-nowrap"
-                    onClick={() => setMobileOpen(false)}
-                  />
+                  item.isLogout ? (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        handleLogoutClick();
+                        setMobileOpen(false);
+                      }}
+                      className={`flex items-center gap-3 p-3 mx-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer
+                        ${theme === "dark" ? "text-gray-100 hover:bg-gray-700" : "text-[#0F172A] hover:bg-gray-100"}`}
+                    >
+                      <span className="shrink-0 w-6 h-6 flex items-center justify-center">
+                        {item.icon}
+                      </span>
+                      <span className={`font-semibold text-[17px] md:text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                        {item.title}
+                      </span>
+                    </button>
+                  ) : (
+                    <SidebarItem
+                      key={idx}
+                      label={item.title}
+                      href={item.href!}
+                      icon={item.icon}
+                      isOpen={true}
+                      theme={theme}
+                      className="whitespace-nowrap"
+                      onClick={() => setMobileOpen(false)}
+                    />
+                  )
                 ))}
               </div>
 
               <div className="flex px-5 mt-4 justify-start">
                 <Link href="/perfil" aria-label="Ir para o perfil">
-                  <Image
-                    src="/images/Perfil.png"
-                    alt="User"
-                    width={55}
-                    height={55}
-                    className="rounded-full border cursor-pointer w-14 h-14 md:w-16 md:h-16"
-                  />
+                  <Avatar 
+                    className={`w-14 h-14 md:w-16 md:h-16 cursor-pointer border-2 ${
+                      theme === "dark" ? "border-gray-600" : "border-gray-200"
+                    }`}
+                  >
+                    <AvatarImage 
+                      src={user?.fotoPerfil || undefined} 
+                      alt={user?.nome || "Usuário"} 
+                    />
+                    <AvatarFallback 
+                      className={`text-sm md:text-base font-semibold ${
+                        theme === "dark" 
+                          ? "bg-blue-600 text-white" 
+                          : "bg-blue-600 text-white"
+                      }`}
+                    >
+                      {getUserInitials(user?.nome)}
+                    </AvatarFallback>
+                  </Avatar>
                 </Link>
               </div>
             </div>
           </aside>
         </div>
       )}
+
+      {/* Modal de Logout */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={handleLogoutCancel}
+        onLogout={handleLogoutConfirm}
+      />
     </>
   );
 }
