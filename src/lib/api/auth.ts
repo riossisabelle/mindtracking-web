@@ -29,7 +29,10 @@ export const register = async (payload: {
   nome: string;
   email: string;
   senha: string;
-  dataNascimento?: string;
+  confirmarSenha: string;
+  data_nascimento: string;
+  genero: string;
+  telefone: string;
 }) => {
   const { data } = await api.post("/auth/register", payload);
   return data;
