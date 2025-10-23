@@ -7,6 +7,11 @@ export function isAsciiOnly(value: string): boolean {
   return !emojiRegex.test(value) && !variationSelector.test(value);
 }
 
+// ✅ Detecta apenas emojis, não bloqueia acentos
+export function hasEmoji(value: string): boolean {
+  return /[\p{Extended_Pictographic}]/u.test(value);
+};
+
 export function validateEmail(valueRaw: string): string | null {
   const value = valueRaw.trim();
 
@@ -147,7 +152,7 @@ export function validateGender(gender: string): string | null {
 export function validateName(name: string): string | null {
   const trimmed = name.trim();
   if (!trimmed) return "Nome é obrigatório";
-  if (!isAsciiOnly(name)) return "O nome não pode conter emoji";
+  if (hasEmoji(name)) return "O nome não pode conter emoji";
   if (trimmed.length < 2) return "Nome muito curto (mínimo 2 caracteres)";
   if (trimmed.length > 150) return "Nome muito longo (máximo 150 caracteres)";
   // Permite letras Unicode e marcas de acentuação (combining marks), espaços, apóstrofo e hífen

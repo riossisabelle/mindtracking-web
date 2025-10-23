@@ -4,12 +4,20 @@ import { login as loginApi } from "@/lib/api/auth";
 import { setAuthToken } from "@/lib/api/axios";
 import { useTheme } from "@/contexts/ThemeContext";
 import Image from "next/image";
-import Link from "next/link";
 import IconInput from "@/components/common/Inputs/InputEmail";
 import PasswordInput from "@/components/common/Inputs/InputSenha";
 import Button from "@/components/common/Buttons";
 import { validateEmail } from "@/lib/validation";
 import dynamic from "next/dynamic";
+import ForgotPasswordModal from "@/components/features/Auth/RedefinicaoSenha/VerificacaoEmail";
+import ButtonEsqueceuSenha from "@/components/common/Buttons/ButtonEsqueceuSenha";
+
+interface User {
+  email_verificado?: boolean;
+  emailVerified?: boolean;
+  questionario_inicial?: boolean;
+  questionarioInicial?: boolean;
+}
 
 export default function Login() {
   const { theme } = useTheme();
@@ -23,7 +31,9 @@ export default function Login() {
   const [showVerify, setShowVerify] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [pendingToken, setPendingToken] = useState<string | null>(null);
-  const [pendingUser, setPendingUser] = useState<any | null>(null);
+  const [pendingUser, setPendingUser] = useState<User | null>(null);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+    useState(false);
   const VerifyEmailModal = dynamic(
     () => import("@/components/features/Auth/Register/ModalCode"),
     { ssr: false },
@@ -76,42 +86,48 @@ export default function Login() {
     try {
       const res = await loginApi(email, password);
       // debug: log response to help diagnose verification flow
-      // eslint-disable-next-line no-console
       console.debug("login response:", res);
 
       // Normalize user object: backend might return stringified JSON, array, camelCase or snake_case
-      let userObj: any = null;
+      let userObj: User | null = null;
       try {
-        if (!res.user) userObj = null;
-        else if (typeof res.user === "string") {
+        if (!res.user) {
+          userObj = null;
+        } else if (typeof res.user === "string") {
           userObj = JSON.parse(res.user);
         } else if (Array.isArray(res.user)) {
           userObj = res.user.length > 0 ? res.user[0] : null;
         } else {
-          userObj = res.user;
+          userObj = res.user as User;
         }
-      } catch (e) {
-        userObj = res.user;
+      } catch {
+        userObj = res.user as User;
       }
-      
+
       // support both snake_case and camelCase property names, on both top-level and nested user
       const emailVerified =
-        (res as any)?.email_verificado ??
-        (res as any)?.emailVerified ??
-        (userObj && (userObj.email_verificado ?? userObj.emailVerified ?? null));
+        res?.email_verificado ??
+        res?.emailVerified ??
+        (userObj &&
+          (userObj.email_verificado ?? userObj.emailVerified ?? null));
       const questionarioInicial =
-        (res as any)?.questionario_inicial ??
-        (res as any)?.questionarioInicial ??
-        (userObj && (userObj.questionario_inicial ?? userObj.questionarioInicial ?? null));
+        res?.questionario_inicial ??
+        res?.questionarioInicial ??
+        (userObj &&
+          (userObj.questionario_inicial ??
+            userObj.questionarioInicial ??
+            null));
 
       // debug: values
-      // eslint-disable-next-line no-console
-      console.debug("normalized user:", userObj, { emailVerified, questionarioInicial });
+      console.debug("normalized user:", userObj, {
+        emailVerified,
+        questionarioInicial,
+      });
       // If email not verified, open verification modal and wait for code verification
       if (emailVerified === false) {
         // hold token & user until verification completes
         setPendingToken(res.token ?? null);
-        setPendingUser(userObj ?? res.user ?? null);
+        setPendingUser(userObj);
         setRegisteredEmail(email);
         setShowVerify(true);
         return;
@@ -149,7 +165,7 @@ export default function Login() {
     }
   };
 
-  const handleVerifySuccess = (codigo: string) => {
+  const handleVerifySuccess = () => {
     // Called after verifyEmail inside modal succeeds
     if (pendingToken) {
       localStorage.setItem("mt_token", pendingToken);
@@ -225,14 +241,13 @@ export default function Login() {
           />
         </div>
         <div className="flex w-full max-w-72 md:max-w-full justify-end">
-          <Link
+          <ButtonEsqueceuSenha
             className={`text-right text-sm md:text-base font-bold ${
               theme === "dark" ? "text-white" : "text-slate-900"
             }`}
-            href={"/auth/forgot-password"} // Corrigi o link para a página de recuperação de senha
           >
             Esqueceu sua senha?
-          </Link>
+          </ButtonEsqueceuSenha>
         </div>
 
         {apiError && (
@@ -251,15 +266,19 @@ export default function Login() {
             loading={loading}
           />
         </div>
-          {showVerify && (
-            <VerifyEmailModal
-              email={registeredEmail}
-              isOpen={true}
-              onClose={() => setShowVerify(false)}
-              onSuccess={handleVerifySuccess}
-            />
-          )}
-        
+        {showVerify && (
+          <VerifyEmailModal
+            email={registeredEmail}
+            isOpen={true}
+            onClose={() => setShowVerify(false)}
+            onSuccess={handleVerifySuccess}
+          />
+        )}
+        <ForgotPasswordModal
+          isOpen={isForgotPasswordModalOpen}
+          onClose={() => setIsForgotPasswordModalOpen(false)}
+          onSuccess={handleVerifySuccess}
+        />
       </div>
     </div>
   );
