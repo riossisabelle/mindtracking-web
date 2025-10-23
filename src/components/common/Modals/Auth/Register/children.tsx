@@ -133,6 +133,18 @@ export default function Register() {
     setGenderError(validateGender(value));
   };
 
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement | HTMLFormElement>,
+  ) => {
+    if (e.key === "Enter") {
+      if (isRegisterView && isFormOneValid()) {
+        handleRegisterClick();
+      } else if (!isRegisterView && isFormTwoValid()) {
+        handleRegisterClick();
+      }
+    }
+  };
+
   const [apiError, setApiError] = useState<string | null>(null);
   const [showVerify, setShowVerify] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
@@ -186,11 +198,16 @@ export default function Register() {
         await registerApi(payload);
         setRegisteredEmail(email);
         setShowVerify(true);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Erro desconhecido";
+        const apiErrorMessage = (
+          error as { response?: { data?: { message?: string } } }
+        )?.response?.data?.message;
         setApiError(
-          error?.response?.data?.message ||
-          error?.message ||
-          "Erro ao registrar. Tente novamente."
+          apiErrorMessage ||
+            errorMessage ||
+            "Erro ao registrar. Tente novamente.",
         );
       } finally {
         setLoading(false);
@@ -246,17 +263,17 @@ export default function Register() {
           // Após verificar o e-mail com sucesso, faz login para obter JWT e dados do usuário
           try {
             const res = await loginApi(email, password);
-            const token = (res as any)?.token;
+            const token = res.token;
             if (token) {
               localStorage.setItem("mt_token", token);
               sessionStorage.setItem("mt_token", token);
               setAuthToken(token);
             }
-            if ((res as any)?.user) {
-              localStorage.setItem("mt_user", JSON.stringify((res as any).user));
-              sessionStorage.setItem("mt_user", JSON.stringify((res as any).user));
+            if (res.user) {
+              localStorage.setItem("mt_user", JSON.stringify(res.user));
+              sessionStorage.setItem("mt_user", JSON.stringify(res.user));
             }
-          } catch (e) {
+          } catch {
             // Se falhar o login automático, segue para questionário mesmo assim
           }
           router.push("/questionnaire");
@@ -313,7 +330,7 @@ export default function Register() {
                   Sua jornada rumo ao equilíbrio emocional começa aqui
                 </h2>
               </div>
-              <form className="flex flex-col gap-4">
+              <form className="flex flex-col gap-4" onKeyDown={handleKeyDown}>
                 <IconInput
                   width="w-full"
                   type="email"
@@ -428,7 +445,10 @@ export default function Register() {
               </h2>
             </div>
 
-            <div className="flex flex-col gap-3 mt-4">
+            <div
+              className="flex flex-col gap-3 mt-4"
+              onKeyDown={handleKeyDown}
+            >
               {" "}
               {/* Reduzi o gap para 3 */}
               <IconInput
