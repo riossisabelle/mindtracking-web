@@ -185,6 +185,12 @@ export default function Login() {
     setShowVerify(false);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" && isFormValid) {
+      handleLoginClick();
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col items-center justify-between w-full md:w-[28.125em] gap-4">
@@ -206,7 +212,7 @@ export default function Login() {
             Seu bem-estar importa todos os dias
           </h2>
         </div>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6" onKeyDown={handleKeyDown}>
           <IconInput
             width="w-full"
             type="email"
