@@ -1,6 +1,10 @@
 export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{8,}$/;
 export function isAsciiOnly(value: string): boolean {
-  return /^[\x00-\x7F]*$/.test(value);
+  // Antes exigia ASCII; agora apenas detecta/ bloqueia emojis para permitir acentuação
+  // Usa propriedade Unicode Extended_Pictographic e também verifica o selector de variação (U+FE0F)
+  const emojiRegex = /\p{Extended_Pictographic}/u;
+  const variationSelector = /\uFE0F/;
+  return !emojiRegex.test(value) && !variationSelector.test(value);
 }
 
 export function validateEmail(valueRaw: string): string | null {
@@ -146,6 +150,7 @@ export function validateName(name: string): string | null {
   if (!isAsciiOnly(name)) return "O nome não pode conter emoji";
   if (trimmed.length < 2) return "Nome muito curto (mínimo 2 caracteres)";
   if (trimmed.length > 150) return "Nome muito longo (máximo 150 caracteres)";
-  if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(trimmed)) return "Nome contém caracteres inválidos";
+  // Permite letras Unicode e marcas de acentuação (combining marks), espaços, apóstrofo e hífen
+  if (!/^[\p{L}\p{M}\s'-]+$/u.test(trimmed)) return "Nome contém caracteres inválidos";
   return null;
 }
