@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useTheme } from "@/contexts/ThemeContext";
 import BaseCard from "./BaseCard";
-import ModalDiario from "@/components/common/Modals/Diario/ModalEscreverDiario";
+import ModalDiario from "@/components/common/Modals/Diario/ModalEscritaDiario";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getDiarios, createDiario, getDiarioById } from "@/lib/api/diario";
