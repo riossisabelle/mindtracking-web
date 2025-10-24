@@ -7,7 +7,6 @@ import {
   validateGender
 } from '@/lib/validation';
 import { updateDadosUser } from '@/lib/api/auth';
-import { dadosUser } from '@/lib/api/auth';
 // @ts-ignore
 import { toast } from 'react-toastify';
 
@@ -27,13 +26,10 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [gender, setGender] = useState('');
   const [genderError, setGenderError] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
 
   // Resetar campos ao abrir o modal
   useEffect(() => {
-    // não limpar ao abrir (assim preenche com os dados do servidor)
-    // limpar apenas quando o modal for fechado
-    if (!isOpen) {
+    if (isOpen) {
       setName('');
       setNameError(null);
       setBirthDate('');
@@ -44,79 +40,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
       setGenderError(null);
     }
   }, [isOpen]);
-  
-  // Ao abrir, buscar dados do usuário (usando token do JWT) e preencher os campos sem enviar
-  useEffect(() => {
-    if (!isOpen) return;
-
-    let mounted = true;
-
-    const getToken = () => {
-      // tenta localStorage primeiro, depois cookies
-      const fromStorage = localStorage.getItem('token') || localStorage.getItem('authToken');
-      if (fromStorage) return fromStorage;
-      const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
-      if (match) return match[2];
-      return null;
-    };
-
-    const formatDateToDisplay = (isoDate?: string) => {
-      if (!isoDate) return '';
-      // espera yyyy-mm-dd ou yyyy-mm-ddT...
-      const d = isoDate.split('T')[0];
-      const [y, m, day] = d.split('-');
-      if (!y || !m || !day) return '';
-      return `${day}/${m}/${y}`;
-    };
-
-    const formatPhoneDisplay = (raw?: string) => {
-      if (!raw) return '';
-      const onlyNums = raw.replace(/\D/g, '');
-      const limited = onlyNums.slice(0, 11);
-      if (limited.length <= 2) return limited;
-      if (limited.length <= 6) return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
-      if (limited.length === 11) return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
-      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6)}`;
-    };
-
-    const fetchProfile = async () => {
-      const data = await dadosUser();
-      const profile = data?.data || data?.user || data || null;
-      if (!profile || !mounted) return;
-
-      const nome = profile.nome ?? profile.name ?? '';
-      const telefone = profile.telefone ?? profile.phone ?? '';
-      const dataNascimento = profile.data_nascimento ?? profile.dataNascimento ?? profile.birthdate ?? '' ;
-      const genero = profile.genero ?? profile.gender ?? '';
-
-      const formattedDate = formatDateToDisplay(dataNascimento);
-      const formattedPhone = formatPhoneDisplay(telefone);
-
-      setName(nome);
-      setNameError(validateName(nome));
-      setBirthDate(formattedDate);
-      setBirthDateError(validateBirthdate(formattedDate));
-      setPhone(formattedPhone);
-      setPhoneError(validatePhone(formattedPhone));
-      setGender(genero);
-      setGenderError(validateGender(genero));
-    };
-
-    fetchProfile();
-
-    return () => { mounted = false; };
-  }, [isOpen]);
-
-  // useEffect para buscar o email do usuário logado
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const u = JSON.parse(localStorage.getItem('mt_user') || '{}');
-      setEmail(u.email || '');
-    } catch {
-      setEmail('');
-    }
-  }, []);
 
   if (!isOpen) return null;
 
@@ -183,7 +106,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
           className="absolute top-5 right-4 p-1 rounded-full"
           aria-label="Fechar"
         >
-          <img src={icons.fechar} alt="Fechar" className="w-10 h-10" />
+          <img src={icons.fechar} alt="Fechar" className="w-10 h-10 cursor-pointer" />
         </button>
 
         <div className="flex flex-col items-center mb-6 mt-6">
