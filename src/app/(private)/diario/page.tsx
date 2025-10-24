@@ -9,6 +9,28 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import Sidebar from "@/components/layout/Sidebar";
 import ModalAnalise from "@/components/common/Modals/Diario/ModalAnalise";
 
+// Hook para detectar tamanho da tela
+const useScreenSize = () => {
+  const [screenSize, setScreenSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1024,
+    height: typeof window !== 'undefined' ? window.innerHeight : 768,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return screenSize;
+};
+
 interface Analysis {
   message: string;
   emotion: string;
@@ -52,11 +74,35 @@ interface DiarioResponse {
 
 export default function Diario() {
   const { theme } = useTheme();
+  const screenSize = useScreenSize();
+  
   const formatDate = (iso?: string | null) => {
     if (!iso) return "";
     const d = new Date(iso);
     const pad = (n: number) => n.toString().padStart(2, "0");
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} - ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const truncateText = (text: string) => {
+    // Limite responsivo baseado no tamanho da tela
+    let maxLength: number;
+    
+    if (screenSize.width < 640) {
+      // Mobile pequeno (sm)
+      maxLength = 120;
+    } else if (screenSize.width < 768) {
+      // Mobile médio
+      maxLength = 150;
+    } else if (screenSize.width < 1024) {
+      // Tablet
+      maxLength = 200;
+    } else {
+      // Desktop
+      maxLength = 300;
+    }
+    
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + "...";
   };
   const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(
     null,
@@ -165,7 +211,11 @@ export default function Diario() {
                 <div className="mb-4 flex items-center justify-between shrink-0">
                   <div className="text-sm text-gray-400 pl-4">
                     Registros encontrados:{" "}
-                    <span className="font-medium text-white/90">
+                    <span className={`font-medium ${
+                      theme === "dark"
+                        ? "text-white"
+                        : "text-gray-900"
+                    }`}>
                       {cards.length}
                     </span>
                   </div>
@@ -179,7 +229,7 @@ export default function Diario() {
                   {cards.map((card) => (
                     <div key={card.id} className="p-4 max-w-full h-full">
                       <div
-                        className={`w-full h-full rounded-lg p-4 border-2 transition-all duration-300 ease-in-out ${
+                        className={`w-full h-full rounded-lg p-4 border-2 transition-all duration-300 ease-in-out flex flex-col ${
                           theme === "dark"
                             ? "bg-slate-800 text-gray-200 border-blue-600"
                             : "bg-slate-50 text-gray-800 border-blue-500"
@@ -197,37 +247,39 @@ export default function Diario() {
                             </span>
                           </div>
                         </div>
-                        <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line">
-                          {card.analysis && card.analysis.message
-                            ? card.analysis.message
-                            : "Análise ainda não disponível."}
-                        </p>
-                        {card.analysis && (
-                          <div className="mt-2">
-                            <button
-                              onClick={() => {
-                                if (card.analysis) {
-                                  setSelectedAnalysis({
-                                    message: card.analysis.message ?? "",
-                                    emotion: card.analysis.emotion ?? "",
-                                    intensity: card.analysis.intensity ?? "",
-                                    athena: card.analysis.athena ?? "",
-                                  });
-                                }
-                              }}
-                              className="inline-flex items-center gap-2 px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm transition duration-200 ease-in-out shadow-md hover:shadow-lg"
-                              aria-label={`Ver análise de ${card.title}`}
-                            >
-                              <Image
-                                src="/images/icons/lupa.svg"
-                                alt="Lupa"
-                                width={14}
-                                height={14}
-                              />
-                              <span>Ver Análise</span>
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex-1 flex flex-col">
+                          <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line flex-1">
+                            {card.analysis && card.analysis.message
+                              ? truncateText(card.analysis.message)
+                              : "Análise ainda não disponível."}
+                          </p>
+                          {card.analysis && (
+                            <div className="mt-auto">
+                              <button
+                                onClick={() => {
+                                  if (card.analysis) {
+                                    setSelectedAnalysis({
+                                      message: card.analysis.message ?? "",
+                                      emotion: card.analysis.emotion ?? "",
+                                      intensity: card.analysis.intensity ?? "",
+                                      athena: card.analysis.athena ?? "",
+                                    });
+                                  }
+                                }}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm transition duration-200 ease-in-out shadow-md hover:shadow-lg"
+                                aria-label={`Ver análise de ${card.title}`}
+                              >
+                                <Image
+                                  src="/images/icons/lupa.svg"
+                                  alt="Lupa"
+                                  width={14}
+                                  height={14}
+                                />
+                                <span>Ver Análise</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
