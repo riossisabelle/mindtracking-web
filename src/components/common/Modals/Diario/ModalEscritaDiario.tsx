@@ -5,6 +5,7 @@ import { useTheme } from "../../../../contexts/ThemeContext";
 import axios from "axios";
 import Image from "next/image";
 
+
 interface ModalEscritaDiarioProps {
   isOpen: boolean;
   onClose: () => void;
@@ -61,7 +62,10 @@ export default function ModalEscritaDiario({
         </button>
 
         <div className="flex flex-col items-center gap-2 text-center mt-10">
+
           <Image
+
+
             src={
               theme === "dark"
                 ? "/images/icons/diario_b.svg"
@@ -113,3 +117,4 @@ export default function ModalEscritaDiario({
     </div>
   );
 }
+

@@ -8,8 +8,9 @@ import EditProfileModal from "@/components/common/Modals/perfil/editarPerfil";
 import LogoutModal from "@/components/common/Modals/perfil/sairdaConta";
 import VerifyCodeModal from "@/components/features/Auth/RedefinicaoSenha/VerificacaoCodigo";
 import ResetPasswordModal from "@/components/features/Auth/RedefinicaoSenha/AtualizacaoSenha";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { dadosUser, recuperarSenha } from "@/lib/api/auth";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { dadosUser } from "@/lib/api/auth";
+import ButtonEsqueceuSenha from "@/components/common/Buttons/ButtonEsqueceuSenha";
 
 export default function PerfilPage() {
   const [fotoPaisagem, setFotoPaisagem] = useState<string | null>(null);
@@ -17,10 +18,8 @@ export default function PerfilPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [verifyCodeModalOpen, setVerifyCodeModalOpen] = useState(false);
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
-
   const [userData, setUserData] = useState<{
     id?: number | string;
     nome?: string;
@@ -53,28 +52,6 @@ export default function PerfilPage() {
     setLogoutModalOpen(false);
   };
 
-  const handleResetPassword = async () => {
-    setIsLoading(true);
-    try {
-      const userDataString = localStorage.getItem('mt_user');
-      if (!userDataString) {
-        throw new Error('Dados do usuário não encontrados');
-      }
-      
-      const userData = JSON.parse(userDataString);
-      if (!userData.email) {
-        throw new Error('Email não encontrado nos dados do usuário');
-      }
-      
-      await recuperarSenha({ email: userData.email });
-      setVerifyCodeModalOpen(true);
-    } catch (error) {
-      console.error('Erro ao enviar código:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const getUserInitials = (name: string) => {
     if (!name) return "?";
     const parts = name.trim().split(" ");
@@ -84,7 +61,9 @@ export default function PerfilPage() {
   };
 
   const cardClasses = `rounded-2xl shadow-xl overflow-hidden transition-colors duration-700 ${
-    darkMode ? "bg-slate-800 text-white" : "bg-slate-50 text-gray-900 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.10)]"
+    darkMode
+      ? "bg-slate-800 text-white"
+      : "bg-slate-50 text-gray-900 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.10)]"
   }`;
 
   const fieldClasses = `p-4 rounded-lg transition-colors duration-300 ${
@@ -95,7 +74,11 @@ export default function PerfilPage() {
     <>
       <div className={cardClasses}>
         {/* Imagem de paisagem */}
-        <div className={`relative w-full h-32 md:h-40 ${darkMode ? "bg-gray-700" : "bg-gray-200"}`}>
+        <div
+          className={`relative w-full h-32 md:h-40 ${
+            darkMode ? "bg-gray-700" : "bg-gray-200"
+          }`}
+        >
           <Image
             src={fotoPaisagem || "/images/paisagem.png"}
             alt="Foto paisagem"
@@ -111,9 +94,11 @@ export default function PerfilPage() {
         <div className="flex flex-col md:flex-row items-start px-6 mt-6 relative">
           <div className="flex flex-col items-center md:items-start -mt-16 z-10">
             <div className="relative">
-              <Avatar 
+              <Avatar
                 className={`w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 text-2xl md:text-3xl lg:text-4xl font-bold border-4 ${
-                  darkMode ? 'border-slate-800 bg-blue-600 text-white' : 'border-slate-50 bg-blue-600 text-white'
+                  darkMode
+                    ? "border-slate-800 bg-blue-600 text-white"
+                    : "border-slate-50 bg-blue-600 text-white"
                 }`}
               >
                 <AvatarFallback className="bg-blue-600 text-white">
@@ -131,22 +116,23 @@ export default function PerfilPage() {
           {/* Botões responsivos */}
           <div className="mt-6 md:mt-0 ml-auto z-10 w-full md:w-auto flex flex-col md:flex-row gap-2 md:gap-3">
             <button
-              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap text-center"
+              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap flex items-center justify-center text-center"
               onClick={() => setModalOpen(true)}
             >
               Editar Perfil
             </button>
 
-            <button
-              onClick={handleResetPassword}
-              disabled={isLoading}
+            <ButtonEsqueceuSenha
               className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              onSuccess={() => {
+                setChangePasswordModalOpen(true);
+              }}
             >
-              {isLoading ? "Enviando..." : "Redefinir Senha"}
-            </button>
+              Redefinir Senha
+            </ButtonEsqueceuSenha>
 
             <button
-              className="min-w-[120px] w-full sm:w-auto bg-red-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap text-center"
+              className="min-w-[120px] w-full sm:w-auto bg-red-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap flex items-center justify-center text-center"
               onClick={() => setLogoutModalOpen(true)}
             >
               Sair da Conta
@@ -154,7 +140,11 @@ export default function PerfilPage() {
           </div>
         </div>
 
-        <hr className={`my-4 mx-6 mb-0 border-t ${darkMode ? "border-gray-600" : "border-gray-300"}`} />
+        <hr
+          className={`my-4 mx-6 mb-0 border-t ${
+            darkMode ? "border-gray-600" : "border-gray-300"
+          }`}
+        />
 
         {/* Campos do perfil */}
         <div className="px-6 md:px-8 lg:-mx-8 xl:-mx-2 2xl:-mx-2 gap-2">
@@ -188,23 +178,20 @@ export default function PerfilPage() {
       </div>
 
       {/* Modais */}
-      <LogoutModal 
-        isOpen={logoutModalOpen} 
-        onClose={() => setLogoutModalOpen(false)} 
-        onLogout={handleLogout} 
+      <LogoutModal
+        isOpen={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
+        onLogout={handleLogout}
       />
-      <EditProfileModal 
-        isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-      />
+      <EditProfileModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
       <VerifyCodeModal
         isOpen={verifyCodeModalOpen}
         onClose={() => setVerifyCodeModalOpen(false)}
-        onSuccess={(codigo) => {
+        onSuccess={() => {
           setVerifyCodeModalOpen(false);
           setChangePasswordModalOpen(true);
         }}
-        email={JSON.parse(localStorage.getItem('mt_user') || '{}').email || ''}
+        email={JSON.parse(localStorage.getItem("mt_user") || "{}").email || ""}
       />
       <ResetPasswordModal
         isOpen={changePasswordModalOpen}
@@ -212,18 +199,13 @@ export default function PerfilPage() {
         onSuccess={() => {
           setChangePasswordModalOpen(false);
         }}
-        email={JSON.parse(localStorage.getItem('mt_user') || '{}').email || ''}
+        email={JSON.parse(localStorage.getItem("mt_user") || "{}").email || ""}
       />
     </>
   );
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-transparent">
-      {/* Sidebar fixa no topo em mobile */}
-      <div className="sm:hidden fixed top-0 left-0 w-full z-50">
-        <Sidebar />
-      </div>
-
       {/* Layout desktop */}
       <div className="hidden sm:flex min-h-screen">
         <Sidebar />
@@ -232,10 +214,26 @@ export default function PerfilPage() {
         </div>
       </div>
 
-      {/* Layout mobile/tablet */}
-      <div className="sm:hidden px-5 pb-6 pt-[88px] md:pt-3">
-        {ProfileCard}
-      </div>
+     {/* Layout mobile/tablet corrigido */}
+<div className="sm:hidden relative">
+  {/* Sidebar realmente fixa no topo, sem espaço ao rolar */}
+  <div
+    className="sticky top-0 left-0 w-full z-50 bg-slate-900 dark:bg-slate-900"
+    style={{
+      position: "sticky",
+      top: "env(safe-area-inset-top, 0px)",
+      zIndex: 9999,
+    }}
+  >
+    <Sidebar />
+  </div>
+
+  {/* Conteúdo abaixo da sidebar */}
+  <div className="relative z-40 px-5 pb-6 pt-[100px]">
+    {ProfileCard}
+  </div>
+</div>
+
     </div>
   );
 }
