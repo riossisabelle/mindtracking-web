@@ -54,10 +54,13 @@ export default function DiarioEmocionalCard() {
           entradas.sort((a, b) => new Date(b.data_hora).getTime() - new Date(a.data_hora).getTime());
           const ultima = entradas[0];
           setEntrada(ultima);
-          // Verifica se já há diário hoje
-          const hoje = new Date().toDateString();
-          const dataUltima = new Date(ultima.data_hora).toDateString();
-          setDiarioHoje(dataUltima === hoje);
+          // Verifica se já existe um diário nas últimas 24 horas (janela de 24h)
+          const ultimaTime = new Date(ultima.data_hora).getTime();
+          const now = Date.now();
+          const diffMs = now - ultimaTime;
+          const twentyFourHoursMs = 24 * 60 * 60 * 1000;
+          // considera diário como "já registrado" se foi criado há menos de 24h
+          setDiarioHoje(diffMs >= 0 && diffMs < twentyFourHoursMs);
         }
       } catch (err: any) {
         console.error("Erro ao carregar diários:", err);
