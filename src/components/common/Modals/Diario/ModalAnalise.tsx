@@ -25,9 +25,9 @@ export default function ModalAnalise({
   if (!isOpen || !analysis) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4 py-[70px]">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4 py-4">
       <div
-        className={`p-8 rounded-2xl w-full max-w-[600px] relative shadow-xl transition-all duration-300 mt-[100px] mb-[100px]
+        className={`p-6 rounded-2xl w-full max-w-[90vw] lg:max-w-[800px] relative shadow-xl transition-all duration-300 max-h-[90vh] overflow-y-auto
         ${
           theme === "dark" ? "bg-slate-900 text-white" : "bg-white text-gray-900"
         }`}
@@ -70,28 +70,36 @@ export default function ModalAnalise({
 
         {/* Conteúdo */}
         <div className="flex flex-col gap-4 mt-6 text-left">
-          <p className="text-sm md:text-base leading-relaxed">
-            <span className="font-bold">Mensagem: </span>“{analysis.message}”
-          </p>
+          <div className="break-words">
+            <p className="text-sm md:text-base leading-relaxed">
+              <span className="font-bold">Mensagem: </span>"{analysis.message}"
+            </p>
+          </div>
 
-          <p className="text-sm md:text-base">
-            <span className="font-bold">Emoção predominante: </span>
-            {analysis.emotion}
-          </p>
+          <div className="break-words">
+            <p className="text-sm md:text-base">
+              <span className="font-bold">Emoção predominante: </span>
+              {analysis.emotion}
+            </p>
+          </div>
 
-          <p className="text-sm md:text-base">
-            <span className="font-bold">Intensidade: </span>
-            {analysis.intensity}
-          </p>
+          <div className="break-words">
+            <p className="text-sm md:text-base">
+              <span className="font-bold">Intensidade: </span>
+              {analysis.intensity}
+            </p>
+          </div>
 
           {/* Athena diz: com font-mixed */}
-          <p
-            className={`text-sm md:text-base ${
-              theme === "dark" ? "text-blue-400" : "text-blue-600"
-            }`}
-          >
-            <span className="font-bold">Athena diz:</span> “{analysis.athena}”
-          </p>
+          <div className="break-words">
+            <p
+              className={`text-sm md:text-base ${
+                theme === "dark" ? "text-blue-400" : "text-blue-600"
+              }`}
+            >
+              <span className="font-bold">Athena diz:</span> "{analysis.athena}"
+            </p>
+          </div>
         </div>
       </div>
     </div>

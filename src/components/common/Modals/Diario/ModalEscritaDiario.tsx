@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { useTheme } from "../../../../contexts/ThemeContext";
 import axios from "axios";
+import Image from "next/image";
+
 
 interface ModalEscritaDiarioProps {
   isOpen: boolean;
@@ -46,25 +48,32 @@ export default function ModalEscritaDiario({
         ${theme === "dark" ? "bg-slate-900 text-white" : "bg-white text-gray-900"}`}
       >
         <button onClick={onClose} className="absolute top-4 right-4 p-1">
-          <img
+          <Image
             src={
               theme === "dark"
                 ? "/images/icons/fechar_b.svg"
                 : "/images/icons/fechar.svg"
             }
             alt="Fechar"
+            width={32}
+            height={32}
             className="w-8 h-8"
           />
         </button>
 
         <div className="flex flex-col items-center gap-2 text-center mt-10">
-          <img
+
+          <Image
+
+
             src={
               theme === "dark"
                 ? "/images/icons/diario_b.svg"
                 : "/images/icons/diario.svg"
             }
             alt="Logo Diário"
+            width={48}
+            height={48}
             className="w-12 md:w-12"
           />
           <h2 className="text-xl md:text-2xl font-bold">Escrita no Diário</h2>
@@ -108,3 +117,4 @@ export default function ModalEscritaDiario({
     </div>
   );
 }
+
