@@ -15,7 +15,9 @@ export default function BaseCard({ children, className }: BaseCardProps) {
     <div
       className={`
         rounded-[8px]
-        pl-[21px] pr-[33px] pt-[25px]
+
+        pl-[20px] pr-[20px] pt-[20px]
+
         w-full h-full flex flex-col min-h-[150px] max-w-[500px]
         transition-colors
         ${

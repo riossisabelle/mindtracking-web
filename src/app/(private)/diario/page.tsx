@@ -2,13 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import { getDiarios, getDiarioById } from "@/lib/api/diario";
+<<<<<<< HEAD
 import ModalDiario from "@/components/common/Modals/Diario/ModalEscritaDiario";
+=======
+import ModalDiario from "@/components/common/Modals/Diario/ModalEscreverDiario";
+>>>>>>> fix/projetoatt
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTheme } from "../../../contexts/ThemeContext";
 import Sidebar from "@/components/layout/Sidebar";
 import ModalAnalise from "@/components/common/Modals/Diario/ModalAnalise";
 
+<<<<<<< HEAD
 // Hook para detectar tamanho da tela
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -31,6 +36,8 @@ const useScreenSize = () => {
   return screenSize;
 };
 
+=======
+>>>>>>> fix/projetoatt
 interface Analysis {
   message: string;
   emotion: string;
@@ -46,14 +53,46 @@ interface Card {
   analysis?: Analysis;
 }
 
+<<<<<<< HEAD
 export default function Diario() {
   const { theme } = useTheme();
   const screenSize = useScreenSize();
   
+=======
+interface DiarioEntry {
+  id?: string | number;
+  _id?: string | number;
+  titulo?: string;
+  title?: string;
+  texto?: string;
+  text?: string;
+  descricao?: string;
+  mensagem?: string;
+  data_hora?: string;
+  createdAt?: string;
+  date?: string;
+  emocao_predominante?: string;
+  emocao?: string;
+  intensidade_emocional?: string;
+  intensidade?: string;
+  comentario_athena?: string;
+  comentario?: string;
+  athena?: string;
+}
+
+interface DiarioResponse {
+  entradas?: DiarioEntry[];
+  data?: DiarioEntry[];
+}
+
+export default function Diario() {
+  const { theme } = useTheme();
+>>>>>>> fix/projetoatt
   const formatDate = (iso?: string | null) => {
     if (!iso) return "";
     const d = new Date(iso);
     const pad = (n: number) => n.toString().padStart(2, "0");
+<<<<<<< HEAD
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} - ${pad(
       d.getHours()
     )}:${pad(d.getMinutes())}`;
@@ -80,6 +119,9 @@ export default function Diario() {
     
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + "...";
+=======
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} - ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+>>>>>>> fix/projetoatt
   };
   const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(
     null,
@@ -90,6 +132,7 @@ export default function Diario() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
+<<<<<<< HEAD
 
   // Adiciona cards fictícios
   const fakeCards: Card[] = [
@@ -133,11 +176,16 @@ export default function Diario() {
       },
     },
   ];
+=======
+  const [tituloModal, setTituloModal] = useState("");
+  const [textoModal, setTextoModal] = useState("");
+>>>>>>> fix/projetoatt
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
         const resp = await getDiarios();
+<<<<<<< HEAD
         let entradas: any[] = [];
 
         if (Array.isArray(resp)) entradas = resp as any[];
@@ -154,6 +202,30 @@ export default function Diario() {
             e.comentario_athena ?? e.comentario ?? e.athena ?? null;
 
           const hasAnalysis = Boolean(comentarioAthena || emocao || intensidade);
+=======
+
+        let entradas: DiarioEntry[] = [];
+        if (Array.isArray(resp)) entradas = resp as DiarioEntry[];
+        else if ((resp as DiarioResponse)?.entradas)
+          entradas = (resp as DiarioResponse).entradas || [];
+        else if ((resp as DiarioResponse)?.data)
+          entradas = (resp as DiarioResponse).data || [];
+
+        const mapped = entradas.map((e: DiarioEntry) => {
+          const titulo = e.titulo ?? e.title ?? "Diário";
+          const texto = e.texto ?? e.text ?? e.descricao ?? e.mensagem ?? "";
+          const data_hora = e.data_hora ?? e.createdAt ?? e.date ?? null;
+
+          const emocao = (e.emocao_predominante ?? e.emocao) || null;
+          const intensidade =
+            (e.intensidade_emocional ?? e.intensidade) || null;
+          const comentarioAthena =
+            (e.comentario_athena ?? e.comentario ?? e.athena) || null;
+          const hasAnalysis = Boolean(
+            comentarioAthena || emocao || intensidade,
+          );
+
+>>>>>>> fix/projetoatt
           const analysis = hasAnalysis
             ? {
                 message: texto,
@@ -171,6 +243,7 @@ export default function Diario() {
             analysis,
           } as Card;
         });
+<<<<<<< HEAD
 
         // Junta os dados reais + fictícios
         setCards([...fakeCards, ...mapped]);
@@ -181,11 +254,20 @@ export default function Diario() {
 
         // Se der erro, mostra só os cards fictícios
         setCards(fakeCards);
+=======
+        setCards(mapped as Card[]);
+        setFetchError(null);
+      } catch (error) {
+        setFetchError(String(error ?? "Erro desconhecido"));
+>>>>>>> fix/projetoatt
       } finally {
         setLoading(false);
       }
     };
+<<<<<<< HEAD
 
+=======
+>>>>>>> fix/projetoatt
     fetchCards();
   }, []);
 
@@ -197,6 +279,7 @@ export default function Diario() {
       url.searchParams.delete("openModal");
       router.replace(url.pathname + url.search);
     }
+<<<<<<< HEAD
   }, [searchParams]);
 
   return (
@@ -206,14 +289,30 @@ export default function Diario() {
       <div className="w-full p-6 md:p-10">
         <h1
           className={`text-2xl font-bold mb-10 lg:mb-10 font-inter ${
+=======
+  }, [searchParams, router]);
+
+  return (
+    <div className="h-screen min-h-0 flex flex-col">
+      <Sidebar />
+
+      <div className="flex flex-col min-h-0 h-full p-6 md:p-10 lg:ml-37.5 md:mt-20 mt-25 lg:mt-0 overflow-hidden">
+        <h1
+          className={`text-2xl font-bold mb-10 font-inter ${
+>>>>>>> fix/projetoatt
             theme === "dark" ? "text-white" : "text-gray-900"
           } transition-all duration-300 ease-in-out`}
         >
           Diário Emocional
         </h1>
+<<<<<<< HEAD
 
         <div
           className={`rounded-xl p-6 ${
+=======
+        <div
+          className={`flex-1 min-h-0 flex flex-col rounded-xl p-6 ${
+>>>>>>> fix/projetoatt
             theme === "dark"
               ? "border-2 border-blue-600 bg-slate-900"
               : "bg-white border-2 border-black"
@@ -231,11 +330,15 @@ export default function Diario() {
                 <div className="mb-4 flex items-center justify-between shrink-0">
                   <div className="text-sm text-gray-400 pl-4">
                     Registros encontrados:{" "}
+<<<<<<< HEAD
                     <span className={`font-medium ${
                       theme === "dark"
                         ? "text-white"
                         : "text-gray-900"
                     }`}>
+=======
+                    <span className="font-medium text-white/90">
+>>>>>>> fix/projetoatt
                       {cards.length}
                     </span>
                   </div>
@@ -249,7 +352,11 @@ export default function Diario() {
                   {cards.map((card) => (
                     <div key={card.id} className="p-4 max-w-full h-full">
                       <div
+<<<<<<< HEAD
                         className={`w-full h-full rounded-lg p-4 border-2 transition-all duration-300 ease-in-out flex flex-col ${
+=======
+                        className={`w-full h-full rounded-lg p-4 border-2 transition-all duration-300 ease-in-out ${
+>>>>>>> fix/projetoatt
                           theme === "dark"
                             ? "bg-slate-800 text-gray-200 border-blue-600"
                             : "bg-slate-50 text-gray-800 border-blue-500"
@@ -267,6 +374,7 @@ export default function Diario() {
                             </span>
                           </div>
                         </div>
+<<<<<<< HEAD
                         <div className="flex-1 flex flex-col">
                           <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line flex-1">
                             {card.analysis && card.analysis.message
@@ -331,6 +439,46 @@ export default function Diario() {
               </div>
             </div>
           )}
+=======
+                        <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line">
+                          {card.analysis && card.analysis.message
+                            ? card.analysis.message
+                            : "Análise ainda não disponível."}
+                        </p>
+                        {card.analysis && (
+                          <div className="mt-2">
+                            <button
+                              onClick={() => {
+                                if (card.analysis) {
+                                  setSelectedAnalysis({
+                                    message: card.analysis.message ?? "",
+                                    emotion: card.analysis.emotion ?? "",
+                                    intensity: card.analysis.intensity ?? "",
+                                    athena: card.analysis.athena ?? "",
+                                  });
+                                }
+                              }}
+                              className="inline-flex items-center gap-2 px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm transition duration-200 ease-in-out shadow-md hover:shadow-lg"
+                              aria-label={`Ver análise de ${card.title}`}
+                            >
+                              <Image
+                                src="/images/icons/lupa.svg"
+                                alt="Lupa"
+                                width={14}
+                                height={14}
+                              />
+                              <span>Ver Análise</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+>>>>>>> fix/projetoatt
         </div>
       </div>
 
@@ -340,6 +488,7 @@ export default function Diario() {
         analysis={selectedAnalysis}
       />
 
+<<<<<<< HEAD
 
       <ModalDiario
         isOpen={openModal}
@@ -347,6 +496,115 @@ export default function Diario() {
         onSaved={() => {
           // Aqui você pode implementar a lógica para abrir a análise
           // Por enquanto, apenas fechamos o modal
+=======
+      <ModalDiario
+        isOpen={openModal}
+        onClose={() => setOpenModal(false)}
+        value={textoModal}
+        onChange={(v: string) => setTextoModal(v)}
+        title={tituloModal}
+        onTitleChange={(t: string) => setTituloModal(t)}
+        onSave={(created) => {
+          if (created) {
+            const titulo = created.titulo ?? created.title ?? "Diário";
+            const texto =
+              created.texto ?? created.text ?? created.descricao ?? "";
+            const data_hora =
+              created.data_hora ??
+              created.createdAt ??
+              new Date().toISOString();
+            const hasAnalysis = Boolean(
+              created?.comentario_athena ||
+                created?.comentario ||
+                created?.athena ||
+                created?.emocao_predominante ||
+                created?.emocao ||
+                created?.intensidade_emocional ||
+                created?.intensidade,
+            );
+
+            const newCard = {
+              id: created.id ?? created._id ?? Math.random(),
+              title: titulo,
+              date: data_hora ? formatDate(data_hora) : "",
+              description: texto,
+              analysis: hasAnalysis
+                ? {
+                    message: texto,
+                    emotion:
+                      created.emocao_predominante ?? created.emocao ?? "",
+                    intensity:
+                      created.intensidade_emocional ??
+                      created.intensidade ??
+                      "",
+                    athena:
+                      created.comentario_athena ??
+                      created.comentario ??
+                      created.athena ??
+                      "",
+                  }
+                : undefined,
+            };
+            setCards((prev) => [newCard, ...prev]);
+
+            const hasAnalysisNow = Boolean(newCard.analysis);
+            if (!hasAnalysisNow && (created.id || created._id)) {
+              const id = created.id ?? created._id;
+              (async function poll() {
+                for (let i = 0; i < 6; i++) {
+                  try {
+                    const fresh = await getDiarioById(String(id));
+                    const entry = fresh?.entrada ?? fresh;
+                    if (
+                      entry &&
+                      (entry.comentario_athena ||
+                        entry.emocao_predominante ||
+                        entry.intensidade_emocional)
+                    ) {
+                      setCards((prev) =>
+                        prev.map((c) =>
+                          c.id === (entry.id ?? entry._id)
+                            ? {
+                                ...c,
+                                date: formatDate(
+                                  entry.data_hora ??
+                                    entry.createdAt ??
+                                    new Date().toISOString(),
+                                ),
+                                description:
+                                  entry.texto ?? entry.text ?? c.description,
+                                analysis: {
+                                  message:
+                                    entry.texto ?? entry.text ?? c.description,
+                                  emotion:
+                                    entry.emocao_predominante ??
+                                    entry.emocao ??
+                                    "",
+                                  intensity:
+                                    entry.intensidade_emocional ??
+                                    entry.intensidade ??
+                                    "",
+                                  athena:
+                                    entry.comentario_athena ??
+                                    entry.comentario ??
+                                    entry.athena ??
+                                    "",
+                                },
+                              }
+                            : c,
+                        ),
+                      );
+                      break;
+                    }
+                  } catch {
+                    // ignore
+                  }
+                  await new Promise((r) => setTimeout(r, 2000));
+                }
+              })();
+            }
+          }
+>>>>>>> fix/projetoatt
           setOpenModal(false);
         }}
       />

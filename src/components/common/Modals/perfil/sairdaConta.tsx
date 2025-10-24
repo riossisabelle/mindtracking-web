@@ -40,7 +40,11 @@ export default function LogoutModal({ isOpen, onClose, onLogout }: LogoutModalPr
           className="absolute top-4 right-4 p-1 rounded-full"
           aria-label="Fechar"
         >
+<<<<<<< HEAD
           <img src={icons.fechar} alt="Fechar" className="w-10 h-10 cursor-pointer" />
+=======
+          <img src={icons.fechar} alt="Fechar" className="w-10 h-10" />
+>>>>>>> fix/projetoatt
         </button>
 
         {/* Ícone sair */}
