@@ -44,7 +44,11 @@ export default function Dashboard() {
         });
       } catch (error) {
         console.error("Erro ao verificar questionário:", error);
-        setQuestionarioStatus({ respondeuHoje: false, respondidos: 0, loading: false });
+        setQuestionarioStatus({
+          respondeuHoje: false,
+          respondidos: 0,
+          loading: false,
+        });
       }
     };
 
@@ -74,10 +78,11 @@ export default function Dashboard() {
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-[98%] my-4 auto-rows-fr min-h-0">
           <GraficoCard />
           <DiarioEmocionalCard />
-          
+
+          <div className="flex flex-col gap-2">
             <CorrelacaoCard />
-            
-          
+            <AthenaCard />
+          </div>
         </div>
       </div>
     </div>
