@@ -8,6 +8,7 @@ import DiarioEmocionalCard from "@/components/common/Cards/Cards_Dashboard/Diari
 import CorrelacaoCard from "@/components/common/Cards/Cards_Dashboard/CorrelacaoCard";
 import AthenaCard from "@/components/common/Cards/Cards_Dashboard/AthenaCard";
 import api, { setAuthToken } from "@/lib/api/axios";
+import { verificarDiario } from "@/lib/api/questionario";
 
 export default function Dashboard() {
   const [questionarioStatus, setQuestionarioStatus] = useState({
@@ -17,39 +18,46 @@ export default function Dashboard() {
   });
   const [usuarioId, setUsuarioId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const init = async () => {
-      if (typeof window !== "undefined") {
-        const token = localStorage.getItem("mt_token");
-        if (token) setAuthToken(token);
-      }
+ useEffect(() => {
+  const init = async () => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("mt_token");
+      if (token) setAuthToken(token);
+    }
 
-      const userStr = localStorage.getItem("mt_user");
-      if (!userStr) return;
-      const user = JSON.parse(userStr);
-      const id = user.id || user.user_id || user.usuario_id;
-      if (id) setUsuarioId(id);
+    const userStr = localStorage.getItem("mt_user");
+    if (!userStr) return;
+    const user = JSON.parse(userStr);
+    const id = user.id || user.user_id || user.usuario_id;
+    if (id) setUsuarioId(id);
 
-      try {
-        const respVerif = await api.get(`/questionario/diario/verificar/${id}`);
-        const respEstat = await api.get(`/questionario/estatisticas/${id}`);
-        setQuestionarioStatus({
-          respondeuHoje: respVerif.data.ja_respondido || false,
-          respondidos: respEstat.data.estatisticas?.total_questionarios || 0,
-          loading: false,
-        });
-      } catch (error) {
-        console.error("Erro ao verificar questionário:", error);
-        setQuestionarioStatus({
-          respondeuHoje: false,
-          respondidos: 0,
-          loading: false,
-        });
-      }
-    };
+    try {
+  const respVerif = await verificarDiario(id);
+  console.log("Resposta da API verificarDiario completa:", respVerif);
 
-    init();
-  }, []);
+  const jaRespondido =
+    respVerif?.ja_respondido === true || respVerif?.data?.ja_respondido === true;
+
+  setQuestionarioStatus({
+    respondeuHoje: jaRespondido,
+    respondidos: (await api.get(`/questionario/estatisticas/${id}`))?.data?.estatisticas?.total_questionarios || 0,
+    loading: false,
+  });
+
+} catch (error) {
+  console.error("Erro ao verificar questionário:", error);
+  setQuestionarioStatus({
+    respondeuHoje: false,
+    respondidos: 0,
+    loading: false,
+  });
+}
+}
+
+  init();
+}, []);
+
+  console.log("Estado questionarioStatus:", questionarioStatus);
 
   return (
     <div className="ml-0 lg:ml-37.5 min-h-0 h-screen">
@@ -83,4 +91,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
