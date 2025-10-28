@@ -8,31 +8,20 @@ import EditProfileModal from "@/components/common/Modals/perfil/editarPerfil";
 import LogoutModal from "@/components/common/Modals/perfil/sairdaConta";
 import VerifyCodeModal from "@/components/features/Auth/RedefinicaoSenha/VerificacaoCodigo";
 import ResetPasswordModal from "@/components/features/Auth/RedefinicaoSenha/AtualizacaoSenha";
-<<<<<<< HEAD
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { dadosUser } from "@/lib/api/auth";
-import ButtonEsqueceuSenha from "@/components/common/Buttons/ButtonEsqueceuSenha";
-=======
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dadosUser, recuperarSenha } from "@/lib/api/auth";
->>>>>>> fix/projetoatt
 
 export default function PerfilPage() {
-  const [fotoPaisagem, setFotoPaisagem] = useState<string | null>(null);
   const { darkMode } = useTheme();
   const [modalOpen, setModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-  const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
-<<<<<<< HEAD
-  const [verifyCodeModalOpen, setVerifyCodeModalOpen] = useState(false);
-  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
-=======
+
   const [isLoading, setIsLoading] = useState(false);
   const [verifyCodeModalOpen, setVerifyCodeModalOpen] = useState(false);
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
 
   const [emailUser, setEmailUser] = useState("");
->>>>>>> fix/projetoatt
+
   const [userData, setUserData] = useState<{
     id?: number | string;
     nome?: string;
@@ -42,10 +31,7 @@ export default function PerfilPage() {
     telefone?: string | null;
     genero?: string | null;
   } | null>(null);
-  const [loadingUser, setLoadingUser] = useState<boolean>(true);
 
-<<<<<<< HEAD
-=======
   // Garante que só tenta ler o localStorage no cliente
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -61,18 +47,14 @@ export default function PerfilPage() {
     }
   }, []);
 
->>>>>>> fix/projetoatt
   useEffect(() => {
     const load = async () => {
       try {
-        setLoadingUser(true);
         const resp = await dadosUser();
         setUserData(resp?.user ?? null);
       } catch (err) {
         console.error("Erro ao carregar perfil:", err);
         setUserData(null);
-      } finally {
-        setLoadingUser(false);
       }
     };
     load();
@@ -83,8 +65,6 @@ export default function PerfilPage() {
     setLogoutModalOpen(false);
   };
 
-<<<<<<< HEAD
-=======
   const handleResetPassword = async () => {
     setIsLoading(true);
     try {
@@ -92,7 +72,8 @@ export default function PerfilPage() {
       if (!userDataString) throw new Error("Dados do usuário não encontrados");
 
       const userData = JSON.parse(userDataString);
-      if (!userData.email) throw new Error("Email não encontrado nos dados do usuário");
+      if (!userData.email)
+        throw new Error("Email não encontrado nos dados do usuário");
 
       await recuperarSenha({ email: userData.email });
       setVerifyCodeModalOpen(true);
@@ -103,7 +84,6 @@ export default function PerfilPage() {
     }
   };
 
->>>>>>> fix/projetoatt
   const getUserInitials = (name: string) => {
     if (!name) return "?";
     const parts = name.trim().split(" ");
@@ -112,8 +92,6 @@ export default function PerfilPage() {
     return `${first}${second}`;
   };
 
-<<<<<<< HEAD
-=======
   // Função para formatar telefone no padrão (11) 99999-9999
   const formatTelefone = (telefone: string | null | undefined) => {
     if (!telefone) return "—";
@@ -132,7 +110,6 @@ export default function PerfilPage() {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
->>>>>>> fix/projetoatt
   const cardClasses = `rounded-2xl shadow-xl overflow-hidden transition-colors duration-700 ${
     darkMode
       ? "bg-slate-800 text-white"
@@ -146,30 +123,27 @@ export default function PerfilPage() {
   const ProfileCard = (
     <>
       <div className={cardClasses}>
-<<<<<<< HEAD
-        {/* Imagem de paisagem */}
-=======
->>>>>>> fix/projetoatt
         <div
           className={`relative w-full h-32 md:h-40 ${
             darkMode ? "bg-gray-700" : "bg-gray-200"
           }`}
         >
           <Image
-            src={fotoPaisagem || "/images/paisagem.png"}
+            src="/images/paisagem.png"
             alt="Foto paisagem"
             fill
             className="object-cover object-bottom"
           />
           <button className="absolute top-3 right-3 bg-blue-600 p-2 rounded-full hover:bg-blue-700 flex items-center justify-center">
-            <Image src="/images/icons/camera.svg" alt="camera" width={14} height={14} />
+            <Image
+              src="/images/icons/camera.svg"
+              alt="camera"
+              width={14}
+              height={14}
+            />
           </button>
         </div>
 
-<<<<<<< HEAD
-        {/* Perfil + botões */}
-=======
->>>>>>> fix/projetoatt
         <div className="flex flex-col md:flex-row items-start px-6 mt-6 relative">
           <div className="flex flex-col items-center md:items-start -mt-16 z-10">
             <div className="relative">
@@ -186,40 +160,27 @@ export default function PerfilPage() {
               </Avatar>
 
               <button className="absolute bottom-2 right-2 bg-blue-600 p-2 rounded-full hover:bg-blue-700">
-                <Image src="/images/icons/editar.svg" alt="editar" width={14} height={14} />
+                <Image
+                  src="/images/icons/editar.svg"
+                  alt="editar"
+                  width={14}
+                  height={14}
+                />
               </button>
             </div>
-            <h2 className="mt-3 text-2xl font-semibold">{userData?.nome ?? "Usuário"}</h2>
+            <h2 className="mt-3 text-2xl font-semibold">
+              {userData?.nome ?? "Usuário"}
+            </h2>
           </div>
 
-<<<<<<< HEAD
-          {/* Botões responsivos */}
-          <div className="mt-6 md:mt-0 ml-auto z-10 w-full md:w-auto flex flex-col md:flex-row gap-2 md:gap-3">
-            <button
-              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap flex items-center justify-center text-center"
-=======
           <div className="mt-6 md:mt-0 ml-auto z-10 w-full md:w-auto flex flex-col md:flex-row gap-2 md:gap-3">
             <button
               className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap text-center"
->>>>>>> fix/projetoatt
               onClick={() => setModalOpen(true)}
             >
               Editar Perfil
             </button>
 
-<<<<<<< HEAD
-            <ButtonEsqueceuSenha
-              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-              onSuccess={() => {
-                setChangePasswordModalOpen(true);
-              }}
-            >
-              Redefinir Senha
-            </ButtonEsqueceuSenha>
-
-            <button
-              className="min-w-[120px] w-full sm:w-auto bg-red-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap flex items-center justify-center text-center"
-=======
             <button
               onClick={handleResetPassword}
               disabled={isLoading}
@@ -230,7 +191,6 @@ export default function PerfilPage() {
 
             <button
               className="min-w-[120px] w-full sm:w-auto bg-red-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap text-center"
->>>>>>> fix/projetoatt
               onClick={() => setLogoutModalOpen(true)}
             >
               Sair da Conta
@@ -244,40 +204,36 @@ export default function PerfilPage() {
           }`}
         />
 
-<<<<<<< HEAD
-        {/* Campos do perfil */}
-=======
->>>>>>> fix/projetoatt
         <div className="px-6 md:px-8 lg:-mx-8 xl:-mx-2 2xl:-mx-2 gap-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 lg:gap-x-14 py-8">
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Gênero</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                Gênero
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
-<<<<<<< HEAD
-                {userData?.genero ?? "—"}
-=======
                 {capitalize(userData?.genero ?? "")}
->>>>>>> fix/projetoatt
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Idade</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                Idade
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {userData?.idade ? `${userData.idade} Anos` : "—"}
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Telefone</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                Telefone
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
-<<<<<<< HEAD
-                {userData?.telefone ?? "—"}
-=======
                 {formatTelefone(userData?.telefone)}
->>>>>>> fix/projetoatt
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">E-mail</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                E-mail
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {userData?.email ?? "—"}
               </p>
@@ -292,7 +248,10 @@ export default function PerfilPage() {
         onClose={() => setLogoutModalOpen(false)}
         onLogout={handleLogout}
       />
-      <EditProfileModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <EditProfileModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
       <VerifyCodeModal
         isOpen={verifyCodeModalOpen}
         onClose={() => setVerifyCodeModalOpen(false)}
@@ -300,38 +259,23 @@ export default function PerfilPage() {
           setVerifyCodeModalOpen(false);
           setChangePasswordModalOpen(true);
         }}
-<<<<<<< HEAD
-        email={JSON.parse(localStorage.getItem("mt_user") || "{}").email || ""}
-=======
         email={emailUser}
->>>>>>> fix/projetoatt
       />
       <ResetPasswordModal
         isOpen={changePasswordModalOpen}
         onClose={() => setChangePasswordModalOpen(false)}
-<<<<<<< HEAD
-        onSuccess={() => {
-          setChangePasswordModalOpen(false);
-        }}
-        email={JSON.parse(localStorage.getItem("mt_user") || "{}").email || ""}
-=======
         onSuccess={() => setChangePasswordModalOpen(false)}
         email={emailUser}
->>>>>>> fix/projetoatt
       />
     </>
   );
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-transparent">
-<<<<<<< HEAD
-      {/* Layout desktop */}
-=======
       <div className="sm:hidden fixed top-0 left-0 w-full z-50">
         <Sidebar />
       </div>
 
->>>>>>> fix/projetoatt
       <div className="hidden sm:flex min-h-screen">
         <Sidebar />
         <div className="flex-1 flex items-center justify-center px-4 md:px-8 pt-10 md:pt-14 pb-10 md:justify-center ml-0 lg:ml-37.5">
@@ -339,30 +283,7 @@ export default function PerfilPage() {
         </div>
       </div>
 
-<<<<<<< HEAD
-     {/* Layout mobile/tablet corrigido */}
-<div className="sm:hidden relative">
-  {/* Sidebar realmente fixa no topo, sem espaço ao rolar */}
-  <div
-    className="sticky top-0 left-0 w-full z-50 bg-slate-900 dark:bg-slate-900"
-    style={{
-      position: "sticky",
-      top: "env(safe-area-inset-top, 0px)",
-      zIndex: 9999,
-    }}
-  >
-    <Sidebar />
-  </div>
-
-  {/* Conteúdo abaixo da sidebar */}
-  <div className="relative z-40 px-5 pb-6 pt-[100px]">
-    {ProfileCard}
-  </div>
-</div>
-
-=======
       <div className="sm:hidden px-5 pb-6 pt-[88px] md:pt-3">{ProfileCard}</div>
->>>>>>> fix/projetoatt
     </div>
   );
 }

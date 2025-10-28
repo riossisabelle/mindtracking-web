@@ -72,7 +72,7 @@ export default function ModalAnalise({
         <div className="flex flex-col gap-4 mt-6 text-left">
           <div className="break-words">
             <p className="text-sm md:text-base leading-relaxed">
-              <span className="font-bold">Mensagem: </span>"{analysis.message}"
+              <span className="font-bold">Mensagem: </span>&quot;{analysis.message}&quot;
             </p>
           </div>
 
@@ -97,7 +97,7 @@ export default function ModalAnalise({
                 theme === "dark" ? "text-blue-400" : "text-blue-600"
               }`}
             >
-              <span className="font-bold">Athena diz:</span> "{analysis.athena}"
+              <span className="font-bold">Athena diz:</span> &quot;{analysis.athena}&quot;
             </p>
           </div>
         </div>

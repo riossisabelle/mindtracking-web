@@ -1,13 +1,11 @@
 "use client";
 import { useState, useEffect } from 'react';
-// import Image from 'next/image'; // Import removido (código que usava está comentado)
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPerguntas, responderQuestionario, responderDiario } from '@/lib/api/questionario';
 import { setAuthToken } from '@/lib/api/axios';
 
-// Tipagens auxiliares para remover usos de 'any' sem alterar lógica
 interface AlternativaAPI {
   id?: number | string;
   ID?: number | string;

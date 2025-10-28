@@ -5,7 +5,7 @@ import BaseCard from "./BaseCard";
 import ModalDiario from "@/components/common/Modals/Diario/ModalEscreverDiario";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getDiarios, createDiario, getDiarioById } from "@/lib/api/diario";
+import { getDiarios, getDiarioById } from "@/lib/api/diario";
 import { setAuthToken } from "@/lib/api/axios";
 
 interface DiarioEntrada {
@@ -17,6 +17,25 @@ interface DiarioEntrada {
   comentario_athena: string | null;
 }
 
+interface DiarioCreated {
+  id?: string | number;
+  _id?: string | number;
+  titulo?: string;
+  title?: string;
+  texto?: string;
+  text?: string;
+  descricao?: string;
+  data_hora?: string;
+  createdAt?: string;
+  comentario_athena?: string;
+  comentario?: string;
+  athena?: string;
+  emocao_predominante?: string;
+  emocao?: string;
+  intensidade_emocional?: string;
+  intensidade?: string;
+}
+
 export default function DiarioEmocionalCard() {
   const { theme } = useTheme();
   const [entrada, setEntrada] = useState<DiarioEntrada | null>(null);
@@ -24,7 +43,10 @@ export default function DiarioEmocionalCard() {
   const [error, setError] = useState<string | null>(null);
   const [diarioHoje, setDiarioHoje] = useState(false);
 
-  const modalBg = theme === "dark" ? "bg-slate-800 border-green-600" : "bg-white border-green-600";
+  const modalBg =
+    theme === "dark"
+      ? "bg-slate-800 border-green-600"
+      : "bg-white border-green-600";
   const textColor = theme === "dark" ? "text-white" : "text-slate-800";
 
   // Formata data para "DD/MM às HHhMM"
@@ -51,7 +73,10 @@ export default function DiarioEmocionalCard() {
         const entradas: DiarioEntrada[] = resp.entradas;
         if (entradas.length > 0) {
           // Ordena do mais recente para o mais antigo
-          entradas.sort((a, b) => new Date(b.data_hora).getTime() - new Date(a.data_hora).getTime());
+          entradas.sort(
+            (a, b) =>
+              new Date(b.data_hora).getTime() - new Date(a.data_hora).getTime(),
+          );
           const ultima = entradas[0];
           setEntrada(ultima);
 
@@ -62,11 +87,12 @@ export default function DiarioEmocionalCard() {
           const twentyFourHoursMs = 24 * 60 * 60 * 1000;
           // considera diário como "já registrado" se foi criado há menos de 24h
           setDiarioHoje(diffMs >= 0 && diffMs < twentyFourHoursMs);
-
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Erro ao carregar diários:", err);
-        setError(err.message || "Erro ao buscar diários");
+        const errorMessage =
+          err instanceof Error ? err.message : "Erro ao buscar diários";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -119,7 +145,9 @@ export default function DiarioEmocionalCard() {
           </div>
           {/* Conteúdo */}
           {entrada ? (
-            <div className={`mt-4 space-y-2 text-[15px] font-semibold font-inter ${textColor}`}>
+            <div
+              className={`mt-4 space-y-2 text-[15px] font-semibold font-inter ${textColor}`}
+            >
               <p>
                 Último diário registrado:
                 {entrada.titulo ? (
@@ -144,8 +172,7 @@ export default function DiarioEmocionalCard() {
               {entrada.comentario_athena && (
                 <p>
                   <span className="font-semibold">Athena diz:</span>
-                  <br />
-                  “{entrada.comentario_athena}”
+                  <br />“{entrada.comentario_athena}”
                 </p>
               )}
             </div>
@@ -168,7 +195,7 @@ export default function DiarioEmocionalCard() {
                 className="my-6 w-full h-[50px] bg-blue-600 hover:bg-blue-500 text-white font-bold text-[16px] py-2 rounded-3xl border-4 border-transparent transition-all duration-200 cursor-pointer active:scale-[0.98] active:brightness-95 active:border-blue-700 active:drop-shadow-[0_0_15px_#0C4A6E]"
                 onClick={() => {
                   // Primeiro navega para a página de diários e inclui query param para abrir o modal lá
-                  router.push('/diario?openModal=1');
+                  router.push("/diario?openModal=1");
                 }}
               >
                 Escrever no diário
@@ -181,14 +208,16 @@ export default function DiarioEmocionalCard() {
       {/* Quando já há diário hoje mostramos modal informativo */}
       {modalAberto && diarioHoje && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className={`rounded-xl border p-6 w-full max-w-md shadow-lg ${modalBg}`}>
+          <div
+            className={`rounded-xl border p-6 w-full max-w-md shadow-lg ${modalBg}`}
+          >
             <h2 className={`text-xl font-bold mb-2 ${textColor}`}>
               Sua reflexão de hoje já foi registrada!
             </h2>
             <p className={`mb-4 text-[15px] font-inter ${textColor}`}>
-              Para incentivar um registro focado e significativo, nossa plataforma 
-              limita a um diário por dia. Isso ajuda a consolidar os pensamentos e sentimentos 
-              mais importantes do seu dia.
+              Para incentivar um registro focado e significativo, nossa
+              plataforma limita a um diário por dia. Isso ajuda a consolidar os
+              pensamentos e sentimentos mais importantes do seu dia.
             </p>
             <button
               className="bg-green-600 hover:bg-green-700 active:scale-[0.98] active:brightness-95 active:border-green-900 active:drop-shadow-[0_0_15px_#383838] cursor-pointer text-white rounded-full py-2 w-full font-bold text-[16px] transition"
@@ -209,14 +238,20 @@ export default function DiarioEmocionalCard() {
           onChange={(v: string) => setTextoDiario(v)}
           title={tituloDiario}
           onTitleChange={(t: string) => setTituloDiario(t)}
-          onSave={(created?: any) => {
+          onSave={(created?: DiarioCreated) => {
             // O modal já chama a API; aqui apenas atualizamos estado local com o result
             if (created) {
-              const createdTitulo = created.titulo ?? created.title ?? (tituloDiario || textoDiario.split('\n')[0] || 'Sem título');
+              const createdTitulo =
+                created.titulo ??
+                created.title ??
+                (tituloDiario || textoDiario.split("\n")[0] || "Sem título");
               const createdTexto = created.texto ?? created.text ?? textoDiario;
               setDiarioHoje(true);
               setEntrada({
-                data_hora: created.data_hora ?? created.createdAt ?? new Date().toISOString(),
+                data_hora:
+                  created.data_hora ??
+                  created.createdAt ??
+                  new Date().toISOString(),
                 titulo: createdTitulo,
                 texto: createdTexto,
                 emocao_predominante: created.emocao_predominante ?? null,
@@ -229,7 +264,11 @@ export default function DiarioEmocionalCard() {
 
               // Se a API criou a entrada mas ainda não retornou a análise, tenta reconsultar por alguns segundos
               const needsAnalysis = !(
-                created.comentario_athena || created.comentario || created.athena || created.emocao_predominante || created.intensidade_emocional
+                created.comentario_athena ||
+                created.comentario ||
+                created.athena ||
+                created.emocao_predominante ||
+                created.intensidade_emocional
               );
               if (needsAnalysis && (created.id || created._id)) {
                 const id = created.id ?? created._id;
@@ -238,19 +277,41 @@ export default function DiarioEmocionalCard() {
                     try {
                       const fresh = await getDiarioById(String(id));
                       const entry = fresh?.entrada ?? fresh;
-                      if (entry && (entry.comentario_athena || entry.emocao_predominante || entry.intensidade_emocional)) {
+                      if (
+                        entry &&
+                        (entry.comentario_athena ||
+                          entry.emocao_predominante ||
+                          entry.intensidade_emocional)
+                      ) {
                         setEntrada((prev) => ({
                           ...(prev ?? {}),
-                          data_hora: entry.data_hora ?? entry.createdAt ?? (prev?.data_hora ?? new Date().toISOString()),
+                          data_hora:
+                            entry.data_hora ??
+                            entry.createdAt ??
+                            prev?.data_hora ??
+                            new Date().toISOString(),
                           titulo: entry.titulo ?? prev?.titulo ?? createdTitulo,
                           texto: entry.texto ?? prev?.texto ?? createdTexto,
-                          emocao_predominante: entry.emocao_predominante ?? entry.emocao ?? prev?.emocao_predominante ?? null,
-                          intensidade_emocional: entry.intensidade_emocional ?? entry.intensidade ?? prev?.intensidade_emocional ?? null,
-                          comentario_athena: entry.comentario_athena ?? entry.comentario ?? entry.athena ?? prev?.comentario_athena ?? null,
+                          emocao_predominante:
+                            entry.emocao_predominante ??
+                            entry.emocao ??
+                            prev?.emocao_predominante ??
+                            null,
+                          intensidade_emocional:
+                            entry.intensidade_emocional ??
+                            entry.intensidade ??
+                            prev?.intensidade_emocional ??
+                            null,
+                          comentario_athena:
+                            entry.comentario_athena ??
+                            entry.comentario ??
+                            entry.athena ??
+                            prev?.comentario_athena ??
+                            null,
                         }));
                         break;
                       }
-                    } catch (e) {
+                    } catch {
                       // ignora e aguarda
                     }
                     await new Promise((r) => setTimeout(r, 2000));

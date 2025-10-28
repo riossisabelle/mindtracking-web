@@ -1,4 +1,5 @@
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from "@/contexts/ThemeContext";
+import Image from "next/image";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -6,24 +7,33 @@ interface LogoutModalProps {
   onLogout: () => void;
 }
 
-export default function LogoutModal({ isOpen, onClose, onLogout }: LogoutModalProps) {
+export default function LogoutModal({
+  isOpen,
+  onClose,
+  onLogout,
+}: LogoutModalProps) {
   const { theme } = useTheme();
 
   if (!isOpen) return null;
 
   const icons = {
-    sair: '/images/icons/sair.svg',
-    fechar: theme === 'dark' ? '/images/icons/fechar_b.svg' : '/images/icons/fechar.svg',
+    sair: "/images/icons/sair.svg",
+    fechar:
+      theme === "dark"
+        ? "/images/icons/fechar_b.svg"
+        : "/images/icons/fechar.svg",
   };
 
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   // Cancel button color based on theme
-  const cancelBtnBg = isDark ? 'bg-slate-700 text-white' : 'bg-gray-300 text-gray-700';
+  const cancelBtnBg = isDark
+    ? "bg-slate-700 text-white"
+    : "bg-gray-300 text-gray-700";
 
   // Cores dinâmicas apenas para texto e botões, sem bg explícito
-  const titleColor = isDark ? 'text-white' : 'text-gray-900';
-  const descriptionColor = isDark ? 'text-gray-300' : 'text-gray-500';
+  const titleColor = isDark ? "text-white" : "text-gray-900";
+  const descriptionColor = isDark ? "text-gray-300" : "text-gray-500";
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
@@ -31,26 +41,34 @@ export default function LogoutModal({ isOpen, onClose, onLogout }: LogoutModalPr
       <div
         className={
           `relative w-full max-w-lg px-4 sm:px-6 py-6 mx-auto rounded-lg sm:rounded-2xl text-center shadow-lg ` +
-          (isDark ? 'bg-slate-800' : 'bg-slate-50')
+          (isDark ? "bg-slate-800" : "bg-slate-50")
         }
       >
         {/* Botão fechar */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-full"
+          className="absolute top-4 right-4 p-1 cursor-pointer rounded-full"
           aria-label="Fechar"
         >
-<<<<<<< HEAD
-          <img src={icons.fechar} alt="Fechar" className="w-10 h-10 cursor-pointer" />
-=======
-          <img src={icons.fechar} alt="Fechar" className="w-10 h-10" />
->>>>>>> fix/projetoatt
+          <Image
+            src={icons.fechar}
+            alt="Fechar"
+            width={40}
+            height={40}
+            className="w-10 h-10"
+          />
         </button>
 
         {/* Ícone sair */}
         <div className="flex justify-center mb-2 mt-6">
           <div className="w-14 h-14 flex items-center justify-center">
-            <img src={icons.sair} alt="Sair" className="w-14 h-14" />
+            <Image
+              src={icons.sair}
+              alt="Sair"
+              width={56}
+              height={56}
+              className="w-14 h-14"
+            />
           </div>
         </div>
 
@@ -60,7 +78,9 @@ export default function LogoutModal({ isOpen, onClose, onLogout }: LogoutModalPr
         </h2>
 
         {/* Descrição */}
-        <p className={`text-sm font-inter font-medium mb-6 ${descriptionColor}`}>
+        <p
+          className={`text-sm font-inter font-medium mb-6 ${descriptionColor}`}
+        >
           Você precisará fazer login novamente para continuar usando a Athena.
         </p>
 

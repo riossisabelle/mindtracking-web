@@ -304,8 +304,8 @@ export default function Register() {
                 className=""
                 src="/images/athena-apontando-direito.png"
                 alt="Athena apontando para a direita"
-                width={230}
-                height={230}
+                width={190}
+                height={190}
               />
             </div>
           </div>

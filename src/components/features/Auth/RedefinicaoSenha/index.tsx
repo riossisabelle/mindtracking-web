@@ -26,7 +26,7 @@ export default function RedefinicaoSenhaFlow({
     setCurrentStep("code");
   };
 
-  const handleCodeSuccess = (code: string) => {
+  const handleCodeSuccess = () => {
     setCurrentStep("password");
   };
 

@@ -1,93 +1,76 @@
-import { useTheme } from '@/contexts/ThemeContext';
-import { useState, useEffect } from 'react';
+import { useTheme } from "@/contexts/ThemeContext";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   validateName,
   validateBirthdate,
   validatePhone,
-  validateGender
-} from '@/lib/validation';
-import { updateDadosUser } from '@/lib/api/auth';
-<<<<<<< HEAD
-=======
-import { dadosUser } from '@/lib/api/auth';
->>>>>>> fix/projetoatt
-// @ts-ignore
-import { toast } from 'react-toastify';
+  validateGender,
+} from "@/lib/validation";
+import { updateDadosUser } from "@/lib/api/auth";
+import { dadosUser } from "@/lib/api/auth";
+import { toast } from "react-toastify";
 
 interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
+export default function EditProfileModal({
+  isOpen,
+  onClose,
+}: EditProfileModalProps) {
   const { theme } = useTheme();
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState("");
   const [birthDateError, setBirthDateError] = useState<string | null>(null);
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
-  const [gender, setGender] = useState('');
+  const [gender, setGender] = useState("");
   const [genderError, setGenderError] = useState<string | null>(null);
-<<<<<<< HEAD
-
-  // Resetar campos ao abrir o modal
-  useEffect(() => {
-    if (isOpen) {
-=======
-  const [email, setEmail] = useState('');
 
   // Resetar campos ao abrir o modal
   useEffect(() => {
     // não limpar ao abrir (assim preenche com os dados do servidor)
     // limpar apenas quando o modal for fechado
     if (!isOpen) {
->>>>>>> fix/projetoatt
-      setName('');
+      setName("");
       setNameError(null);
-      setBirthDate('');
+      setBirthDate("");
       setBirthDateError(null);
-      setPhone('');
+      setPhone("");
       setPhoneError(null);
-      setGender('');
+      setGender("");
       setGenderError(null);
     }
   }, [isOpen]);
-<<<<<<< HEAD
-=======
-  
+
   // Ao abrir, buscar dados do usuário (usando token do JWT) e preencher os campos sem enviar
   useEffect(() => {
     if (!isOpen) return;
 
     let mounted = true;
 
-    const getToken = () => {
-      // tenta localStorage primeiro, depois cookies
-      const fromStorage = localStorage.getItem('token') || localStorage.getItem('authToken');
-      if (fromStorage) return fromStorage;
-      const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
-      if (match) return match[2];
-      return null;
-    };
-
     const formatDateToDisplay = (isoDate?: string) => {
-      if (!isoDate) return '';
+      if (!isoDate) return "";
       // espera yyyy-mm-dd ou yyyy-mm-ddT...
-      const d = isoDate.split('T')[0];
-      const [y, m, day] = d.split('-');
-      if (!y || !m || !day) return '';
+      const d = isoDate.split("T")[0];
+      const [y, m, day] = d.split("-");
+      if (!y || !m || !day) return "";
       return `${day}/${m}/${y}`;
     };
 
     const formatPhoneDisplay = (raw?: string) => {
-      if (!raw) return '';
-      const onlyNums = raw.replace(/\D/g, '');
+      if (!raw) return "";
+      const onlyNums = raw.replace(/\D/g, "");
       const limited = onlyNums.slice(0, 11);
       if (limited.length <= 2) return limited;
-      if (limited.length <= 6) return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
-      if (limited.length === 11) return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
+      if (limited.length <= 6)
+        return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
+      if (limited.length === 11)
+        return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
       return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6)}`;
     };
 
@@ -96,10 +79,14 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
       const profile = data?.data || data?.user || data || null;
       if (!profile || !mounted) return;
 
-      const nome = profile.nome ?? profile.name ?? '';
-      const telefone = profile.telefone ?? profile.phone ?? '';
-      const dataNascimento = profile.data_nascimento ?? profile.dataNascimento ?? profile.birthdate ?? '' ;
-      const genero = profile.genero ?? profile.gender ?? '';
+      const nome = profile.nome ?? profile.name ?? "";
+      const telefone = profile.telefone ?? profile.phone ?? "";
+      const dataNascimento =
+        profile.data_nascimento ??
+        profile.dataNascimento ??
+        profile.birthdate ??
+        "";
+      const genero = profile.genero ?? profile.gender ?? "";
 
       const formattedDate = formatDateToDisplay(dataNascimento);
       const formattedPhone = formatPhoneDisplay(telefone);
@@ -116,36 +103,40 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
     fetchProfile();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [isOpen]);
-
-  // useEffect para buscar o email do usuário logado
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const u = JSON.parse(localStorage.getItem('mt_user') || '{}');
-      setEmail(u.email || '');
-    } catch {
-      setEmail('');
-    }
-  }, []);
->>>>>>> fix/projetoatt
 
   if (!isOpen) return null;
 
   const icons = {
-    logo: theme === 'dark' ? '/images/icons/logo_branca.svg' : '/images/icons/logo_p.svg',
-    nome: theme === 'dark' ? '/images/icons/nome.svg' : '/images/icons/nome_p.svg',
-    data: theme === 'dark' ? '/images/icons/data.svg' : '/images/icons/data_p.svg',
-    telefone: theme === 'dark' ? '/images/icons/telefone.svg' : '/images/icons/telefone_p.svg',
-    genero: theme === 'dark' ? '/images/icons/genero.svg' : '/images/icons/genero_p.svg',
-    fechar: theme === 'dark' ? '/images/icons/fechar_b.svg' : '/images/icons/fechar.svg',
+    logo:
+      theme === "dark"
+        ? "/images/icons/logo_branca.svg"
+        : "/images/icons/logo_p.svg",
+    nome:
+      theme === "dark" ? "/images/icons/nome.svg" : "/images/icons/nome_p.svg",
+    data:
+      theme === "dark" ? "/images/icons/data.svg" : "/images/icons/data_p.svg",
+    telefone:
+      theme === "dark"
+        ? "/images/icons/telefone.svg"
+        : "/images/icons/telefone_p.svg",
+    genero:
+      theme === "dark"
+        ? "/images/icons/genero.svg"
+        : "/images/icons/genero_p.svg",
+    fechar:
+      theme === "dark"
+        ? "/images/icons/fechar_b.svg"
+        : "/images/icons/fechar.svg",
   };
 
-  const borderColor = theme === 'dark' ? 'border-blue-600' : 'border-blue-900';
-  const iconSize = 'w-6 h-6 shrink-0'; // padroniza tamanho dos ícones dos campos
-  const fieldBgClass = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200';
-  const cancelBtnBg = theme === 'dark' ? 'bg-slate-700' : 'bg-gray-300';
+  const borderColor = theme === "dark" ? "border-blue-600" : "border-blue-900";
+  const iconSize = "w-6 h-6 shrink-0"; // padroniza tamanho dos ícones dos campos
+  const fieldBgClass = theme === "dark" ? "bg-gray-800" : "bg-gray-200";
+  const cancelBtnBg = theme === "dark" ? "bg-slate-700" : "bg-gray-300";
 
   // Função de submit
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -155,14 +146,14 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
     try {
       // Converter dd/mm/yyyy → yyyy-mm-dd
-      const [dia, mes, ano] = birthDate.split('/');
+      const [dia, mes, ano] = birthDate.split("/");
       const data_nascimento = `${ano}-${mes}-${dia}`;
 
       const payload = {
         nome: name,
         telefone: phone.replace(/\D/g, ""),
         data_nascimento,
-        genero: gender
+        genero: gender,
       };
 
       const response = await updateDadosUser(payload);
@@ -173,7 +164,6 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
       } else {
         toast.error("Erro ao atualizar perfil. Tente novamente.");
       }
-
     } catch (err) {
       console.error(err);
       toast.error("Erro ao atualizar perfil.");
@@ -188,7 +178,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
       {/* Modal */}
       <div
         className={`relative w-full max-w-xl mx-auto p-6 rounded-2xl shadow-lg ${
-          theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+          theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
         }`}
       >
         <button
@@ -196,43 +186,74 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
           className="absolute top-5 right-4 p-1 rounded-full"
           aria-label="Fechar"
         >
-<<<<<<< HEAD
-          <img src={icons.fechar} alt="Fechar" className="w-10 h-10 cursor-pointer" />
-=======
-          <img src={icons.fechar} alt="Fechar" className="w-10 h-10" />
->>>>>>> fix/projetoatt
+          <Image
+            src={icons.fechar}
+            alt="Fechar"
+            width={40}
+            height={40}
+            className="w-10 h-10"
+          />
         </button>
 
         <div className="flex flex-col items-center mb-6 mt-6">
-          <img src={icons.logo} alt="Ícone" className="w-16 h-16 mb-1" />
+          <Image
+            src={icons.logo}
+            alt="Ícone"
+            width={64}
+            height={64}
+            className="w-16 h-16 mb-1"
+          />
           <h2 className="text-2xl font-semibold">Editar Perfil</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md mx-auto w-full">
-          
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4 max-w-md mx-auto w-full"
+        >
           {/* Nome */}
           <div className="flex flex-col gap-1">
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
-              <img src={icons.nome} alt="Nome" className={iconSize}/>
+            <div
+              className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}
+            >
+              <Image
+                src={icons.nome}
+                alt="Nome"
+                width={24}
+                height={24}
+                className={iconSize}
+              />
               <input
                 type="text"
                 placeholder="Nome"
                 value={name}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s'´^~`]/g, "");
+                  const value = e.target.value.replace(
+                    /[^A-Za-zÀ-ÖØ-öø-ÿ\s'´^~`]/g,
+                    "",
+                  );
                   setName(value);
                   setNameError(validateName(value));
                 }}
                 className={`${fieldBgClass} w-full outline-none text-sm font-inter font-semibold`}
               />
             </div>
-            {nameError && <span className="text-red-500 text-xs ml-2">{nameError}</span>}
+            {nameError && (
+              <span className="text-red-500 text-xs ml-2">{nameError}</span>
+            )}
           </div>
 
           {/* Data de nascimento */}
           <div className="flex flex-col gap-1">
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
-              <img src={icons.data} alt="Data" className={iconSize}/>
+            <div
+              className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}
+            >
+              <Image
+                src={icons.data}
+                alt="Data"
+                width={24}
+                height={24}
+                className={iconSize}
+              />
               <input
                 type="text"
                 placeholder="Data de nascimento"
@@ -254,13 +275,25 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 className={`${fieldBgClass} w-full outline-none text-sm font-inter font-semibold`}
               />
             </div>
-            {birthDateError && <span className="text-red-500 text-xs ml-2">{birthDateError}</span>}
+            {birthDateError && (
+              <span className="text-red-500 text-xs ml-2">
+                {birthDateError}
+              </span>
+            )}
           </div>
 
           {/* Telefone */}
           <div className="flex flex-col gap-1">
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
-              <img src={icons.telefone} alt="Telefone" className={iconSize}/>
+            <div
+              className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}
+            >
+              <Image
+                src={icons.telefone}
+                alt="Telefone"
+                width={24}
+                height={24}
+                className={iconSize}
+              />
               <input
                 type="tel"
                 placeholder="Telefone"
@@ -285,13 +318,23 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 className={`${fieldBgClass} w-full outline-none text-sm font-inter font-semibold`}
               />
             </div>
-            {phoneError && <span className="text-red-500 text-xs ml-2">{phoneError}</span>}
+            {phoneError && (
+              <span className="text-red-500 text-xs ml-2">{phoneError}</span>
+            )}
           </div>
 
           {/* Gênero */}
           <div className="flex flex-col gap-1">
-            <div className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}>
-              <img src={icons.genero} alt="Gênero" className={iconSize}/>
+            <div
+              className={`flex items-center ${borderColor} border-2 rounded-xl px-3 py-2.5 gap-2 ${fieldBgClass}`}
+            >
+              <Image
+                src={icons.genero}
+                alt="Gênero"
+                width={24}
+                height={24}
+                className={iconSize}
+              />
               <select
                 value={gender}
                 onChange={(e) => {
@@ -307,7 +350,9 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 <option value="prefiro não dizer">Prefiro não dizer</option>
               </select>
             </div>
-            {genderError && <span className="text-red-500 text-xs ml-2">{genderError}</span>}
+            {genderError && (
+              <span className="text-red-500 text-xs ml-2">{genderError}</span>
+            )}
           </div>
 
           {/* Botões */}
@@ -322,7 +367,9 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
             <button
               type="submit"
               className="px-8 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-inter font-semibold"
-              disabled={!!nameError || !!birthDateError || !!phoneError || !!genderError}
+              disabled={
+                !!nameError || !!birthDateError || !!phoneError || !!genderError
+              }
             >
               Salvar
             </button>
@@ -331,8 +378,4 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> fix/projetoatt
