@@ -14,6 +14,8 @@ export default function QuestionarioCard({
   const router = useRouter();
   const isDark = theme === "dark";
 
+  console.log('QuestionarioCard respondeuHoje:', respondeuHoje, 'loading:', loading);
+
   const handleQuestionarioClick = () => {
     if (!loading && !respondeuHoje) {
       router.push("/questionnaire");
@@ -61,7 +63,7 @@ export default function QuestionarioCard({
         <div className={`pt-4.5 pb-4.5`}>
           <button
             onClick={handleQuestionarioClick}
-            disabled={loading}
+            disabled={loading || respondeuHoje}
             className={`
               md:w-full md:h-[50px] sm:w-[290px] sm:h-[50px] w-[290px] h-[50px]
               ${
