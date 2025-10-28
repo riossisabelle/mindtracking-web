@@ -15,26 +15,6 @@ interface Props {
   email: string;
 }
 
-// Regex para validação - exatamente 8 caracteres
-const passwordRegex =
-  /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{8}$/;
-
-function containsOnlyAscii(str: string): boolean {
-  return /^[\x00-\x7F]*$/.test(str);
-}
-
-// Validação de senha
-// function validatePassword(password: string, confirm: string): string | null {
-//   if (!password || !confirm) return "Preencha todos os campos";
-//   if (!containsOnlyAscii(password)) return "A senha não pode conter emoji";
-//   if (password.length >= 8) return "A senha deve ter no minimo 8 caracteres";
-//   if (password.length <= 20) return "A senha deve ter no minimo 8 caracteres";
-//   if (!passwordRegex.test(password))
-//     return "A senha deve incluir letra maiúscula, minúscula, número e caractere especial";
-//   if (password !== confirm) return "As senhas não coincidem";
-//   return null;
-// }
-
 export default function ResetPasswordModal({
   isOpen,
   onClose,
@@ -50,7 +30,7 @@ export default function ResetPasswordModal({
 
   const passwordError = useMemo(
     () => validatePassword(password, confirm),
-    [password, confirm]
+    [password, confirm],
   );
   const isInvalid = Boolean(passwordError);
 
@@ -65,8 +45,6 @@ export default function ResetPasswordModal({
       setLoading(true);
       await redefinirSenha({ email, senha: password, confirmarSenha: confirm });
       onSuccess();
-    } catch (err: unknown) {
-      setSubmitError("Erro ao redefinir senha");
     } finally {
       setLoading(false);
     }

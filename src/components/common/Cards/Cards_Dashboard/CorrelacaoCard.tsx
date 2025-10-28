@@ -15,7 +15,6 @@ interface Correlacao {
   icone: string;
 }
 
-
 interface CorrelacaoAPI {
   total_ocorrencias: string | number;
   pontuacao?: number | string;
@@ -24,7 +23,6 @@ interface CorrelacaoAPI {
   texto_pergunta?: string;
 }
 
-
 export default function CorrelacoesCard() {
   const { theme } = useTheme();
   const textColor = theme === "dark" ? "text-white" : "text-slate-800";
@@ -32,7 +30,6 @@ export default function CorrelacoesCard() {
   const [correlacoes, setCorrelacoes] = useState<Correlacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
 
   // Estados para o carrossel
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -79,7 +76,7 @@ export default function CorrelacoesCard() {
 
     setCurrentIndex((prev) => {
       const maxIndex = Math.max(0, correlacoes.length - visibleItems);
-      let newIndex = prev + visibleItems; // Avançar pelo número de itens visíveis
+      let newIndex = prev + 1; // Avançar de um em um
       if (newIndex > maxIndex) {
         newIndex = 0; // Voltar ao início se exceder
       }
@@ -103,7 +100,7 @@ export default function CorrelacoesCard() {
     }
 
     if (isCarouselActive) {
-      intervalRef.current = setInterval(nextSlide, 4000); // 4 segundos
+      intervalRef.current = setInterval(nextSlide, 3000); // 3 segundos
     }
   }, [isCarouselActive, nextSlide]);
 
@@ -147,7 +144,6 @@ export default function CorrelacoesCard() {
       }
     };
 
-
     // Processar dados
     return correlacoesOrdenadas.map((correlacao: CorrelacaoAPI) => {
       // tente extrair pontuacao numérica; alguns retornos podem usar 'classificacao' em vez de 'pontuacao'
@@ -163,7 +159,6 @@ export default function CorrelacoesCard() {
         texto_alternativa: correlacao.texto_alternativa || "",
         texto_pergunta: correlacao.texto_pergunta || "",
         icone: obterIcone(pontNum ?? rawPont),
-
       } as Correlacao;
     });
   };
@@ -188,10 +183,8 @@ export default function CorrelacoesCard() {
           throw new Error("Usuário não encontrado no localStorage");
         }
 
-
         const user = JSON.parse(userStr);
         const userId = user.id || user.user_id || user.usuario_id;
-
 
         if (!userId) {
           throw new Error("ID do usuário não encontrado");
@@ -200,18 +193,15 @@ export default function CorrelacoesCard() {
         // Buscar correlações da API
         const correlacaoData = await corelacoes(userId);
 
-
         if (!correlacaoData.success) {
           throw new Error(
             correlacaoData.message || "Erro ao carregar correlações",
           );
-
         }
 
         // Processar dados
         const correlacaoProcessadas = processarCorrelacoes(correlacaoData);
         setCorrelacoes(correlacaoProcessadas);
-
       } catch (error: unknown) {
         console.error("Erro ao carregar correlações:", error);
         setError(
@@ -219,7 +209,6 @@ export default function CorrelacoesCard() {
             ? error.message
             : "Erro ao carregar correlações",
         );
-
       } finally {
         setLoading(false);
       }
@@ -227,7 +216,6 @@ export default function CorrelacoesCard() {
 
     carregarCorrelacoes();
   }, []);
-
 
   // Effect para calcular itens visíveis quando as correlações mudam
   useEffect(() => {
@@ -293,7 +281,6 @@ export default function CorrelacoesCard() {
     return result;
   }, [isCarouselActive, currentIndex, visibleItems, correlacoes]);
 
-
   if (loading) {
     return (
       <BaseCard>
@@ -308,9 +295,7 @@ export default function CorrelacoesCard() {
     return (
       <BaseCard>
         <div className="flex items-center justify-center h-full min-h-[150px]">
-
           <div className={`text-sm ${textColor}`}>Erro: {error}</div>
-
         </div>
       </BaseCard>
     );
@@ -335,20 +320,17 @@ export default function CorrelacoesCard() {
 
   return (
     <BaseCard>
-
       <div className="flex flex-col h-full">
-
         {/* Título */}
-        <h1 className={`text-[20px] font-semibold mb-4 ${textColor}`}>
+        <h1 className={`text-[20px] font-semibold mb-3 ${textColor}`}>
           Respostas frequentes:
         </h1>
-
 
         {/* Container do carrossel */}
         <div ref={containerRef} className="flex-1">
           {/* Lista de correlações */}
           <div
-            className={`space-y-4 text-[16px] font-semibold font-inter mb-5 mt-2 ${textColor} transition-all duration-500 ease-in-out`}
+            className={`space-y-4 text-[16px] font-semibold font-inter mb-5 ${textColor} transition-all duration-500 ease-in-out`}
           >
             {visibleCorrelacoes.map((correlacao, index) => (
               <div
@@ -372,12 +354,8 @@ export default function CorrelacoesCard() {
               </div>
             ))}
           </div>
-
         </div>
       </div>
     </BaseCard>
   );
-
-
 }
-

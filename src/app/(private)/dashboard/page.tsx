@@ -7,8 +7,7 @@ import GraficoCard from "@/components/common/Cards/Cards_Dashboard/GraficoCard";
 import DiarioEmocionalCard from "@/components/common/Cards/Cards_Dashboard/DiarioEmocionalCard";
 import CorrelacaoCard from "@/components/common/Cards/Cards_Dashboard/CorrelacaoCard";
 import AthenaCard from "@/components/common/Cards/Cards_Dashboard/AthenaCard";
-import api from "@/lib/api/axios";
-import { setAuthToken } from "@/lib/api/axios";
+import api, { setAuthToken } from "@/lib/api/axios";
 
 export default function Dashboard() {
   const [questionarioStatus, setQuestionarioStatus] = useState({
@@ -20,20 +19,17 @@ export default function Dashboard() {
 
   useEffect(() => {
     const init = async () => {
-      // Configura token JWT
       if (typeof window !== "undefined") {
         const token = localStorage.getItem("mt_token");
         if (token) setAuthToken(token);
       }
 
-      // Obtém e armazena userId
       const userStr = localStorage.getItem("mt_user");
       if (!userStr) return;
       const user = JSON.parse(userStr);
       const id = user.id || user.user_id || user.usuario_id;
       if (id) setUsuarioId(id);
 
-      // Verifica status dos questionários
       try {
         const respVerif = await api.get(`/questionario/diario/verificar/${id}`);
         const respEstat = await api.get(`/questionario/estatisticas/${id}`);
@@ -44,15 +40,11 @@ export default function Dashboard() {
         });
       } catch (error) {
         console.error("Erro ao verificar questionário:", error);
-<<<<<<< HEAD
-        setQuestionarioStatus({ respondeuHoje: false, respondidos: 0, loading: false });
-=======
         setQuestionarioStatus({
           respondeuHoje: false,
           respondidos: 0,
           loading: false,
         });
->>>>>>> fix/projetoatt
       }
     };
 
@@ -74,7 +66,6 @@ export default function Dashboard() {
             respondeuHoje={questionarioStatus.respondeuHoje}
             loading={questionarioStatus.loading}
           />
-          {/* Passa usuarioId em vez de valor fixo */}
           {usuarioId && <EstadoEmocionalCard usuarioId={usuarioId} />}
           <RecomendacoesCard />
         </div>
@@ -82,24 +73,14 @@ export default function Dashboard() {
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-[98%] my-4 auto-rows-fr min-h-0">
           <GraficoCard />
           <DiarioEmocionalCard />
-<<<<<<< HEAD
-          
-            <CorrelacaoCard />
-            
-          
-=======
 
           <div className="flex flex-col gap-2">
             <CorrelacaoCard />
             <AthenaCard />
           </div>
->>>>>>> fix/projetoatt
         </div>
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> fix/projetoatt
+

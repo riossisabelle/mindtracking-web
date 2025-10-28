@@ -27,7 +27,6 @@ interface EstadisticasHistorico {
   dados_grafico: DadosGrafico[];
   media: number;
   melhor_dia: DadosGrafico | null;
-
   total_questionarios: number;
 }
 
@@ -42,7 +41,6 @@ interface HistoricoResponse {
   message?: string;
   historico?: HistoricoItem[];
 }
-
 
 type DotPositionProps = { cx?: number; cy?: number; size?: number };
 
@@ -75,27 +73,22 @@ export default function GraficoCard() {
     media: 0,
     melhor_dia: null,
     total_questionarios: 0,
-
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Função para processar apenas os últimos 7 questionários
-
   const processarHistoricoUltimos7 = (
     historicoData: HistoricoResponse,
   ): EstadisticasHistorico => {
     const historicoList = historicoData?.historico || [];
-
 
     if (!historicoList || historicoList.length === 0) {
       return {
         dados_grafico: [],
         media: 0,
         melhor_dia: null,
-
         total_questionarios: 0,
-
       };
     }
 
@@ -117,26 +110,21 @@ export default function GraficoCard() {
       const dataIso = item.data;
       const nota = parseFloat(item.nota_convertida);
 
-
       // Converter data para formato brasileiro
       const dataObj = new Date(dataIso);
       const dataFormatada = `${String(dataObj.getDate()).padStart(2, "0")}/${String(dataObj.getMonth() + 1).padStart(2, "0")}`;
-
 
       dadosGrafico.push({
         name: dataFormatada,
         valor: nota,
         data_completa: dataIso,
-
         questionario_id: item.questionario_id,
       });
-
 
       notas.push(nota);
     }
 
     // Ordenar os dados do gráfico por data (mais antigo primeiro para exibição cronológica)
-
     dadosGrafico.sort(
       (a, b) =>
         new Date(a.data_completa).getTime() -
@@ -149,20 +137,12 @@ export default function GraficoCard() {
         ? notas.reduce((acc, cur) => acc + cur, 0) / notas.length
         : 0;
 
-
     // Encontrar melhor e pior dia
     let melhorDia: DadosGrafico | null = null;
-    let piorDia: DadosGrafico | null = null;
 
     if (dadosGrafico.length > 0) {
-
       melhorDia = dadosGrafico.reduce((melhor, atual) =>
         atual.valor > melhor.valor ? atual : melhor,
-      );
-
-      piorDia = dadosGrafico.reduce((pior, atual) =>
-        atual.valor < pior.valor ? atual : pior,
-
       );
     }
 
@@ -170,10 +150,7 @@ export default function GraficoCard() {
       dados_grafico: dadosGrafico,
       media: Math.round(media * 10) / 10, // Arredonda para 1 casa decimal
       melhor_dia: melhorDia,
-
-
       total_questionarios: dadosGrafico.length,
-
     };
   };
 
@@ -204,10 +181,8 @@ export default function GraficoCard() {
           throw new Error("Usuário não encontrado no localStorage");
         }
 
-
         const user = JSON.parse(userStr);
         const userId = user.id || user.user_id || user.usuario_id;
-
 
         if (!userId) {
           throw new Error("ID do usuário não encontrado");
@@ -216,18 +191,15 @@ export default function GraficoCard() {
         // Buscar histórico da API
         const historicoData = await historico(userId);
 
-
         if (!historicoData.success) {
           throw new Error(
             historicoData.message || "Erro ao carregar histórico",
           );
-
         }
 
         // Processar apenas os últimos 7 questionários
         const dadosProcessados = processarHistoricoUltimos7(historicoData);
         setDados(dadosProcessados);
-
       } catch (error: unknown) {
         console.error("Erro ao carregar histórico:", error);
         const errorMessage =
@@ -235,7 +207,6 @@ export default function GraficoCard() {
             ? error.message
             : "Erro ao carregar dados do gráfico";
         setError(errorMessage);
-
       } finally {
         setLoading(false);
       }
@@ -245,12 +216,10 @@ export default function GraficoCard() {
   }, []);
 
   // Dados padrão para quando não há dados ou está carregando
-
   const dadosPadrao = [{ name: "Sem dados", valor: 0 }];
 
   const dadosGrafico =
     dados.dados_grafico.length > 0 ? dados.dados_grafico : dadosPadrao;
-
 
   if (loading) {
     return (
@@ -266,9 +235,7 @@ export default function GraficoCard() {
     return (
       <BaseCard>
         <div className="flex items-center justify-center h-full min-h-[300px]">
-
           <div className={`text-lg ${mainText}`}>Erro: {error}</div>
-
         </div>
       </BaseCard>
     );
@@ -281,9 +248,7 @@ export default function GraficoCard() {
           Seu Bem-Estar Essa Semana
         </div>
         <div className={`text-lg font-semibold ${mainText}`}>
-
           Média: {dados.media.toFixed(1)}
-
           <span className={`${secondaryText} mx-2`}>|</span>
           {dados.melhor_dia ? (
             <>
@@ -294,8 +259,6 @@ export default function GraficoCard() {
             "Sem dados suficientes"
           )}
         </div>
-
-
       </div>
       <div className="flex-1 min-h-0 pb-4">
         <ResponsiveContainer width="100%" height="100%">
@@ -334,9 +297,7 @@ export default function GraficoCard() {
                 color: "#fff",
               }}
               labelStyle={{ color: "#fff" }}
-
               formatter={(value: number) => [`${value.toFixed(1)}`, "Nota"]}
-
             />
             <Line
               type="monotone"
@@ -350,11 +311,9 @@ export default function GraficoCard() {
               verticalAlign="bottom"
               content={() => (
                 <div className="flex justify-center mt-0 text-blue-300 text-sm">
-
                   <div
                     className={`flex items-center ${isDark ? "text-slate-50" : "text-gray-500"}`}
                   >
-
                     <Image
                       src="/images/icons/DotGrafico.svg"
                       alt="Ponto"
@@ -372,6 +331,5 @@ export default function GraficoCard() {
       </div>
     </BaseCard>
   );
-
 }
 

@@ -26,7 +26,7 @@ export default function RedefinicaoSenhaFlow({
     setCurrentStep("code");
   };
 
-  const handleCodeSuccess = (code: string) => {
+  const handleCodeSuccess = () => {
     setCurrentStep("password");
   };
 
@@ -50,8 +50,20 @@ export default function RedefinicaoSenhaFlow({
     setCurrentStep("code");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter") {
+      if (currentStep === "email") {
+        document.getElementById("email-submit")?.click();
+      } else if (currentStep === "code") {
+        document.getElementById("code-submit")?.click();
+      } else if (currentStep === "password") {
+        document.getElementById("password-submit")?.click();
+      }
+    }
+  };
+
   return (
-    <>
+    <div onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Modal de Verificação de Email */}
       <ForgotPasswordModal
         isOpen={isOpen && currentStep === "email"}
@@ -74,6 +86,6 @@ export default function RedefinicaoSenhaFlow({
         onSuccess={handlePasswordSuccess}
         email={userEmail}
       />
-    </>
+    </div>
   );
 }

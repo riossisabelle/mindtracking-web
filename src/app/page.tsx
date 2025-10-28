@@ -62,8 +62,8 @@ export default function Home() {
               className="hidden lg:flex absolute ml-[45em] mt-[0.575em]"
               src="/images/athena-pulando.png"
               alt="Athena pulando"
-              width={250}
-              height={200}
+              width={230}
+              height={180}
               priority
             />
           </Modal>
