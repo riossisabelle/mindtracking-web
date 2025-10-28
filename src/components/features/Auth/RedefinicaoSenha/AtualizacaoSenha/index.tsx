@@ -30,7 +30,7 @@ export default function ResetPasswordModal({
 
   const passwordError = useMemo(
     () => validatePassword(password, confirm),
-    [password, confirm]
+    [password, confirm],
   );
   const isInvalid = Boolean(passwordError);
 

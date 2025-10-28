@@ -1,62 +1,50 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Modal from "../../../../common/Modals/perfil/ModalRedefinicaoSenha";
 import Button from "../../../../common/Buttons/ButtonVerificarEmail";
+import PasswordInput from "../../../../common/Inputs/InputSenha";
 import { useTheme } from "@/contexts/ThemeContext";
-import { verificarCodigo } from "@/lib/api/auth"; // ✅ importa serviço
-import { isAxiosError } from "axios";
+import { redefinirSenha } from "@/lib/api/auth";
+import { validatePassword } from "@/lib/validation";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (codigo: string) => void; // agora passa o código para o modal 3
+  onSuccess: () => void;
   email: string;
 }
 
-export default function VerifyCodeModal({
+export default function ResetPasswordModal({
   isOpen,
   onClose,
   onSuccess,
   email,
 }: Props) {
-  const [code, setCode] = useState(["", "", "", ""]);
-  const [error, setError] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [touched, setTouched] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { theme } = useTheme();
 
-  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const passwordError = useMemo(
+    () => validatePassword(password, confirm),
+    [password, confirm],
+  );
+  const isInvalid = Boolean(passwordError);
 
-  const handleChange = (index: number, value: string) => {
-    if (!/^\d?$/.test(value)) return;
+  const handleBlur = () => setTouched(true);
 
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-
-    if (value && inputsRef.current[index + 1]) {
-      inputsRef.current[index + 1]?.focus();
-    }
-  };
-
-  const handleVerify = async () => {
-    setLoading(true);
-    setError(null);
+  const handleReset = async () => {
+    setTouched(true);
+    setSubmitError(null);
+    if (passwordError) return;
 
     try {
-      const codigo = code.join("");
-
-      // 🔹 Chamada real para a API
-      await verificarCodigo({ email, codigo });
-
-      // se deu certo, abre o modal de redefinição
-      onSuccess(codigo);
-    } catch (error: unknown) {
-      setError(
-        isAxiosError(error)
-          ? error.response?.data?.message || "Erro ao verificar código"
-          : "Erro ao verificar código"
-      );
+      setLoading(true);
+      await redefinirSenha({ email, senha: password, confirmarSenha: confirm });
+      onSuccess();
     } finally {
       setLoading(false);
     }
@@ -65,17 +53,19 @@ export default function VerifyCodeModal({
   // Limpa os dados ao fechar o modal
   useEffect(() => {
     if (!isOpen) {
-      setCode(["", "", "", ""]);
-      setError(null);
-      setLoading(false);
+      setPassword("");
+      setConfirm("");
+      setTouched(false);
+      setSubmitError(null);
     }
   }, [isOpen]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="flex justify-center items-center h-full">
-        <div className="flex flex-col items-center lg:w-[530px] lg:h-[400px] mx-auto">
-          <div className="mb-6 md:mb-8">
+      <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center lg:w-[523px] lg:h-auto mx-auto">
+          {/* Logo */}
+          <div className="mb-4.5">
             <Image
               src={
                 theme === "dark"
@@ -89,44 +79,65 @@ export default function VerifyCodeModal({
             />
           </div>
 
+          {/* Título */}
           <h2 className="text-[22px] md:text-[32px] font-bold">
-            Verificando seu e-mail
+            Crie sua nova senha
           </h2>
-          <div className="md:pt-6 md:pb-12.5 pt-3 pb-10 flex flex-col items-center">
-            <p className="text-[13px] md:text-[16px] font-medium text-center md:w-110 lg:w-full">
-              Enviamos um código de 4 dígitos para seu e-mail.
-            </p>
-            <p className="text-[13px] md:text-[16px] w-65 md:w-full font-medium text-center">
-              Insira o código abaixo para confirmar sua identidade e continuar.
+          <div className="lg:pt-4 lg:pb-4 pt-4 pb-6">
+            <p className="text-[13px] md:text-[16px] font-medium text-center w-70 md:w-115 lg:w-130">
+              Perfeito! Agora, defina uma nova senha de acesso. Escolha uma
+              combinação forte para manter sua conta e suas reflexões sempre
+              seguras.
             </p>
           </div>
 
-          <div className="flex space-x-4">
-            {code.map((digit, i) => (
-              <input
-                key={i}
-                type="text"
-                maxLength={1}
-                value={digit}
-                placeholder="0"
-                onChange={(e) => handleChange(i, e.target.value)}
-                ref={(el) => {
-                  inputsRef.current[i] = el;
-                }}
-                className="text-[28px] md:text-[36px] font-bold text-center border-[2.2px] border-blue-600 rounded-[12px] w-16 h-16 md:w-20 md:h-20 placeholder-[#666666] focus:border-blue-600 focus:outline-none"
-              />
-            ))}
+          {/* Campo Senha */}
+          <div className="w-full max-w-md lg:mb-1.5 mb-3">
+            <PasswordInput
+              id="new-password"
+              name="password"
+              label="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onBlur={handleBlur}
+              error={touched ? passwordError : null}
+              required
+              minLength={8}
+              maxLength={8}
+            />
           </div>
 
-          {error && <p className="mt-1 text-sm text-red-500 text-center">{error}</p>}
+          {/* Campo Confirmar Senha */}
+          <div className="w-full max-w-md lg:mb-1.5 mb-3">
+            <PasswordInput
+              id="confirm-password"
+              name="confirm"
+              label="Confirme sua senha"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              onBlur={handleBlur}
+              error={touched ? passwordError : null}
+              required
+              minLength={8}
+              maxLength={8}
+            />
+          </div>
 
-          <div className="pt-8">
+          {/* Mensagem de erro de submit */}
+          {submitError && !passwordError && (
+            <p className="text-red-500 text-sm mt-1 text-start w-[448px]">
+              {submitError}
+            </p>
+          )}
+
+          {/* Botão */}
+          <div className="pt-1.5">
             <Button
-              onClick={handleVerify}
+              onClick={handleReset}
               loading={loading}
-              disabled={loading || code.some((c) => c === "")}
+              disabled={loading || isInvalid}
             >
-              {loading ? "Verificando..." : "Confirmar código"}
+              {loading ? "Carregando..." : "Confirmar senha"}
             </Button>
           </div>
         </div>
