@@ -8,7 +8,7 @@ import DiarioEmocionalCard from "@/components/common/Cards/Cards_Dashboard/Diari
 import CorrelacaoCard from "@/components/common/Cards/Cards_Dashboard/CorrelacaoCard";
 import AthenaCard from "@/components/common/Cards/Cards_Dashboard/AthenaCard";
 import api, { setAuthToken } from "@/lib/api/axios";
-import { verificarDiario } from "@/lib/api/questionario";
+import { verificarDiario, historico } from "@/lib/api/questionario";
 
 export default function Dashboard() {
   const [questionarioStatus, setQuestionarioStatus] = useState({
@@ -17,47 +17,51 @@ export default function Dashboard() {
     loading: true,
   });
   const [usuarioId, setUsuarioId] = useState<string | null>(null);
+  const [historicoData, setHistoricoData] = useState(null);
 
- useEffect(() => {
-  const init = async () => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("mt_token");
-      if (token) setAuthToken(token);
-    }
+  useEffect(() => {
+    const init = async () => {
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("mt_token");
+        if (token) setAuthToken(token);
+      }
 
-    const userStr = localStorage.getItem("mt_user");
-    if (!userStr) return;
-    const user = JSON.parse(userStr);
-    const id = user.id || user.user_id || user.usuario_id;
-    if (id) setUsuarioId(id);
+      const userStr = localStorage.getItem("mt_user");
+      if (!userStr) return;
+      const user = JSON.parse(userStr);
+      const id = user.id || user.user_id || user.usuario_id;
+      if (id) setUsuarioId(id);
+      else return;
 
-    try {
-  const respVerif = await verificarDiario(id);
-  console.log("Resposta da API verificarDiario completa:", respVerif);
+      try {
+        const respVerif = await verificarDiario(id);
 
-  const jaRespondido =
-    respVerif?.ja_respondido === true || respVerif?.data?.ja_respondido === true;
+        const jaRespondido =
+          respVerif?.ja_respondido === true || respVerif?.data?.ja_respondido === true;
 
-  setQuestionarioStatus({
-    respondeuHoje: jaRespondido,
-    respondidos: (await api.get(`/questionario/estatisticas/${id}`))?.data?.estatisticas?.total_questionarios || 0,
-    loading: false,
-  });
+        // Buscar e guardar histórico no estado
+        const respHistorico = await historico(id);
+        setHistoricoData(respHistorico);
 
-} catch (error) {
-  console.error("Erro ao verificar questionário:", error);
-  setQuestionarioStatus({
-    respondeuHoje: false,
-    respondidos: 0,
-    loading: false,
-  });
-}
-}
+        const estatisticasResponse = await api.get(`/questionario/estatisticas/${id}`);
 
-  init();
-}, []);
+        setQuestionarioStatus({
+          respondeuHoje: jaRespondido,
+          respondidos:
+            estatisticasResponse?.data?.estatisticas?.total_questionarios || 0,
+          loading: false,
+        });
+      } catch (error) {
+        setQuestionarioStatus({
+          respondeuHoje: false,
+          respondidos: 0,
+          loading: false,
+        });
+      }
+    };
 
-  console.log("Estado questionarioStatus:", questionarioStatus);
+    init();
+  }, []);
 
   return (
     <div className="ml-0 lg:ml-37.5 min-h-0 h-screen">
@@ -79,7 +83,7 @@ export default function Dashboard() {
         </div>
 
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-[98%] my-4 auto-rows-fr min-h-0">
-          <GraficoCard />
+          <GraficoCard historicoData={historicoData} />
           <DiarioEmocionalCard />
 
           <div className="flex flex-col gap-2">
