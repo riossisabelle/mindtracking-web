@@ -5,7 +5,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import EditProfileModal from "@/components/common/Modals/perfil/editarPerfil";
-import LogoutModal from "@/components/common/Modals/perfil/sairdaConta";
+import DeleteAccountModal from "@/components/common/Modals/perfil/deletarConta";
 import VerifyCodeModal from "@/components/features/Auth/RedefinicaoSenha/VerificacaoCodigo";
 import ResetPasswordModal from "@/components/features/Auth/RedefinicaoSenha/AtualizacaoSenha";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,14 +14,11 @@ import { dadosUser, recuperarSenha } from "@/lib/api/auth";
 export default function PerfilPage() {
   const { darkMode } = useTheme();
   const [modalOpen, setModalOpen] = useState(false);
-  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-
+  const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [verifyCodeModalOpen, setVerifyCodeModalOpen] = useState(false);
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
-
   const [emailUser, setEmailUser] = useState("");
-
   const [userData, setUserData] = useState<{
     id?: number | string;
     nome?: string;
@@ -32,7 +29,6 @@ export default function PerfilPage() {
     genero?: string | null;
   } | null>(null);
 
-  // Garante que só tenta ler o localStorage no cliente
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -60,9 +56,10 @@ export default function PerfilPage() {
     load();
   }, []);
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-    setLogoutModalOpen(false);
+  const handleAccountDeleted = () => {
+    console.log("Conta deletada");
+    setDeleteAccountModalOpen(false);
+    // Aqui você pode adicionar lógica adicional, como logout ou redirecionamento
   };
 
   const handleResetPassword = async () => {
@@ -92,7 +89,6 @@ export default function PerfilPage() {
     return `${first}${second}`;
   };
 
-  // Função para formatar telefone no padrão (11) 99999-9999
   const formatTelefone = (telefone: string | null | undefined) => {
     if (!telefone) return "—";
     const digits = telefone.replace(/\D/g, "");
@@ -101,10 +97,9 @@ export default function PerfilPage() {
     } else if (digits.length === 10) {
       return digits.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
     }
-    return telefone; // fallback caso número não tenha comprimento esperado
+    return telefone;
   };
 
-  // Função para deixar primeira letra maiúscula e o resto minúsculo
   const capitalize = (text: string | null | undefined) => {
     if (!text) return "—";
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -135,12 +130,7 @@ export default function PerfilPage() {
             className="object-cover object-bottom"
           />
           <button className="absolute top-3 right-3 bg-blue-600 p-2 rounded-full hover:bg-blue-700 flex items-center justify-center">
-            <Image
-              src="/images/icons/camera.svg"
-              alt="camera"
-              width={14}
-              height={14}
-            />
+            <Image src="/images/icons/camera.svg" alt="camera" width={14} height={14} />
           </button>
         </div>
 
@@ -160,17 +150,10 @@ export default function PerfilPage() {
               </Avatar>
 
               <button className="absolute bottom-2 right-2 bg-blue-600 p-2 rounded-full hover:bg-blue-700">
-                <Image
-                  src="/images/icons/editar.svg"
-                  alt="editar"
-                  width={14}
-                  height={14}
-                />
+                <Image src="/images/icons/editar.svg" alt="editar" width={14} height={14} />
               </button>
             </div>
-            <h2 className="mt-3 text-2xl font-semibold">
-              {userData?.nome ?? "Usuário"}
-            </h2>
+            <h2 className="mt-3 text-2xl font-semibold">{userData?.nome ?? "Usuário"}</h2>
           </div>
 
           <div className="mt-6 md:mt-0 ml-auto z-10 w-full md:w-auto flex flex-col md:flex-row gap-2 md:gap-3">
@@ -191,7 +174,7 @@ export default function PerfilPage() {
 
             <button
               className="min-w-[120px] w-full sm:w-auto bg-red-600 px-6 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap text-center"
-              onClick={() => setLogoutModalOpen(true)}
+              onClick={() => setDeleteAccountModalOpen(true)}
             >
               Deletar Conta
             </button>
@@ -207,33 +190,25 @@ export default function PerfilPage() {
         <div className="px-6 md:px-8 lg:-mx-8 xl:-mx-2 2xl:-mx-2 gap-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 lg:gap-x-14 py-8">
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
-                Gênero
-              </p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Gênero</p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {capitalize(userData?.genero ?? "")}
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
-                Idade
-              </p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Idade</p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {userData?.idade ? `${userData.idade} Anos` : "—"}
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
-                Telefone
-              </p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Telefone</p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {formatTelefone(userData?.telefone)}
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
-                E-mail
-              </p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">E-mail</p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {userData?.email ?? "—"}
               </p>
@@ -243,15 +218,12 @@ export default function PerfilPage() {
       </div>
 
       {/* Modais */}
-      <LogoutModal
-        isOpen={logoutModalOpen}
-        onClose={() => setLogoutModalOpen(false)}
-        onLogout={handleLogout}
+      <DeleteAccountModal
+        isOpen={deleteAccountModalOpen}
+        onClose={() => setDeleteAccountModalOpen(false)}
+        onDelete={handleAccountDeleted}
       />
-      <EditProfileModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
+      <EditProfileModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
       <VerifyCodeModal
         isOpen={verifyCodeModalOpen}
         onClose={() => setVerifyCodeModalOpen(false)}
