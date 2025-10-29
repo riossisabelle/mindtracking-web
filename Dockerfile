@@ -10,8 +10,8 @@ ENV CI=true
 # Copia package.json e package-lock.json
 COPY package*.json ./
 
-# Instala dependências completas
-RUN npm ci
+# Instala dependências completas (usa npm install para evitar falhas com lock desatualizado)
+RUN npm install
 
 # Copia o restante do código
 COPY . .
@@ -35,14 +35,8 @@ ENV PORT=80
 ENV HOSTNAME=0.0.0.0
 ENV NXT_SHARP=true
 
-# Copia package.json e package-lock.json
-COPY package*.json ./
-
-# Instala apenas dependências de produção
-RUN npm ci --omit=dev
-
-# Caso tenha next.config.ts, precisamos garantir que TypeScript está disponível
-RUN npm install typescript @types/node
+# Para builds standalone do Next.js, as dependências necessárias já vão em .next/standalone
+# Portanto, não é necessário instalar dependências no runner
 
 # Ajusta permissões
 RUN chown -R node:node /app
