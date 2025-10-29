@@ -35,7 +35,7 @@ export default function ModalAnalise({
         {/* Botão fechar */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 transition-colors p-1"
+          className="absolute top-4 right-4 cursor-pointer transition-colors p-1"
         >
           <Image
             src={
