@@ -52,6 +52,8 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/tsconfig.json ./   
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
 # Instala libcap para permitir porta 80 sem root
 RUN apk add --no-cache libcap \
