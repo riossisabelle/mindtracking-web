@@ -51,7 +51,9 @@ RUN chown -R node:node /app
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./
-COPY --from=builder /app/tsconfig.json ./   
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/tailwind.config.js ./
+COPY --from=builder /app/postcss.config.js ./
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
