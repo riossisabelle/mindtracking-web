@@ -194,13 +194,44 @@ export default function Athena() {
 
       if (!reply) reply = "Desculpe, não consegui entender. Pode reformular?";
 
-      const athenaMessage: Message = {
-        id: Date.now().toString() + "_athena",
-        content: String(reply),
-        sender: "athena",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, athenaMessage]);
+      const athenaId = Date.now().toString() + "_athena";
+      const startedAt = new Date();
+      // adiciona a mensagem vazia do Athena
+      setMessages((prev) => [
+        ...prev,
+        { id: athenaId, content: "", sender: "athena", timestamp: startedAt },
+      ]);
+
+      // a partir daqui, já estamos exibindo a bolha da Athena, então removemos o indicador
+      setIsTyping(false);
+
+      // efeito de "máquina de escrever" preservando quebras de linha e espaços
+      // divide em tokens: sequências de não-whitespace (palavras) ou whitespace (inclui \n)
+      const tokens = String(reply).match(/(\S+|\s+)/g) ?? [];
+      let i = 0;
+      const intervalId = window.setInterval(() => {
+        if (i >= tokens.length) {
+          window.clearInterval(intervalId);
+          setIsTyping(false);
+          return;
+        }
+
+        const nextToken = tokens[i];
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === athenaId
+              ? {
+                  ...m,
+                  // simplesmente concatenamos o próximo token para manter espaços e \n intocados
+                  content: m.content + nextToken,
+                }
+              : m
+          )
+        );
+
+        i += 1;
+        scrollToBottom();
+      }, 80);
     } catch (e) {
       let errorMessage =
         "Tive um problema para responder agora. Tente novamente em instantes.";
@@ -228,7 +259,6 @@ export default function Athena() {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, athenaMessage]);
-    } finally {
       setIsTyping(false);
     }
   };
@@ -320,7 +350,7 @@ export default function Athena() {
                   >
                     {message.sender === "athena" && (
                       <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                        <span className="text-xs font-semibold">Athena</span>
+                        <span className="text-[14px] font-semibold">Athena</span>
                       </div>
                     )}
                     {message.sender === "athena" ? (
