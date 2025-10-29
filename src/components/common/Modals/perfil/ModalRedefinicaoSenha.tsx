@@ -10,7 +10,7 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, children }: ModalProps) {
-  const { theme } = useTheme(); // Obtém o tema atual do contexto
+  const { theme } = useTheme();
 
   if (!isOpen) return null;
 

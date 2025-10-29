@@ -54,7 +54,7 @@ export default function ModalDiario({
     const trimmed = t.trim();
     if (!trimmed) return "Título é obrigatório";
     if (hasEmoji(trimmed)) return "O título não pode conter emoji";
-    if (trimmed.length > 25) return "Título muito longo (máximo 25 caracteres)";
+    if (trimmed.length > 30) return "Título muito longo (máximo 30 caracteres)";
     return null;
   };
 
@@ -100,7 +100,7 @@ export default function ModalDiario({
     } catch (err: unknown) {
       console.error("Erro ao salvar diário:", err);
       setError(
-        "Não foi possível salvar seu diário. Por favor, tente novamente.",
+        "Não foi possível salvar seu diário. Por favor, tente novamente."
       );
     } finally {
       setSaving(false);
@@ -110,12 +110,12 @@ export default function ModalDiario({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4 py-[70px]">
       <div
-        className={`p-8 rounded-2xl w-full max-w-[600px] relative shadow-xl transition-all duration-300 mt-[50px] mb-[50px]
-          ${theme === "dark" ? "bg-slate-900 text-white" : "bg-white text-gray-900"}`}
+        className={`p-6 rounded-2xl w-full max-w-[600px] relative shadow-xl transition-all duration-300 mt-[50px] mb-[50px]
+        ${theme === "dark" ? "bg-slate-900 text-white" : "bg-white text-gray-900"}`}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 transition-colors p-1"
+          className="absolute top-4 right-4 p-1 cursor-pointer"
         >
           <Image
             src={
@@ -130,7 +130,7 @@ export default function ModalDiario({
           />
         </button>
 
-        <div className="flex flex-col items-center gap-4 text-center">
+        <div className="flex flex-col items-center gap-2 text-center mt-10">
           <Image
             src="/images/icons/IconeDiario.svg"
             alt="Ícone Diário"
@@ -138,51 +138,45 @@ export default function ModalDiario({
             height={42}
             className="mb-2"
           />
-
-          <h2 className="text-2xl md:text-3xl font-bold">Escrita no Diário</h2>
-          <p className="text-base text-slate-400">
+          <h2 className="text-xl md:text-2xl font-bold">Escrita no Diário</h2>
+          <p className="text-xs md:text-sm text-gray-500">
             Escreva livremente – somente você verá isso.
           </p>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
           <input
             type="text"
             value={title}
             onChange={(e) => onTitleChangeHandler(e.target.value)}
-            placeholder="Escreva o título do seu diário aqui..."
-            maxLength={25}
-            className={`w-full rounded-xl p-3 outline-none border transition-all mb-3
-              ${
-                theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
-                  : "bg-slate-100 border-slate-200 text-slate-800 placeholder:text-slate-400"
+            placeholder="Adicione um Título"
+            maxLength={30}
+            className={`w-full rounded-lg p-3 text-sm md:text-base border-blue-600 border-[2.5px] focus:border-blue-600 focus:ring-0
+              ${theme === "dark"
+                ? "bg-slate-800 text-white placeholder:text-slate-400"
+                : "bg-white text-gray-900 placeholder:text-slate-400"
               }`}
           />
-        </div>
 
-        <div className="mt-6">
           <textarea
-            className={`w-full min-h-[160px] max-h-[270px] resize-none rounded-xl p-4 outline-none border transition-all
-              ${
-                theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
-                  : "bg-slate-100 border-slate-200 text-slate-800 placeholder:text-slate-400"
+            className={`w-full min-h-[180px] max-h-[270px] resize-none rounded-lg p-4 text-sm md:text-base leading-relaxed outline-none
+              border-blue-600 border-[2.5px] focus:border-blue-600 focus:ring-0
+              ${theme === "dark"
+                ? "bg-slate-800 text-white placeholder:text-slate-400"
+                : "bg-white text-gray-900 placeholder:text-slate-400"
               }`}
             placeholder="Descreva aqui seu texto do diário..."
             value={value}
             onChange={(e) => onTextoChangeHandler(e.target.value)}
-            maxLength={1000} // opcional limite para texto
           />
         </div>
 
         {error && <div className="text-red-400 mt-2">{error}</div>}
 
-        <div className="flex justify-end gap-4 mt-8">
+        <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
-            className={`rounded-xl px-6 py-3 font-semibold transition-colors
-              ${theme === "dark" ? "bg-slate-700 text-white hover:bg-slate-600" : "bg-slate-200 text-gray-800 hover:bg-slate-300"}`}
+            className="min-w-[120px] py-2 px-4 cursor-pointer rounded-2xl text-sm font-medium text-white bg-slate-700 hover:bg-slate-800 transition-colors"
             type="button"
             disabled={saving}
           >
@@ -190,8 +184,7 @@ export default function ModalDiario({
           </button>
           <button
             onClick={handleSave}
-            className={`rounded-xl px-6 py-3 font-semibold transition-colors flex items-center gap-2
-              ${theme === "dark" ? "bg-blue-700 text-white hover:bg-blue-800" : "bg-blue-600 text-white hover:bg-blue-700"}`}
+            className="min-w-[120px] py-2 px-4 cursor-pointer rounded-2xl text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
             type="button"
             disabled={saving || !title || value.trim().length === 0}
           >
