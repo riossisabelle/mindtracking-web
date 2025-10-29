@@ -12,6 +12,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (email: string) => void; // abre modal 2
+  submitButtonId?: string; // Adiciona suporte para submitButtonId
 }
 
 function isAsciiOnly(value: string): boolean {
@@ -79,6 +80,7 @@ export default function ForgotPasswordModal({
   isOpen,
   onClose,
   onSuccess,
+  submitButtonId,
 }: Props) {
   const [email, setEmail] = useState("");
   const [touched, setTouched] = useState(false);
@@ -119,6 +121,20 @@ export default function ForgotPasswordModal({
       setSubmitError(null);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && submitButtonId) {
+        const button = document.getElementById(submitButtonId);
+        button?.click();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [submitButtonId]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -177,6 +193,7 @@ export default function ForgotPasswordModal({
 
           <div className="pt-8">
             <Button
+              id={submitButtonId} // Adiciona o ID ao botão
               onClick={handleRecover}
               loading={loading}
               disabled={loading || isInvalid}

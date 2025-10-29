@@ -13,6 +13,7 @@ interface Props {
   onClose: () => void;
   onSuccess: () => void;
   email: string;
+  submitButtonId?: string; // Adiciona suporte para submitButtonId
 }
 
 export default function ResetPasswordModal({
@@ -20,6 +21,7 @@ export default function ResetPasswordModal({
   onClose,
   onSuccess,
   email,
+  submitButtonId,
 }: Props) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -59,6 +61,20 @@ export default function ResetPasswordModal({
       setSubmitError(null);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && submitButtonId) {
+        const button = document.getElementById(submitButtonId);
+        button?.click();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [submitButtonId]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -133,6 +149,7 @@ export default function ResetPasswordModal({
           {/* Botão */}
           <div className="pt-1.5">
             <Button
+              id={submitButtonId} // Adiciona o ID ao botão
               onClick={handleReset}
               loading={loading}
               disabled={loading || isInvalid}

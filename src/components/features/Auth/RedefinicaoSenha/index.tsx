@@ -69,6 +69,7 @@ export default function RedefinicaoSenhaFlow({
         isOpen={isOpen && currentStep === "email"}
         onClose={handleClose}
         onSuccess={handleEmailSuccess}
+        submitButtonId="email-submit"
       />
 
       {/* Modal de Verificação de Código */}
@@ -77,6 +78,7 @@ export default function RedefinicaoSenhaFlow({
         onClose={handleBackToEmail}
         onSuccess={handleCodeSuccess}
         email={userEmail}
+        submitButtonId="code-submit"
       />
 
       {/* Modal de Redefinição de Senha */}
@@ -85,6 +87,7 @@ export default function RedefinicaoSenhaFlow({
         onClose={handleBackToCode}
         onSuccess={handlePasswordSuccess}
         email={userEmail}
+        submitButtonId="password-submit"
       />
     </div>
   );

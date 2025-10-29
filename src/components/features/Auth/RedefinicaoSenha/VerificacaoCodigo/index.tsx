@@ -12,6 +12,7 @@ interface Props {
   onClose: () => void;
   onSuccess: (codigo: string) => void; // agora passa o código para o modal 3
   email: string;
+  submitButtonId?: string; // Adiciona suporte para submitButtonId
 }
 
 export default function VerifyCodeModal({
@@ -19,6 +20,7 @@ export default function VerifyCodeModal({
   onClose,
   onSuccess,
   email,
+  submitButtonId,
 }: Props) {
   const [code, setCode] = useState(["", "", "", ""]);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +28,15 @@ export default function VerifyCodeModal({
   const { theme } = useTheme();
 
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleBackspace = (index: number, value: string) => {
+    if (value === "" && inputsRef.current[index - 1]) {
+      const newCode = [...code];
+      newCode[index] = "";
+      setCode(newCode);
+      inputsRef.current[index - 1]?.focus();
+    }
+  };
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d?$/.test(value)) return;
@@ -36,6 +47,8 @@ export default function VerifyCodeModal({
 
     if (value && inputsRef.current[index + 1]) {
       inputsRef.current[index + 1]?.focus();
+    } else if (!value) {
+      handleBackspace(index, value);
     }
   };
 
@@ -70,6 +83,20 @@ export default function VerifyCodeModal({
       setLoading(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && submitButtonId) {
+        const button = document.getElementById(submitButtonId);
+        button?.click();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [submitButtonId]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -122,6 +149,7 @@ export default function VerifyCodeModal({
 
           <div className="pt-8">
             <Button
+              id={submitButtonId} // Adiciona o ID ao botão
               onClick={handleVerify}
               loading={loading}
               disabled={loading || code.some((c) => c === "")}

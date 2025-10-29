@@ -204,7 +204,7 @@ export default function DiarioClient() {
                   {cards.map((card) => (
                     <div key={card.id} className="p-4 max-w-full h-full">
                       <div
-                        className={`w-full h-full rounded-lg p-4 border-2 transition-all duration-300 ease-in-out ${theme === "dark"
+                        className={`w-full h-full rounded-lg p-4 border-2 flex flex-col justify-between transition-all duration-300 ease-in-out ${theme === "dark"
                           ? "bg-slate-800 text-gray-200 border-blue-600"
                           : "bg-slate-50 text-gray-800 border-blue-500"
                           }`}
@@ -221,10 +221,8 @@ export default function DiarioClient() {
                             </span>
                           </div>
                         </div>
-                        <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line">
-                          {card.analysis && card.analysis.message
-                            ? truncateText(card.analysis.message)
-                            : "Análise ainda não disponível."}
+                        <p className="text-sm mb-4 font-inter leading-relaxed text-left whitespace-pre-line overflow-hidden text-ellipsis">
+                          {truncateText(card.description)}
                         </p>
                         {card.analysis && (
                           <div className="mt-2">

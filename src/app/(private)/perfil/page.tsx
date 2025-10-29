@@ -175,7 +175,7 @@ export default function PerfilPage() {
 
           <div className="mt-6 md:mt-0 ml-auto z-10 w-full md:w-auto flex flex-col md:flex-row gap-2 md:gap-3">
             <button
-              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap text-center"
+              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 h-9  rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap text-center"
               onClick={() => setModalOpen(true)}
             >
               Editar Perfil
@@ -184,16 +184,16 @@ export default function PerfilPage() {
             <button
               onClick={handleResetPassword}
               disabled={isLoading}
-              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-blue-700 text-white whitespace-nowrap flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-w-[120px] w-full sm:w-auto bg-blue-600 px-6  h-9 rounded-full font-bold hover:bg-blue-700 text-white text-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Enviando..." : "Redefinir Senha"}
             </button>
 
             <button
-              className="min-w-[120px] w-full sm:w-auto bg-red-600 px-6 py-2 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap text-center"
+              className="min-w-[120px] w-full sm:w-auto bg-red-600 px-6 h-9 rounded-full font-bold hover:bg-red-700 text-white whitespace-nowrap text-center"
               onClick={() => setLogoutModalOpen(true)}
             >
-              Sair da Conta
+              Deletar Conta
             </button>
           </div>
         </div>
@@ -260,12 +260,14 @@ export default function PerfilPage() {
           setChangePasswordModalOpen(true);
         }}
         email={emailUser}
+        submitButtonId="code-submit"
       />
       <ResetPasswordModal
         isOpen={changePasswordModalOpen}
         onClose={() => setChangePasswordModalOpen(false)}
         onSuccess={() => setChangePasswordModalOpen(false)}
         email={emailUser}
+        submitButtonId="password-submit"
       />
     </>
   );
