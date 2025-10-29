@@ -16,8 +16,8 @@ RUN npm install
 # Copia o restante do código
 COPY . .
 
-# Se houver next.config.ts, precisamos do TypeScript aqui
-RUN npm install typescript @types/node --save-dev
+# Instala dependências de build necessárias
+RUN npm install typescript @types/node critters --save-dev
 
 # Build
 RUN npx tsc --noEmit && mkdir -p public && npm run build
