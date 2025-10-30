@@ -10,6 +10,10 @@ import VerifyCodeModal from "@/components/features/Auth/RedefinicaoSenha/Verific
 import ResetPasswordModal from "@/components/features/Auth/RedefinicaoSenha/AtualizacaoSenha";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { dadosUser, recuperarSenha } from "@/lib/api/auth";
+import api from "@/lib/api/axios"; 
+
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 
 export default function PerfilPage() {
   const { darkMode } = useTheme();
@@ -27,7 +31,13 @@ export default function PerfilPage() {
     idade?: number | null;
     telefone?: string | null;
     genero?: string | null;
+    foto_perfil_url?: string | null;
+    foto_fundo_url?: string | null;
   } | null>(null);
+
+  const [fotoPerfilUrl, setFotoPerfilUrl] = useState<string | null>(null);
+  const [fotoFundoUrl, setFotoFundoUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -48,6 +58,9 @@ export default function PerfilPage() {
       try {
         const resp = await dadosUser();
         setUserData(resp?.user ?? null);
+
+        if (resp?.user?.foto_perfil_url) setFotoPerfilUrl(resp.user.foto_perfil_url);
+        if (resp?.user?.foto_fundo_url) setFotoFundoUrl(resp.user.foto_fundo_url);
       } catch (err) {
         console.error("Erro ao carregar perfil:", err);
         setUserData(null);
@@ -59,7 +72,6 @@ export default function PerfilPage() {
   const handleAccountDeleted = () => {
     console.log("Conta deletada");
     setDeleteAccountModalOpen(false);
-    // Aqui você pode adicionar lógica adicional, como logout ou redirecionamento
   };
 
   const handleResetPassword = async () => {
@@ -69,8 +81,7 @@ export default function PerfilPage() {
       if (!userDataString) throw new Error("Dados do usuário não encontrados");
 
       const userData = JSON.parse(userDataString);
-      if (!userData.email)
-        throw new Error("Email não encontrado nos dados do usuário");
+      if (!userData.email) throw new Error("Email não encontrado nos dados do usuário");
 
       await recuperarSenha({ email: userData.email });
       setVerifyCodeModalOpen(true);
@@ -115,6 +126,71 @@ export default function PerfilPage() {
     darkMode ? "bg-[#29374F] text-gray-300" : "bg-[#EFEFEF] text-gray-600"
   }`;
 
+  const uploadToCloudinary = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    console.log('CLOUDINARY_CLOUD_NAME:', CLOUDINARY_CLOUD_NAME);
+    console.log('CLOUDINARY_UPLOAD_PRESET:', CLOUDINARY_UPLOAD_PRESET);
+    try {
+      setUploading(true);
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Cloudinary upload error status:', res.status, res.statusText);
+        console.error('Cloudinary upload error response:', errorText);
+        throw new Error("Erro no upload");
+      }
+
+      const data = await res.json();
+      return data.secure_url;
+    } catch (err) {
+      console.error("Erro upload Cloudinary:", err);
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const updateFotoUsuario = async (body: Object) => {
+  try {
+    const resp = await api.put("/auth/profile", body);
+
+    if (resp.status !== 200) {
+      console.error("Erro ao atualizar foto no backend", resp);
+    }
+  } catch (error) {
+    console.error("Erro na chamada backend:", error);
+  }
+};
+
+  const handleFotoPerfilChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const url = await uploadToCloudinary(e.target.files[0]);
+      if (url) {
+        setFotoPerfilUrl(url);
+        await updateFotoUsuario({ foto_perfil_url: url });
+      }
+    }
+  };
+
+  const handleFotoFundoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const url = await uploadToCloudinary(e.target.files[0]);
+      if (url) {
+        setFotoFundoUrl(url);
+        await updateFotoUsuario({ foto_fundo_url: url });
+      }
+    }
+  };
+
   const ProfileCard = (
     <>
       <div className={cardClasses}>
@@ -123,15 +199,30 @@ export default function PerfilPage() {
             darkMode ? "bg-gray-700" : "bg-gray-200"
           }`}
         >
-          <Image
-            src="/images/paisagem.png"
-            alt="Foto paisagem"
-            fill
-            className="object-cover object-bottom"
-          />
-          <button className="absolute top-3 right-3 bg-blue-600 p-2 rounded-full hover:bg-blue-700 flex items-center justify-center">
+          {fotoFundoUrl ? (
+            <img
+              src={fotoFundoUrl}
+              alt="Foto de Fundo"
+              className="w-full h-full object-cover object-bottom"
+            />
+          ) : (
+            <Image
+              src="/images/paisagem.png"
+              alt="Foto paisagem"
+              fill
+              className="object-cover object-bottom"
+            />
+          )}
+
+          <label className="absolute top-3 right-3 cursor-pointer z-10 inline-flex items-center justify-center rounded-full bg-blue-600 p-2 hover:bg-blue-700">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFotoFundoChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
             <Image src="/images/icons/camera.svg" alt="camera" width={14} height={14} />
-          </button>
+          </label>
         </div>
 
         <div className="flex flex-col md:flex-row items-start px-6 mt-6 relative">
@@ -144,16 +235,32 @@ export default function PerfilPage() {
                     : "border-slate-50 bg-blue-600 text-white"
                 }`}
               >
-                <AvatarFallback className="bg-blue-600 text-white">
-                  {getUserInitials(userData?.nome ?? "")}
-                </AvatarFallback>
+                {fotoPerfilUrl ? (
+                  <img
+                    src={fotoPerfilUrl}
+                    alt="Foto de Perfil"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <AvatarFallback className="bg-blue-600 text-white">
+                    {getUserInitials(userData?.nome ?? "")}
+                  </AvatarFallback>
+                )}
               </Avatar>
 
-              <button className="absolute bottom-2 right-2 bg-blue-600 p-2 rounded-full hover:bg-blue-700">
+              <label className="absolute bottom-2 right-2 cursor-pointer z-10 inline-flex items-center justify-center rounded-full bg-blue-600 p-2 hover:bg-blue-700">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFotoPerfilChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
                 <Image src="/images/icons/editar.svg" alt="editar" width={14} height={14} />
-              </button>
+              </label>
             </div>
-            <h2 className="mt-3 text-2xl font-semibold">{userData?.nome ?? "Usuário"}</h2>
+            <h2 className="mt-3 text-2xl font-semibold">
+              {userData?.nome ?? "Usuário"}
+            </h2>
           </div>
 
           <div className="mt-6 md:mt-0 ml-auto z-10 w-full md:w-auto flex flex-col md:flex-row gap-2 md:gap-3">
@@ -190,25 +297,33 @@ export default function PerfilPage() {
         <div className="px-6 md:px-8 lg:-mx-8 xl:-mx-2 2xl:-mx-2 gap-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 lg:gap-x-14 py-8">
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Gênero</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                Gênero
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {capitalize(userData?.genero ?? "")}
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Idade</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                Idade
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {userData?.idade ? `${userData.idade} Anos` : "—"}
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">Telefone</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                Telefone
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {formatTelefone(userData?.telefone)}
               </p>
             </div>
             <div className={fieldClasses}>
-              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">E-mail</p>
+              <p className="text-base lg:text-lg font-semibold opacity-60 mb-2">
+                E-mail
+              </p>
               <p className="text-lg font-semibold dark:text-white text-black">
                 {userData?.email ?? "—"}
               </p>
@@ -217,7 +332,6 @@ export default function PerfilPage() {
         </div>
       </div>
 
-      {/* Modais */}
       <DeleteAccountModal
         isOpen={deleteAccountModalOpen}
         onClose={() => setDeleteAccountModalOpen(false)}
