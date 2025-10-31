@@ -37,13 +37,16 @@ export default function Dashboard() {
         const respVerif = await verificarDiario(id);
 
         const jaRespondido =
-          respVerif?.ja_respondido === true || respVerif?.data?.ja_respondido === true;
+          respVerif?.ja_respondido === true ||
+          respVerif?.data?.ja_respondido === true;
 
         // Buscar e guardar histórico no estado
         const respHistorico = await historico(id);
         setHistoricoData(respHistorico);
 
-        const estatisticasResponse = await api.get(`/questionario/estatisticas/${id}`);
+        const estatisticasResponse = await api.get(
+          `/questionario/estatisticas/${id}`,
+        );
 
         setQuestionarioStatus({
           respondeuHoje: jaRespondido,
@@ -64,8 +67,8 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="ml-0 lg:ml-37.5 min-h-0 h-screen">
-      <div className="ml-o lg:ml-12.5 flex flex-col min-h-0 h-full">
+    <div className="ml-0 lg:ml-[150px] min-h-0 h-screen">
+      <div className="ml-0 lg:ml-[50px] flex flex-col min-h-0 h-full">
         <div className="flex-shrink-0">
           <h2 className="text-[30px] font-semibold mb-2 mt-2">
             Seu resumo de saúde mental semanal

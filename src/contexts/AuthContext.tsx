@@ -28,7 +28,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchUserData = async () => {
     try {
       const response = await authService.dadosUser();
-      setUser(response?.user ?? null);
+
+      const isRecord = (val: unknown): val is Record<string, unknown> =>
+        typeof val === "object" && val !== null;
+
+      const pickString = (
+        obj: Record<string, unknown>,
+        key: string,
+      ): string | undefined => {
+        const v = obj[key];
+        return typeof v === "string" ? v : undefined;
+      };
+
+      const raw = response && isRecord(response.user) ? response.user : null;
+
+      if (!raw) {
+        setUser(null);
+        return;
+      }
+
+      const fotoPerfilCandidate =
+        pickString(raw, "fotoPerfil") ||
+        pickString(raw, "foto_perfil_url") ||
+        pickString(raw, "foto_perfil") ||
+        pickString(raw, "fotoPerfilUrl") ||
+        null;
+
+      const normalized: UserData = {
+        id:
+          (raw["id"] as number | string | undefined) ??
+          (raw["user_id"] as number | string | undefined) ??
+          (raw["usuario_id"] as number | string | undefined),
+        nome: pickString(raw, "nome"),
+        email: pickString(raw, "email"),
+        data_nascimento: pickString(raw, "data_nascimento") ?? null,
+        idade:
+          typeof raw["idade"] === "number" ? (raw["idade"] as number) : null,
+        telefone: pickString(raw, "telefone") ?? null,
+        genero: pickString(raw, "genero") ?? null,
+        fotoPerfil: fotoPerfilCandidate,
+      };
+
+      setUser(normalized);
     } catch (err) {
       console.error("Erro ao carregar dados do usuário:", err);
       setUser(null);
@@ -44,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUserData = (newData: Partial<UserData>) => {
-    setUser(prev => prev ? { ...prev, ...newData } : null);
+    setUser((prev) => (prev ? { ...prev, ...newData } : null));
   };
 
   const getUserInitials = (name?: string) => {
@@ -57,7 +100,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // restore token on mount
-    const t = typeof window !== "undefined" ? localStorage.getItem("mt_token") : null;
+    const t =
+      typeof window !== "undefined" ? localStorage.getItem("mt_token") : null;
     if (t) {
       setToken(t);
       setAuthToken(t);
@@ -92,16 +136,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      token, 
-      user, 
-      loading, 
-      login, 
-      logout, 
-      fetchUserData, 
-      updateUserData, 
-      getUserInitials 
-    }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        loading,
+        login,
+        logout,
+        fetchUserData,
+        updateUserData,
+        getUserInitials,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

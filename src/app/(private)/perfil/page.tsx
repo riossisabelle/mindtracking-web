@@ -4,19 +4,22 @@ import Image from "next/image";
 import Sidebar from "@/components/layout/Sidebar";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import EditProfileModal from "@/components/common/Modals/perfil/editarPerfil";
 import DeleteAccountModal from "@/components/common/Modals/perfil/deletarConta";
 import VerifyCodeModal from "@/components/features/Auth/RedefinicaoSenha/VerificacaoCodigo";
 import ResetPasswordModal from "@/components/features/Auth/RedefinicaoSenha/AtualizacaoSenha";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { dadosUser, recuperarSenha } from "@/lib/api/auth";
-import api from "@/lib/api/axios"; 
+import api from "@/lib/api/axios";
 
-const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
+const CLOUDINARY_UPLOAD_PRESET =
+  process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
 const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 
 export default function PerfilPage() {
   const { darkMode } = useTheme();
+  const { updateUserData } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,8 +62,10 @@ export default function PerfilPage() {
         const resp = await dadosUser();
         setUserData(resp?.user ?? null);
 
-        if (resp?.user?.foto_perfil_url) setFotoPerfilUrl(resp.user.foto_perfil_url);
-        if (resp?.user?.foto_fundo_url) setFotoFundoUrl(resp.user.foto_fundo_url);
+        if (resp?.user?.foto_perfil_url)
+          setFotoPerfilUrl(resp.user.foto_perfil_url);
+        if (resp?.user?.foto_fundo_url)
+          setFotoFundoUrl(resp.user.foto_fundo_url);
       } catch (err) {
         console.error("Erro ao carregar perfil:", err);
         setUserData(null);
@@ -81,7 +86,8 @@ export default function PerfilPage() {
       if (!userDataString) throw new Error("Dados do usuário não encontrados");
 
       const userData = JSON.parse(userDataString);
-      if (!userData.email) throw new Error("Email não encontrado nos dados do usuário");
+      if (!userData.email)
+        throw new Error("Email não encontrado nos dados do usuário");
 
       await recuperarSenha({ email: userData.email });
       setVerifyCodeModalOpen(true);
@@ -130,8 +136,8 @@ export default function PerfilPage() {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-    console.log('CLOUDINARY_CLOUD_NAME:', CLOUDINARY_CLOUD_NAME);
-    console.log('CLOUDINARY_UPLOAD_PRESET:', CLOUDINARY_UPLOAD_PRESET);
+    console.log("CLOUDINARY_CLOUD_NAME:", CLOUDINARY_CLOUD_NAME);
+    console.log("CLOUDINARY_UPLOAD_PRESET:", CLOUDINARY_UPLOAD_PRESET);
     try {
       setUploading(true);
       const res = await fetch(
@@ -139,13 +145,17 @@ export default function PerfilPage() {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Cloudinary upload error status:', res.status, res.statusText);
-        console.error('Cloudinary upload error response:', errorText);
+        console.error(
+          "Cloudinary upload error status:",
+          res.status,
+          res.statusText,
+        );
+        console.error("Cloudinary upload error response:", errorText);
         throw new Error("Erro no upload");
       }
 
@@ -159,29 +169,40 @@ export default function PerfilPage() {
     }
   };
 
-  const updateFotoUsuario = async (body: Object) => {
-  try {
-    const resp = await api.put("/auth/profile", body);
+  type UpdateFotoPayload = Partial<{
+    foto_perfil_url: string;
+    foto_fundo_url: string;
+  }>;
 
-    if (resp.status !== 200) {
-      console.error("Erro ao atualizar foto no backend", resp);
+  const updateFotoUsuario = async (body: UpdateFotoPayload) => {
+    try {
+      const resp = await api.put("/auth/profile", body);
+
+      if (resp.status !== 200) {
+        console.error("Erro ao atualizar foto no backend", resp);
+      }
+    } catch (error) {
+      console.error("Erro na chamada backend:", error);
     }
-  } catch (error) {
-    console.error("Erro na chamada backend:", error);
-  }
-};
+  };
 
-  const handleFotoPerfilChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFotoPerfilChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     if (e.target.files && e.target.files[0]) {
       const url = await uploadToCloudinary(e.target.files[0]);
       if (url) {
         setFotoPerfilUrl(url);
         await updateFotoUsuario({ foto_perfil_url: url });
+        // Atualiza imediatamente o contexto para refletir na Sidebar
+        updateUserData({ fotoPerfil: url });
       }
     }
   };
 
-  const handleFotoFundoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFotoFundoChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     if (e.target.files && e.target.files[0]) {
       const url = await uploadToCloudinary(e.target.files[0]);
       if (url) {
@@ -200,10 +221,11 @@ export default function PerfilPage() {
           }`}
         >
           {fotoFundoUrl ? (
-            <img
+            <Image
               src={fotoFundoUrl}
               alt="Foto de Fundo"
-              className="w-full h-full object-cover object-bottom"
+              fill
+              className="object-cover object-bottom"
             />
           ) : (
             <Image
@@ -221,7 +243,12 @@ export default function PerfilPage() {
               onChange={handleFotoFundoChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
-            <Image src="/images/icons/camera.svg" alt="camera" width={14} height={14} />
+            <Image
+              src="/images/icons/camera.svg"
+              alt="camera"
+              width={14}
+              height={14}
+            />
           </label>
         </div>
 
@@ -229,17 +256,18 @@ export default function PerfilPage() {
           <div className="flex flex-col items-center md:items-start -mt-16 z-10">
             <div className="relative">
               <Avatar
-                className={`w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 text-2xl md:text-3xl lg:text-4xl font-bold border-4 ${
+                className={`w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 text-2xl md:text-3xl lg:text-4xl font-bold border-4 relative overflow-hidden ${
                   darkMode
                     ? "border-slate-800 bg-blue-600 text-white"
                     : "border-slate-50 bg-blue-600 text-white"
                 }`}
               >
                 {fotoPerfilUrl ? (
-                  <img
+                  <Image
                     src={fotoPerfilUrl}
                     alt="Foto de Perfil"
-                    className="w-full h-full object-cover rounded-full"
+                    fill
+                    className="object-cover"
                   />
                 ) : (
                   <AvatarFallback className="bg-blue-600 text-white">
@@ -255,7 +283,12 @@ export default function PerfilPage() {
                   onChange={handleFotoPerfilChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                <Image src="/images/icons/editar.svg" alt="editar" width={14} height={14} />
+                <Image
+                  src="/images/icons/editar.svg"
+                  alt="editar"
+                  width={14}
+                  height={14}
+                />
               </label>
             </div>
             <h2 className="mt-3 text-2xl font-semibold">
@@ -337,7 +370,10 @@ export default function PerfilPage() {
         onClose={() => setDeleteAccountModalOpen(false)}
         onDelete={handleAccountDeleted}
       />
-      <EditProfileModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <EditProfileModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
       <VerifyCodeModal
         isOpen={verifyCodeModalOpen}
         onClose={() => setVerifyCodeModalOpen(false)}
