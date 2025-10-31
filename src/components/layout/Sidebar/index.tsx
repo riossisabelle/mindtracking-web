@@ -32,11 +32,11 @@ const menuItems = [
 ];
 
 const bottomItems = [
-  { 
-    title: "Sair da conta", 
-    icon: <LogOut size={24} />, 
+  {
+    title: "Sair da conta",
+    icon: <LogOut size={24} />,
     href: null,
-    isLogout: true 
+    isLogout: true,
   },
 ];
 
@@ -69,7 +69,7 @@ export default function Sidebar({
       {/* Header mobile/tablet fixo no topo */}
       {!mobileOpen && (
         <div
-          className={`lg:hidden fixed top-9 left-0 right-0 z-50 flex items-center justify-between px-7 md:px-18.5 h-16 ${
+          className={`lg:hidden fixed top-9 left-0 right-0 z-50 flex items-center justify-between px-7 md:px-[74px] h-[64px] ${
             theme === "dark" ? "bg-gray-900" : "bg-white"
           } ${theme === "dark" ? "text-white" : "text-black"}`}
         >
@@ -111,8 +111,8 @@ export default function Sidebar({
           setIsOpen(false);
           onToggle?.(false);
         }}
-        className={`fixed left-0 top-0 h-screen shadow-lg border-r transition-all py-8.5 md ease-in-out duration-300 z-40
-        ${isOpen ? "w-100 pl-9" : "w-37.5"}
+        className={`fixed left-0 top-0 h-screen shadow-lg border-r transition-all py-[34px] ease-in-out duration-300 z-40
+        ${isOpen ? "w-[400px] pl-9" : "w-[150px]"}
         hidden lg:flex flex-col justify-between
         ${theme === "dark" ? "bg-gray-800 border-gray-600" : "bg-white border-gray-200"}`}
       >
@@ -179,7 +179,7 @@ export default function Sidebar({
             )}
           </button>
 
-          {bottomItems.map((item, idx) => (
+          {bottomItems.map((item, idx) =>
             item.isLogout ? (
               <button
                 key={idx}
@@ -192,7 +192,9 @@ export default function Sidebar({
                   {item.icon}
                 </span>
                 {isOpen && (
-                  <span className={`font-semibold text-[17px] md:text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <span
+                    className={`font-semibold text-[17px] md:text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  >
                     {item.title}
                   </span>
                 )}
@@ -207,26 +209,27 @@ export default function Sidebar({
                 theme={theme}
                 className="whitespace-nowrap"
               />
-            )
-          ))}
+            ),
+          )}
 
           <div
             className={`flex px-3 mt-4 ${isOpen ? "justify-start" : "justify-center"}`}
           >
             <Link href="/perfil" aria-label="Ir para o perfil">
-              <Avatar 
-                className={`w-15 h-15 cursor-pointer border-none ${
+              <Avatar
+                className={`${isOpen ? "w-[60px] h-[60px]" : "w-[60px] h-[60px]"} cursor-pointer border-none ${
                   theme === "dark" ? "border-gray-600" : "border-gray-200"
                 }`}
               >
-                <AvatarImage 
-                  src={user?.fotoPerfil || undefined} 
-                  alt={user?.nome || "Usuário"} 
+                <AvatarImage
+                  src={user?.fotoPerfil || undefined}
+                  alt={user?.nome || "Usuário"}
+                  className="object-cover"
                 />
-                <AvatarFallback 
+                <AvatarFallback
                   className={`text-sm font-semibold ${
-                    theme === "dark" 
-                      ? "bg-blue-600 text-white" 
+                    theme === "dark"
+                      ? "bg-blue-600 text-white"
                       : "bg-blue-600 text-white"
                   }`}
                 >
@@ -244,7 +247,7 @@ export default function Sidebar({
           onClick={() => setMobileOpen(false)}
         >
           <aside
-            className={`fixed top-0 h-full left-0 w-75 flex flex-col ${theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-[#0F172A]"} pt-7 z-50`}
+            className={`fixed top-0 h-full left-0 w-[300px] flex flex-col ${theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-[#0F172A]"} pt-7 z-50`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6 px-5">
@@ -308,7 +311,7 @@ export default function Sidebar({
               </button>
 
               <div className="mt-0">
-                {bottomItems.map((item, idx) => (
+                {bottomItems.map((item, idx) =>
                   item.isLogout ? (
                     <button
                       key={idx}
@@ -319,10 +322,12 @@ export default function Sidebar({
                       className={`flex items-center gap-3 p-3 mx-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer
                         ${theme === "dark" ? "text-gray-100 hover:bg-gray-700" : "text-[#0F172A] hover:bg-gray-100"}`}
                     >
-                      <span className="shrink-0 w-6 h-6 flex items-center justify-center">
+                      <span className="shrink-0 w-[80px] h-[80px] flex items-center justify-center">
                         {item.icon}
                       </span>
-                      <span className={`font-semibold text-[17px] md:text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                      <span
+                        className={`font-semibold text-[17px] md:text-[22px] whitespace-nowrap ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                      >
                         {item.title}
                       </span>
                     </button>
@@ -337,25 +342,25 @@ export default function Sidebar({
                       className="whitespace-nowrap"
                       onClick={() => setMobileOpen(false)}
                     />
-                  )
-                ))}
+                  ),
+                )}
               </div>
 
               <div className="flex px-5 mt-4 justify-start">
                 <Link href="/perfil" aria-label="Ir para o perfil">
-                  <Avatar 
+                  <Avatar
                     className={`w-14 h-14 md:w-16 md:h-16 cursor-pointer border-2 ${
                       theme === "dark" ? "border-gray-600" : "border-gray-200"
                     }`}
                   >
-                    <AvatarImage 
-                      src={user?.fotoPerfil || undefined} 
-                      alt={user?.nome || "Usuário"} 
+                    <AvatarImage
+                      src={user?.fotoPerfil || undefined}
+                      alt={user?.nome || "Usuário"}
                     />
-                    <AvatarFallback 
+                    <AvatarFallback
                       className={`text-sm md:text-base font-semibold ${
-                        theme === "dark" 
-                          ? "bg-blue-600 text-white" 
+                        theme === "dark"
+                          ? "bg-blue-600 text-white"
                           : "bg-blue-600 text-white"
                       }`}
                     >
