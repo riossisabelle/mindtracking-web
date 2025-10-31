@@ -72,7 +72,7 @@ export default function Footer() {
               <h2 className="font-semibold text-lg whitespace-nowrap  lg:font-semibold md:font-semibold">
                 Nossas Redes & Comunidades
               </h2>
-              <div className="flex space-x-10 md:space-x-8 lg:space-x-16">
+              <div className="flex space-x-10 md:space-x-[32px] lg:space-x-[72px]">
                 <a
                   href="https://www.facebook.com/share/p/1BLJcL6khd/?mibextid=wwXIfr"
                   target="_blank"
