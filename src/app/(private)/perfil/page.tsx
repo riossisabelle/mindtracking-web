@@ -221,10 +221,11 @@ export default function PerfilPage() {
           }`}
         >
           {fotoFundoUrl ? (
-            <img
+            <Image
               src={fotoFundoUrl}
               alt="Foto de Fundo"
-              className="w-full h-full object-cover object-bottom"
+              fill
+              className="object-cover object-bottom"
             />
           ) : (
             <Image
@@ -255,17 +256,18 @@ export default function PerfilPage() {
           <div className="flex flex-col items-center md:items-start -mt-16 z-10">
             <div className="relative">
               <Avatar
-                className={`w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 text-2xl md:text-3xl lg:text-4xl font-bold border-4 ${
+                className={`w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 text-2xl md:text-3xl lg:text-4xl font-bold border-4 relative overflow-hidden ${
                   darkMode
                     ? "border-slate-800 bg-blue-600 text-white"
                     : "border-slate-50 bg-blue-600 text-white"
                 }`}
               >
                 {fotoPerfilUrl ? (
-                  <img
+                  <Image
                     src={fotoPerfilUrl}
                     alt="Foto de Perfil"
-                    className="w-full h-full object-cover rounded-full"
+                    fill
+                    className="object-cover"
                   />
                 ) : (
                   <AvatarFallback className="bg-blue-600 text-white">
